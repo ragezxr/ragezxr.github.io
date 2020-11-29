@@ -1,2 +1,0 @@
-# ragezxr.github.io
-RageRacer
