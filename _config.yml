@@ -1,3 +1,2 @@
 theme: jekyll-theme-slate
-body: __Start__.html
-[__Start__.html](__Start__.html)
+index: __Start__.html
