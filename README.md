@@ -1,8 +1,8 @@
 ## Welcome to GitHub Pages
 
-You can use the [editor on GitHub](https://github.com/ragezxr/ragezxr.github.io/edit/main/README.md) to maintain and preview the content for your website in Markdown files.
+[editor on GitHub](https://github.com/ragezxr/ragezxr.github.io/edit/main/README.md) 사용하여 Markdown 파일에서 웹 사이트의 콘텐츠를 유지하고 미리 볼 수 있습니다.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+이 저장소에 커밋 할 때마다 GitHub Pages는 [Jekyll](https://jekyllrb.com/) 을 실행 하여 Markdown 파일의 콘텐츠에서 사이트의 페이지를 다시 빌드합니다. 
 
 ### Markdown
 
