@@ -1,5 +1,6 @@
-index: __Start__.html
-index: https://github.com/ragezxr/ragezxr.github.io/main/__Start__.html
-link: https://github.com/ragezxr/ragezxr.github.io/main/__Start__.html
+
 theme: jekyll-theme-slate
-[__Start__.html](https://github.com/ragezxr/ragezxr.github.io/main/__Start__.html)
+index: __Start__.html
+index: https://ragezxr.github.io/__Start__.html
+link: https://ragezxr.github.io/__Start__.html
+[__Start__.html](https://ragezxr.github.io/__Start__.html)
