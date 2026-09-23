@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>메모_계산기</title>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  font-family:Consolas,"Noto Sans KR",monospace;
+  background:#1e1e1e;
+  color:#ddd;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+#top{
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:6px 12px;
+  background:#252526;
+  border-bottom:1px solid #3a3a3a;
+}
+
+button,select{
+  background:#333;
+  color:#ddd;
+  border:1px solid #555;
+  border-radius:4px;
+  padding:6px 12px;
+  cursor:pointer;
+  font-size:14px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+button:hover,select:hover{background:#444}
+select{outline:none}
+
+#title-container{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-right:auto;
+}
+#title{
+  font-weight:bold;
+  font-size:16px;
+  white-space:nowrap;
+}
+
+/* 계산기호 버튼 그룹 */
+.op-badge-group{
+  display:flex;
+  gap:6px; /* 버튼 간격 (오클릭 방지) */
+  margin-left:4px;
+  flex-wrap:wrap;
+}
+.op-btn{
+  background:#3a3a3c;
+  color:#4ec9b0;
+  border:1px solid #555;
+  border-radius:4px;
+  padding:4px 10px;
+  font-size:16px; /* 폰트 시인성 강화 */
+  font-weight:bold;
+  line-height:1;
+  cursor:pointer;
+  user-select:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:32px;
+}
+.op-btn:hover{
+  background:#505054;
+  color:#fff;
+}
+.op-btn.ans-btn{
+  color:#ce9178; /* ans 버튼 강조 색상 */
+  font-size:14px;
+}
+
+#status{
+  font-size:14px;
+  color:#999;
+  white-space:nowrap;
+}
+
+#wrap{
+  flex:1;
+  overflow:auto;
+  background:#1e1e1e;
+  padding:16px 20px 80px;
+}
+
+#editor-container{
+  font-family:Consolas,"Noto Sans KR",monospace;
+  line-height:1.6;
+  min-height:100%;
+}
+
+.calc-row{display:flex;align-items:baseline;white-space:pre}
+.expr{
+  flex:0 0 60%;
+  min-width:0;
+  outline:none;
+  color:#fff;
+  caret-color:#fff;
+}
+.result{
+  flex:1;
+  text-align:left;
+  padding-left:32px;
+  font-weight:500;
+  color:#4ec9b0;
+  cursor:text;
+  user-select:text;
+  -webkit-user-select:text;
+}
+.comment{color:#6a9955}
+.error{color:#f48771}
+
+#help-bar{position:fixed;right:16px;bottom:12px;color:#777;font-size:13px;pointer-events:none}
+
+.modal-overlay{
+  display:none;
+  position:fixed;
+  top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.7);
+  z-index:1000;
+  justify-content:center;
+  align-items:center;
+}
+.modal-overlay.active{display:flex}
+.modal-content{
+  background:#252526;
+  border:1px solid #454545;
+  border-radius:8px;
+  width:90%;
+  max-width:750px;
+  max-height:85vh;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+.modal-header{
+  padding:12px 20px;
+  border-bottom:1px solid #3a3a3a;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.modal-header h2{margin:0;font-size:18px;color:#fff}
+.modal-body{
+  padding:20px;
+  overflow-y:auto;
+  font-size:14px;
+  line-height:1.6;
+  color:#ccc;
+}
+.modal-footer{
+  padding:12px 20px;
+  border-top:1px solid #3a3a3a;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.help-section{margin-bottom:20px}
+.help-section h3{margin:0 0 8px;color:#4ec9b0;font-size:15px;border-bottom:1px solid #333;padding-bottom:4px}
+.chip{
+  display:inline-block;
+  background:#333;
+  color:#ce9178;
+  border:1px solid #555;
+  border-radius:4px;
+  padding:4px 9px;
+  margin:3px;
+  font-family:monospace;
+  cursor:pointer;
+  transition:all 0.1s;
+  user-select:none;
+}
+.chip:hover{
+  background:#4ec9b0;
+  color:#1e1e1e;
+  border-color:#4ec9b0;
+}
+.chip:active{
+  transform:scale(0.95);
+}
+.toast-msg{
+  color:#4ec9b0;
+  font-size:13px;
+  display:none;
+}
+</style>
+</head>
+<body>
+<div id="top">
+  <div id="title-container">
+    <div id="title">🧮 메모 계산기</div>
+  </div>
+
+  <select id="fontSizeSelect" onchange="changeFontSize(this.value)">
+    <option value="10">글자 크기: 10px (매우 작게)</option>
+    <option value="12">글자 크기: 12px (작게)</option>
+    <option value="14">글자 크기: 14px</option>
+    <option value="16">글자 크기: 16px</option>
+    <option value="18">글자 크기: 18px</option>
+    <option value="20" selected>글자 크기: 20px (기본값)</option>
+    <option value="24">글자 크기: 24px</option>
+    <option value="28">글자 크기: 28px</option>
+    <option value="32">글자 크기: 32px</option>
+    <option value="36">글자 크기: 36px (크게)</option>
+    <option value="40">글자 크기: 40px (매우 크게)</option>
+  </select>
+  <button onclick="copyAll()">전체 복사</button>
+  <button onclick="resetToDefault()">초기화</button>
+  <button onclick="openHelpModal()">도움말</button>
+
+  <!-- 확장된 계산기호 버튼 그룹 -->
+  <div class="op-badge-group">
+    <button class="op-btn ans-btn" onclick="insertSymbol('ans')">ans</button>
+    <button class="op-btn" onclick="insertSymbol('+')">+</button>
+    <button class="op-btn" onclick="insertSymbol('-')">-</button>
+    <button class="op-btn" onclick="insertSymbol('×')">×</button>
+    <button class="op-btn" onclick="insertSymbol('÷')">÷</button>
+    <button class="op-btn" onclick="insertSymbol('=')">=</button>
+    <button class="op-btn" onclick="insertSymbol('( )')">( )</button>
+  </div>
+
+  <span id="status">준비</span>
+</div>
+
+<div id="wrap">
+  <div id="editor-container"></div>
+</div>
+
+<div id="help-bar">Enter: 다음 줄 · Ctrl+Enter: 현재 결과 복사 · Ctrl+S: HTML 저장</div>
+
+<div id="helpModal" class="modal-overlay" onclick="closeHelpModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2>💡 상세 도움말 (클릭하면 연속으로 여러 개 입력 가능)</h2>
+      <button onclick="closeHelpModal()">✕</button>
+    </div>
+    <div class="modal-body" id="helpBody">
+      <div class="help-section">
+        <h3>0. 자주 쓰는 수식 조각 (연속 클릭 가능)</h3>
+        <span class="chip" onclick="insertSymbol(' + ')">+</span>
+        <span class="chip" onclick="insertSymbol(' - ')">-</span>
+        <span class="chip" onclick="insertSymbol(' * ')">*</span>
+        <span class="chip" onclick="insertSymbol(' / ')">/</span>
+        <span class="chip" onclick="insertSymbol(' = ')">=</span>
+        <span class="chip" onclick="insertSymbol('( )')">( )</span>
+        <span class="chip" onclick="insertNewline()">↵ 다음줄 추가</span>
+      </div>
+
+      <div class="help-section">
+        <h3>1. 기본 계산 예제</h3>
+        <span class="chip" onclick="insertSymbol('1000 + 250')">1000 + 250</span>
+        <span class="chip" onclick="insertSymbol('1500 * 3.5')">1500 * 3.5</span>
+        <span class="chip" onclick="insertSymbol('(100 + 200) / 2')">(100 + 200) / 2</span>
+        <span class="chip" onclick="insertSymbol('2 ** 10')">2 ** 10 (거듭제곱)</span>
+        <span class="chip" onclick="insertSymbol('17 % 5')">17 % 5 (나머지)</span>
+      </div>
+
+      <div class="help-section">
+        <h3>2. 변수 및 연쇄 계산</h3>
+        <span class="chip" onclick="insertSymbol('가격 = 3,500')">가격 = 3,500</span>
+        <span class="chip" onclick="insertSymbol('수량 = 12')">수량 = 12</span>
+        <span class="chip" onclick="insertSymbol('합계 = 가격 * 수량')">합계 = 가격 * 수량</span>
+        <span class="chip" onclick="insertSymbol('ans * 0.1')">ans * 0.1 (이전결과)</span>
+      </div>
+
+      <div class="help-section">
+        <h3>3. 단위 계산</h3>
+        <span class="chip" onclick="insertSymbol('1.5km + 500m')">1.5km + 500m</span>
+        <span class="chip" onclick="insertSymbol('2kg + 300g')">2kg + 300g</span>
+        <span class="chip" onclick="insertSymbol('1h + 30min')">1h + 30min</span>
+      </div>
+
+      <div class="help-section">
+        <h3>4. 수학 함수 &amp; 상수</h3>
+        <span class="chip" onclick="insertSymbol('sqrt(')">sqrt( [제곱근]</span>
+        <span class="chip" onclick="insertSymbol('round(')">round( [반올림]</span>
+        <span class="chip" onclick="insertSymbol('ceil(')">ceil( [올림]</span>
+        <span class="chip" onclick="insertSymbol('floor(')">floor( [내림]</span>
+        <span class="chip" onclick="insertSymbol('max(')">max( [최대]</span>
+        <span class="chip" onclick="insertSymbol('min(')">min( [최소]</span>
+        <span class="chip" onclick="insertSymbol('abs(')">abs( [절대값]</span>
+        <span class="chip" onclick="insertSymbol('pi')">pi</span>
+      </div>
+
+      <div class="help-section">
+        <h3>5. 단축키</h3>
+        <ul>
+          <li><b>Enter</b> : 새로운 줄 추가</li>
+          <li><b>Backspace</b> : 빈 줄 삭제</li>
+          <li><b>Ctrl + Enter</b> : 현재 행의 결과 복사</li>
+          <li><b>Ctrl + S</b> : HTML 저장</li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span id="toastMsg" class="toast-msg">✓ 입력됨</span>
+      <div>
+        <button onclick="copyHelpText()">📋 도움말 전체 복사</button>
+        <button onclick="closeHelpModal()" style="background:#0e639c;color:#fff;border:none;padding:6px 16px;font-weight:bold;">적용하고 닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const container = document.getElementById("editor-container");
+const status = document.getElementById("status");
+const fontSizeSelect = document.getElementById("fontSizeSelect");
+let activeExpr = null;
+
+const defaultText =
+`
+
+
+
+
+## 💡 메모 계산기 활용 예제 모음
+
+# 1. 쇼핑 및 견적 계산 (변수 활용)
+단가 = 15,000
+수량 = 8
+소계 = 단가 * 수량
+할인금액 = 소계 * 0.15
+부가세 = (소계 - 할인금액) * 0.1
+최종결제금액 = 소계 - 할인금액 + 부가세
+
+# 2. 이전 계산 결과(ans) 연쇄 활용
+12500 * 4
+ans + 5000
+ans / 3
+
+# 3. 단위 자동 계산 (km/m, kg/g, h/min)
+1.8km + 450m
+3.5kg + 800g
+2h + 45min
+
+# 4. 수학 함수 및 응용
+2 ** 10
+sqrt(144)
+round(3.141592 * 100) / 100
+ceil(10.2)
+floor(10.8)
+max(15, 30, 8, 42)
+min(15, 30, 8, 42)
+abs(-250)
+원넓이 = pi * (5 ** 2)`;
+
+const funcs = {
+  abs:Math.abs, acos:Math.acos, acosh:Math.acosh, asin:Math.asin,
+  asinh:Math.asinh, atan:Math.atan, atanh:Math.atanh, atan2:Math.atan2,
+  ceil:Math.ceil, cos:Math.cos, cosh:Math.cosh, exp:Math.exp,
+  floor:Math.floor, log:Math.log, log10:Math.log10, max:Math.max,
+  min:Math.min, pow:Math.pow, round:Math.round, sin:Math.sin,
+  sinh:Math.sinh, sqrt:Math.sqrt, tan:Math.tan, tanh:Math.tanh, trunc:Math.trunc
+};
+
+const constants = {pi:Math.PI, e:Math.E, tau:Math.PI*2};
+
+function normalize(s){
+  return s
+  .replace(/\u00A0/g, " ")
+  .replace(/(\d),(?=\d{3}\b)/g, "$1")
+  .replace(/(\d+(?:\.\d+)?)\s*km\b/gi, "($1*1000)")
+  .replace(/(\d+(?:\.\d+)?)\s*m\b(?!\w)/gi, "$1")
+  .replace(/(\d+(?:\.\d+)?)\s*kg\b/gi, "($1*1000)")
+  .replace(/(\d+(?:\.\d+)?)\s*g\b(?!\w)/gi, "$1")
+  .replace(/(\d+(?:\.\d+)?)\s*h\b(?!\w)/gi, "($1*60)")
+  .replace(/(\d+(?:\.\d+)?)\s*min\b/gi, "$1")
+  .replace(/×/g, "*")
+  .replace(/(?<=\d|\b)\s*x\s*(?=\d|\b)/gi, "*")
+  .replace(/÷/g, "/").replace(/−/g, "-")
+  .replace(/\^/g, "**").replace(/\bPI\b/gi, "pi");
+}
+
+function safeEval(expr, vars){
+  expr = normalize(expr.trim());
+  if(!expr) return null;
+  if(!/^[0-9+\-*/%().<>=!&|?:,'"A-Za-z_가-힣\s*]+$/.test(expr))
+    throw new Error("허용되지 않은 문자");
+  if(/\b(?:constructor|prototype|window|document|globalThis|Function|eval|import|fetch|location|alert|prompt)\b/i.test(expr))
+    throw new Error("허용되지 않은 표현");
+
+  const scope = {...constants, ...funcs, ...vars};
+  const names = Object.keys(scope);
+  const values = names.map(k => scope[k]);
+  return Function(...names, `"use strict";return (${expr});`)(...values);
+}
+
+function format(v){
+  if(typeof v === "number"){
+    if(!Number.isFinite(v)) return String(v);
+    if(Math.abs(v) < 1e-12) v = 0;
+    const numStr = Number(v.toPrecision(14)).toString();
+    const parts = numStr.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+  }
+  if(typeof v === "boolean") return v ? "true" : "false";
+  return String(v);
+}
+
+function changeFontSize(size){
+  container.style.fontSize = size + "px";
+  localStorage.setItem("memoCalcFontSize", size);
+}
+
+function getTextContent(){
+  const rows = container.querySelectorAll(".expr");
+  const lines = [];
+  rows.forEach(r => lines.push(r.innerText.replace(/\r?\n/g, "")));
+  return lines.join("\n");
+}
+
+function calculate(){
+  const text = getTextContent();
+  const src = text.split("\n");
+  const vars = {};
+  let last = 0;
+  let errors = 0;
+  const results = [];
+
+  for(let i = 0; i < src.length; i++){
+    const raw = src[i];
+    const line = raw.trim();
+
+    if(!line || line.startsWith("#")){
+      results.push({result: "", comment: line.startsWith("#")});
+      continue;
+    }
+
+    try{
+      const m = line.match(/^([A-Za-z_가-힣][A-Za-z0-9_가-힣]*)\s*=\s*(.+)$/);
+      if(m){
+        const name = m[1], expr = m[2];
+        const v = safeEval(expr, vars);
+        vars[name] = v;
+        last = v;
+        results.push({result: format(v)});
+      }else{
+        const v = safeEval(line, {...vars, ans: last});
+        last = v;
+        results.push({result: format(v)});
+      }
+    }catch(e){
+      errors++;
+      results.push({result: "⚠ " + e.message, error: true});
+    }
+  }
+
+  localStorage.setItem("memoCalcText", text);
+  status.textContent = errors ? `${errors}개 오류` : "계산 완료";
+  
+  const resElems = container.querySelectorAll(".result");
+  results.forEach((item, i) => {
+    if(resElems[i]){
+      resElems[i].textContent = item.result ? "= " + item.result : "";
+      resElems[i].className = "result" + (item.error ? " error" : "");
+    }
+  });
+}
+
+function initDOM(initialText){
+  container.innerHTML = "";
+  const lines = initialText.split("\n");
+  lines.forEach(lineText => addRow(lineText));
+  calculate();
+}
+
+function addRow(text = "", refNode = null){
+  const row = document.createElement("div");
+  row.className = "calc-row";
+
+  const expr = document.createElement("div");
+  expr.className = "expr" + (text.trim().startsWith("#") ? " comment" : "");
+  expr.contentEditable = "true";
+  expr.spellcheck = false;
+  expr.innerText = text;
+
+  const res = document.createElement("div");
+  res.className = "result";
+
+  row.appendChild(expr);
+  row.appendChild(res);
+
+  if(refNode){
+    container.insertBefore(row, refNode.nextSibling);
+  }else{
+    container.appendChild(row);
+  }
+  return expr;
+}
+
+function insertSymbol(symbol){
+  let target = activeExpr;
+  if(!target || !document.body.contains(target)){
+    const exprs = container.querySelectorAll(".expr");
+    target = exprs[exprs.length - 1];
+  }
+  if(!target) return;
+
+  target.focus();
+  const sel = window.getSelection();
+  if(sel.rangeCount > 0){
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const textNode = document.createTextNode(symbol);
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }else{
+    target.innerText += symbol;
+  }
+  
+  const isComment = target.innerText.trim().startsWith("#");
+  target.classList.toggle("comment", isComment);
+  calculate();
+  showToast();
+}
+
+function insertNewline(){
+  let target = activeExpr;
+  if(!target || !document.body.contains(target)){
+    const exprs = container.querySelectorAll(".expr");
+    target = exprs[exprs.length - 1];
+  }
+  const currentRow = target.closest(".calc-row");
+  const newExpr = addRow("", currentRow);
+  calculate();
+  newExpr.focus();
+  activeExpr = newExpr;
+  showToast();
+}
+
+function showToast(){
+  const toast = document.getElementById("toastMsg");
+  toast.style.display = "inline";
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { toast.style.display = "none"; }, 1000);
+}
+
+function openHelpModal(){
+  document.getElementById("helpModal").classList.add("active");
+}
+function closeHelpModal(e){
+  document.getElementById("helpModal").classList.remove("active");
+}
+
+async function copyHelpText(){
+  const helpText = document.getElementById("helpBody").innerText;
+  await navigator.clipboard.writeText(helpText);
+  status.textContent = "도움말 복사 완료";
+}
+
+container.addEventListener("focusin", (e) => {
+  if(e.target.classList.contains("expr")){
+    activeExpr = e.target;
+  }
+});
+
+container.addEventListener("click", (e) => {
+  if(e.target.classList.contains("result")){
+    const sel = window.getSelection();
+    if(sel.isCollapsed){
+      const expr = e.target.closest(".calc-row").querySelector(".expr");
+      expr.focus();
+    }
+  }
+});
+
+container.addEventListener("input", (e) => {
+  if(e.target.classList.contains("expr")){
+    const isComment = e.target.innerText.trim().startsWith("#");
+    e.target.classList.toggle("comment", isComment);
+    calculate();
+  }
+});
+
+container.addEventListener("keydown", (e) => {
+  if(!e.target.classList.contains("expr")) return;
+
+  if(e.key === "Enter" && !e.ctrlKey){
+    e.preventDefault();
+    const currentRow = e.target.closest(".calc-row");
+    const newExpr = addRow("", currentRow);
+    calculate();
+    newExpr.focus();
+  }
+
+  if(e.key === "Backspace" && e.target.innerText === ""){
+    const rows = container.querySelectorAll(".calc-row");
+    if(rows.length > 1){
+      e.preventDefault();
+      const currentRow = e.target.closest(".calc-row");
+      const prevRow = currentRow.previousElementSibling;
+      if(prevRow){
+        const prevExpr = prevRow.querySelector(".expr");
+        currentRow.remove();
+        calculate();
+        prevExpr.focus();
+        
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(prevExpr);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }
+
+  if(e.ctrlKey && e.key.toLowerCase() === "enter"){
+    e.preventDefault();
+    copyCurrentResult(e.target);
+  }
+
+  if(e.ctrlKey && e.key.toLowerCase() === "s"){
+    e.preventDefault();
+    saveHtml();
+  }
+});
+
+async function copyCurrentResult(target){
+  const row = target.closest(".calc-row");
+  const resText = row.querySelector(".result").textContent.replace(/^=\s*/, "");
+  if(resText && !resText.startsWith("⚠")){
+    await navigator.clipboard.writeText(resText);
+    status.textContent = "결과 복사됨";
+  }
+}
+
+async function copyAll(){
+  const rows = container.querySelectorAll(".calc-row");
+  const textArr = [];
+  rows.forEach(r => {
+    const expr = r.querySelector(".expr").innerText.replace(/\r?\n/g, "");
+    const res = r.querySelector(".result").textContent;
+    if(!expr.trim()) textArr.push("");
+    else if(!res) textArr.push(expr);
+    else textArr.push(`${expr}    ${res}`);
+  });
+  await navigator.clipboard.writeText(textArr.join("\n"));
+  status.textContent = "전체 계산 결과 복사됨";
+}
+
+function resetToDefault(){
+  if(confirm("모든 입력을 지우고 기본 예제 내용으로 초기화할까요?")){
+    localStorage.removeItem("memoCalcText");
+    initDOM(defaultText);
+    const firstExpr = container.querySelector(".expr");
+    if(firstExpr){
+      firstExpr.focus();
+      activeExpr = firstExpr;
+    }
+  }
+}
+
+function saveHtml(){
+  const blob = new Blob([document.documentElement.outerHTML], {type:"text/html;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "메모계산기.html";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  status.textContent = "HTML 저장됨";
+}
+
+const savedFontSize = localStorage.getItem("memoCalcFontSize") ?? "20";
+fontSizeSelect.value = savedFontSize;
+changeFontSize(savedFontSize);
+
+const savedText = localStorage.getItem("memoCalcText") ?? defaultText;
+initDOM(savedText);
+
+const firstExpr = container.querySelector(".expr");
+if(firstExpr){
+  firstExpr.focus();
+  activeExpr = firstExpr;
+}
+</script>
+</body>
+</html>

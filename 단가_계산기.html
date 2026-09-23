@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>단가_계산기</title>
+<style>
+  body { 
+    font-family:"Malgun Gothic",Arial,sans-serif; 
+    margin:0; 
+    background:#121212; 
+    color:#888888; 
+  }
+  .wrap { max-width:370px; margin:10px auto; padding:0 8px; }
+  .card { 
+    background:#1e1e1e; 
+    border-radius:12px; 
+    padding:14px; 
+    box-shadow:0 4px 15px rgba(0,0,0,.5); 
+    border:1px solid #2c2c2c;
+  }
+  
+  h1 { margin:0 0 10px; font-size:17px; color:#888888; text-align:center; }
+  .grid { display:flex; flex-direction:column; gap:8px; }
+  
+  .field { 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    gap:8px; 
+  }
+  
+  label { 
+    font-size:13px; 
+    font-weight:700; 
+    color:#aaaaaa; 
+    white-space:nowrap; 
+    width:120px; 
+    margin:0;
+  }
+  
+  input, button { 
+    box-sizing:border-box; 
+    padding:6px 10px; 
+    border:1px solid #5c5c5c; 
+    border-radius:6px; 
+    font-size:14px; 
+    background:#4a4a4a; 
+    color:#dddddd; 
+  }
+  
+  /* 입력칸 Placeholder */
+  input::placeholder {
+    color: #8294a8;
+    opacity: 1;
+  }
+
+  .field input {
+    flex:1; 
+    width:auto;
+  }
+
+  .sub-group {
+    border: 1px solid #262626; 
+    background: #181818; 
+    border-radius: 8px;
+    padding: 8px 6px; 
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .unit-selector {
+    display: flex;
+    flex: 1;
+    gap: 4px;
+  }
+  .unit-btn {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    background: #454545;
+    border: 1px solid #5c5c5c;
+    border-radius: 6px;
+    color: #8bb3e6; 
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s ease;
+  }
+  .unit-btn:hover { background: #525252; color: #a3c4f3; }
+  .unit-btn.active {
+    background: #172a45;
+    border-color: #254b7c;
+    color: #7ba3d0; 
+    font-weight: 700;
+  }
+  
+  /* 커서 입력 상태(Focus) 시 외곽선 색상을 어두운 녹색 계열로 변경 */
+  input:focus { 
+    outline: 1.5px solid #10b981; 
+    border-color: #047857; 
+  }
+
+  /* 하단 숫자 키패드 */
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-top: 10px;
+    background: #161616;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #262626;
+  }
+  
+  .key-btn {
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 700;
+    background: #2d2d2d; 
+    border: 1px solid #383838;
+    border-radius: 6px;
+    color: #999999; 
+    cursor: pointer;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.05s;
+  }
+  
+  .key-btn:hover { background: #202020; color: #777777; border-color: #2a2a2a; }
+  .key-btn:active { background: #181818; color: #555555; transform: scale(0.97); }
+
+  .key-btn.action-key {
+    background: #2e1e1e;
+    color: #ba7575;
+    border-color: #402828;
+    font-size: 13px;
+  }
+  .key-btn.action-key:hover {
+    background: #201414;
+    color: #8c5252;
+    border-color: #2e1c1c;
+  }
+
+  /* 2칸 차지 세로 대형 버튼 스타일 (초기화, 계산) */
+  .key-btn.large-key {
+    grid-row: span 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .key-btn.clear-key-large {
+    background: #2e1e1e;
+    color: #ba7575;
+    border-color: #402828;
+  }
+  .key-btn.clear-key-large:hover {
+    background: #201414;
+    color: #8c5252;
+    border-color: #2e1c1c;
+  }
+
+  .key-btn.calc-key-large {
+    background: #1e3556;
+    color: #8cb7e8;
+    border-color: #2d568c;
+    font-size: 15px;
+  }
+  .key-btn.calc-key-large:hover { background: #132238; color: #638cb8; border-color: #1f3b61; }
+
+  /* 다음으로 버튼 (3칸 차지) */
+  .key-btn.next-key {
+    grid-column: span 3;
+    background: #252d38;
+    color: #9cb2cd;
+    border-color: #354354;
+    font-size: 14px;
+  }
+  .key-btn.next-key:hover {
+    background: #1a2028;
+    color: #7b93b0;
+    border-color: #263240;
+  }
+  
+  button.action-btn { 
+    width:100%;
+    cursor:pointer; 
+    font-weight:700; 
+    background:#222222; 
+    color:#777777; 
+    border:1px solid #2d2d2d; 
+    transition: background 0.2s, color 0.2s;
+  }
+  button.action-btn:hover { background:#2a2a2a; color:#aaaaaa; }
+
+  button.copied { 
+    background:#064e3b !important; 
+    color:#a7f3d0 !important; 
+    border-color:#047857 !important;
+  }
+
+  .result { 
+    margin-top:10px; 
+    padding:10px; 
+    background:#181818; 
+    border-radius:8px; 
+    border:1px solid #282828;
+  }
+  .row { 
+    display:flex; 
+    justify-content:space-between; 
+    gap:8px; 
+    padding:4px 0; 
+    border-bottom:1px solid #252525; 
+    font-size:13.5px;
+  }
+  .row span { color: #aaaaaa; font-weight: 600; }
+  .row strong { color: #999999; }
+  .row:last-child { border-bottom:0; }
+  .big { font-size:16px; font-weight:800; color:#60a5fa !important; }
+  .copybox { margin-top:8px; }
+  
+  .copyline { 
+    background:#0f0f0f; 
+    border:1px solid #3d3d3d; 
+    padding:8px; 
+    border-radius:6px; 
+    word-break:break-all; 
+    font-weight:700; 
+    font-size:13.5px; 
+    color:#ffffff; 
+    text-align:center;
+  }
+  
+  /* 결과값 힌트 모드 */
+  .copyline.hint-mode { 
+    color: #8294a8; 
+    font-weight: 600; 
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🧺 #단가(100g·100ml) 계산기</h1>
+
+    <div class="grid">
+      <div class="sub-group">
+        <div class="field">
+          <label>1. 개당 단위</label>
+          <div class="unit-selector">
+            <button type="button" class="unit-btn active" data-unit="g" onclick="selectUnit('g')">g</button>
+            <button type="button" class="unit-btn" data-unit="kg" onclick="selectUnit('kg')">kg</button>
+            <button type="button" class="unit-btn" data-unit="ml" onclick="selectUnit('ml')">ml</button>
+            <button type="button" class="unit-btn" data-unit="l" onclick="selectUnit('l')">L</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label id="amountLabel">2. 개당 (g)</label>
+          <input id="amount" type="text" inputmode="decimal" placeholder="개당 (g)" autofocus autocomplete="off">
+        </div>
+      </div>
+
+      <div class="field" style="padding: 0 7px;">
+        <label>3. 수량 (EA)</label>
+        <input id="qty" type="text" inputmode="numeric" placeholder="수량 (EA)" autocomplete="off">
+      </div>
+
+      <div class="field" style="padding: 0 7px;">
+        <label>4. 최종 가격 (￦)</label>
+        <input id="totalPriceInput" type="text" inputmode="numeric" placeholder="최종 가격 (￦)" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- 숫자 키패드 -->
+    <div class="keypad" id="keypad">
+      <!-- Row 1 -->
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '7')">7</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '8')">8</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '9')">9</button>
+      <button type="button" class="key-btn action-key" onpointerdown="handleKeyPad(event, 'back')">⌫</button>
+
+      <!-- Row 2 & 3 (오른쪽 열: 초기화 - 2칸 차지) -->
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '4')">4</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '5')">5</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '6')">6</button>
+      <button type="button" class="key-btn large-key clear-key-large" onpointerdown="handleKeyPad(event, 'clear')">초기화</button>
+
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '1')">1</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '2')">2</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '3')">3</button>
+
+      <!-- Row 4 & 5 (오른쪽 열: 계산 - 2칸 차지) -->
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '00')">00</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '0')">0</button>
+      <button type="button" class="key-btn" onpointerdown="handleKeyPad(event, '.')">.</button>
+      <button type="button" class="key-btn large-key calc-key-large" onpointerdown="handleKeyPad(event, 'calc')">계산</button>
+
+      <!-- Row 5 (왼쪽 3칸: 다음으로) -->
+      <button type="button" class="key-btn next-key" onpointerdown="handleKeyPad(event, 'next')">다음으로 ➔</button>
+    </div>
+
+    <div class="result">
+      <div class="row"><span>개당 가격(￦)</span><strong id="eachPrice">-</strong></div>
+      <div class="row"><span>총 중량(kg / L)</span><strong id="totalAmount">-</strong></div>
+      <div class="row"><span>단가 (100ml/100g당)</span><strong class="big" id="unitPrice">-</strong></div>
+
+      <div class="copybox">
+        <div class="copyline hint-mode" id="copyText">개당가격(x수량)[모든중량#단가]=최종가</div>
+        <button id="copyBtn" class="action-btn" style="margin-top:6px" onclick="copyResult()">📋 결과 복사</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const HINT_TEXT = '개당가격(x수량)[모든중량#단가]=최종가';
+const $ = id => document.getElementById(id);
+
+let selectedUnit = 'g';
+let currentActiveInput = $('amount');
+
+const inputs = [$('amount'), $('qty'), $('totalPriceInput')];
+
+inputs.forEach(input => {
+  input.addEventListener('focus', () => currentActiveInput = input);
+  input.addEventListener('click', () => currentActiveInput = input);
+
+  input.addEventListener('input', () => {
+    let val = input.value.replace(/[^0-9.]/g, '');
+    const parts = val.split('.');
+    if (parts.length > 2) {
+      val = parts[0] + '.' + parts.slice(1).join('');
+    }
+    input.value = val;
+  });
+});
+
+function handleKeyPad(e, action) {
+  e.preventDefault();
+  if (action === 'clear') {
+    clearAll();
+  } else if (action === 'calc') {
+    calculate();
+  } else if (action === 'next') {
+    focusNextInput();
+  } else {
+    pressKey(action);
+  }
+}
+
+function focusNextInput() {
+  const currentIndex = inputs.indexOf(currentActiveInput);
+  if (currentIndex !== -1 && currentIndex < inputs.length - 1) {
+    inputs[currentIndex + 1].focus();
+  } else {
+    inputs[0].focus();
+  }
+}
+
+function selectUnit(unit) {
+  selectedUnit = unit;
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.unit === unit);
+  });
+
+  let unitDisplay = unit === 'l' ? 'L' : unit;
+  $('amountLabel').textContent = `2. 개당 (${unitDisplay})`;
+  $('amount').placeholder = `개당 (${unitDisplay})`;
+}
+
+function pressKey(key) {
+  if (!currentActiveInput) currentActiveInput = $('amount');
+  const input = currentActiveInput;
+
+  if (document.activeElement !== input) {
+    input.focus();
+  }
+
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? input.value.length;
+  const val = input.value;
+
+  if (key === 'back') {
+    if (start !== end) {
+      input.value = val.slice(0, start) + val.slice(end);
+      input.setSelectionRange(start, start);
+    } else if (start > 0) {
+      input.value = val.slice(0, start - 1) + val.slice(start);
+      input.setSelectionRange(start - 1, start - 1);
+    }
+    return;
+  }
+
+  let textToInsert = key;
+
+  if (key === '.' && val.includes('.')) {
+    return;
+  }
+
+  const newVal = val.slice(0, start) + textToInsert + val.slice(end);
+  input.value = newVal;
+
+  const newPos = start + textToInsert.length;
+  input.setSelectionRange(newPos, newPos);
+}
+
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
+
+function trimNumber(n) {
+  return Number(n.toFixed(3)).toLocaleString('ko-KR', { maximumFractionDigits: 3 });
+}
+
+function calculate() {
+  const totalPrice = Number($('totalPriceInput').value);
+  const qty = Number($('qty').value);
+  const amount = Number($('amount').value);
+  const unit = selectedUnit;
+
+  if (!(totalPrice > 0) || !(qty > 0) || !(amount > 0)) {
+    alert('모든 정보를 정확히 입력해 주세요.');
+    return;
+  }
+
+  const eachPrice = Math.round(totalPrice / qty);
+
+  let totalBase;
+  let totalDisplay;
+
+  if (unit === 'ml') {
+    totalBase = amount * qty;
+    totalDisplay = totalBase >= 1000 ? trimNumber(totalBase / 1000) + 'L' : trimNumber(totalBase) + 'ml';
+  } else if (unit === 'l') {
+    totalBase = amount * 1000 * qty;
+    totalDisplay = trimNumber(totalBase / 1000) + 'L';
+  } else if (unit === 'g') {
+    totalBase = amount * qty;
+    totalDisplay = totalBase >= 1000 ? trimNumber(totalBase / 1000) + 'kg' : trimNumber(totalBase) + 'g';
+  } else {
+    totalBase = amount * 1000 * qty;
+    totalDisplay = trimNumber(totalBase / 1000) + 'kg';
+  }
+
+  const unitCost = totalPrice / totalBase * 100;
+  const roundedUnitCost = Math.round(unitCost);
+
+  $('eachPrice').textContent = fmt(eachPrice) + '원';
+  $('totalAmount').textContent = totalDisplay;
+  $('unitPrice').textContent = '#' + fmt(roundedUnitCost) + '원';
+
+  const copyTextElem = $('copyText');
+  copyTextElem.textContent = `${fmt(eachPrice)}(x${fmt(qty)})[${totalDisplay}#${fmt(roundedUnitCost)}]=${fmt(totalPrice)}`;
+  copyTextElem.classList.remove('hint-mode');
+
+  copyResult();
+}
+
+let copyTimer = null;
+
+function copyResult() {
+  const textElem = $('copyText');
+  if (textElem.classList.contains('hint-mode')) return;
+
+  const text = textElem.textContent;
+
+  const onSuccess = () => {
+    const btn = $('copyBtn');
+    btn.textContent = '✔ 복사 완료!';
+    btn.classList.add('copied');
+
+    if (copyTimer) clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => {
+      btn.textContent = '📋 결과 복사';
+      btn.classList.remove('copied');
+    }, 1500);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => {
+      fallbackCopy(text);
+      onSuccess();
+    });
+  } else {
+    fallbackCopy(text);
+    onSuccess();
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  ta.remove();
+}
+
+function clearAll() {
+  inputs.forEach(input => {
+    input.value = '';
+  });
+  selectUnit('g');
+  $('eachPrice').textContent = '-';
+  $('totalAmount').textContent = '-';
+  $('unitPrice').textContent = '-';
+  
+  const copyTextElem = $('copyText');
+  copyTextElem.textContent = HINT_TEXT;
+  copyTextElem.classList.add('hint-mode');
+  
+  $('amount').focus();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') calculate();
+});
+</script>
+</body>
+</html>

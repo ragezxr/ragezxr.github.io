@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>배터리_계산기</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#1e1f23;color:#eee;font-family:Arial,"Malgun Gothic",sans-serif}
+  .wrap{max-width:980px;margin:28px auto;padding:0 16px}
+  .card{background:#282a2f;border:1px solid #444;border-radius:14px;padding:22px;margin-bottom:16px}
+  h1{margin:0 0 8px;font-size:25px}
+  h2{margin-top:0;font-size:20px}
+  .sub{color:#aaa;font-size:14px;margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .main-input{max-width:520px;margin:0 auto;text-align:center}
+  .main-input label{font-size:16px;color:#ddd}
+  .main-input input{font-size:32px;text-align:center;font-weight:bold;padding:16px;background:#121315;border-color:#666}
+  .live-hint{color:#9bbbd4;font-size:13px;margin-top:8px}
+  .settings-btn{max-width:520px;margin:16px auto 0;display:block;background:#4a4d54}
+  .settings{max-width:760px;margin:14px auto 0;padding:16px;background:#1d1f23;border-radius:10px}
+  .settings button{margin-top:12px}
+
+  label{display:block;color:#bbb;font-size:13px;margin-bottom:6px}
+  input{width:100%;padding:12px;border-radius:8px;border:1px solid #555;background:#121315;color:#fff;font-size:18px}
+  button{margin-top:15px;width:100%;padding:13px;border:0;border-radius:9px;background:#686b73;color:white;font-size:16px;font-weight:bold;cursor:pointer}
+  button:hover{filter:brightness(1.15)}
+
+  .result{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+  .box{background:#181a1d;border:1px solid #3d4047;border-radius:10px;padding:16px 12px;text-align:center}
+  .box .title{font-size:13px;color:#c0c4cc}
+  .box .value{font-size:24px;font-weight:bold;margin-top:6px;letter-spacing:-0.5px}
+
+  /* 색상 규칙 클래스 */
+  .bright-green{color:#a3ff52}
+  .bright-blue{color:#60caff}
+  .bright-yellow{color:#ffd843}
+  .bright-red{color:#ff5252}
+
+  table{width:100%;border-collapse:collapse;margin-top:14px}
+  th,td{border-bottom:1px solid #444;padding:10px 7px;text-align:center}
+  th{color:#bbb;font-size:13px}
+  td{font-size:14px}
+  .note{color:#aaa;font-size:13px;line-height:1.6;margin-top:14px}
+  
+  /* 30%, 90% 행 강조 스타일 (폰트 색상은 다른 행과 동일하게 기본 흰색 유지) */
+  .ref-table tr.row-start td{background:#383428;font-weight:bold;border-top:1px solid #82734d;border-bottom:1px solid #82734d}
+  .ref-table tr.row-end td{background:#2a362f;font-weight:bold;border-top:1px solid #4d735b;border-bottom:1px solid #4d735b}
+
+  /* 현재 상태 전용 행 스타일 (폰트색: 현재 추정 잔량 색상 #a3ff52) */
+  .ref-table tr.row-now-detail td{
+    background:#0f2942 !important;
+    color:#a3ff52 !important;
+    font-weight:bold;
+    border-top:2px solid #0284c7 !important;
+    border-bottom:2px solid #0284c7 !important;
+    padding:12px 7px;
+  }
+
+  .warn{background:#2a251a;border:1px solid #5e4c27;border-left:4px solid #ffd843;border-radius:8px;padding:14px 16px;margin-top:16px;line-height:1.6;color:#ffe8a3;font-size:14px}
+  
+  @media(max-width:820px){.result{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:720px){
+    .grid{grid-template-columns:1fr 1fr}
+    table{font-size:12px}
+    .wrap{padding:0 8px}
+  }
+  @media(max-width:480px){.grid,.result{grid-template-columns:1fr}.main-input input{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🔋60V 70Ah 리튬배터리 + ⚡60V 10A 충전기 (600W~730W MAX)</h1>
+    <div class="sub">현재 전압만 입력하면 즉시 계산 · 기본값: 🔋60V 70Ah 리튬배터리 + ⚡60V 10A 충전기 · 214.6원/kWh</div>
+
+    <div class="main-input">
+      <label>🔋 현재 배터리 전압 (V)</label>
+      <input id="voltage" type="number" min="55" max="67.2" step="0.1" value="64.0" autofocus>
+      <div class="live-hint">전압을 입력하면 즉시 잔량과 소요시간이 계산됩니다.</div>
+    </div>
+
+    <button class="settings-btn" onclick="toggleSettings()">⚙️ 설정 변경</button>
+
+    <div id="settings" class="settings" style="display:none">
+      <div class="grid">
+        <div>
+          <label>배터리 용량 (Ah)</label>
+          <input id="ah" type="number" min="1" step="1" value="70">
+        </div>
+        <div>
+          <label>충전 전류 (A)</label>
+          <input id="amp" type="number" min="1" step="0.1" value="10">
+        </div>
+        <div>
+          <label>전기요금 (원/kWh)</label>
+          <input id="price" type="number" min="0" step="0.1" value="214.6">
+        </div>
+      </div>
+      <button onclick="calculate()">설정 적용</button>
+    </div>
+
+    <div class="result">
+      <div class="box"><div class="title">현재 추정 잔량</div><div id="soc" class="value bright-green">-</div></div>
+      <div class="box"><div class="title">80%까지 충전시간</div><div id="t80" class="value bright-blue">-</div></div>
+      <div class="box"><div class="title">90%까지 충전시간</div><div id="t90" class="value bright-yellow">-</div></div>
+      <div class="box"><div class="title">100%까지 충전시간</div><div id="t100" class="value bright-red">-</div></div>
+    </div>
+
+    <div id="message" class="warn"></div>
+  </div>
+
+  <div class="card">
+    <h2>⚡ 충전 예상량 및 전기요금</h2>
+    <table>
+      <thead>
+        <tr><th>충전 목표</th><th>목표 전압</th><th>필요 충전량</th><th>충전 시간</th><th>예상 소비전력</th><th>예상 전기요금</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>80% (CC) 고속 구간🌱</td><td id="s80" class="bright-blue">-</td><td id="ah80">-</td><td id="tt80" class="bright-blue">-</td><td id="k80">-</td><td id="won80">-</td></tr>
+        <tr><td>90% (CV1) 권장 충전🚩</td><td id="s90" class="bright-yellow">-</td><td id="ah90">-</td><td id="tt90" class="bright-yellow">-</td><td id="k90">-</td><td id="won90">-</td></tr>
+        <tr><td>100% (CV2) 완충 장거리❗</td><td id="s100" class="bright-red">-</td><td id="ah100">-</td><td id="tt100" class="bright-red">-</td><td id="k100">-</td><td id="won100">-</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      ※ 소비전력 및 전기요금은 충전기 효율(약 88%)과 CC(고속)/CV(저속) 구간의 전압 및 전류 변화를 반영한 추산치입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🧭 전압·잔량별 표준 충전 기준표</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>잔량</th>
+          <th>전압</th>
+          <th class="bright-blue">CC 구간 (0→80%)</th>
+          <th class="bright-yellow">CV1 권장 (0→90%)</th>
+          <th class="bright-red">CV2 완충 (0→100%)</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody id="ref"></tbody>
+    </table>
+    <div class="note">
+      ※ 기준전압은 정차 후 5~10분 이상 경과한 무부하(안정화) 상태 기준입니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🅿️ 배터리 관리 및 장기 보관 가이드</h2>
+    <div class="note" style="font-size:14px">
+      🔋 <b>장기 보관 기준 (1~3개월 이상 주차)</b><br>
+      • 🟢 <b>약 64.0V (약 50%)</b> 전후 상태로 보관하는 것이 가장 안전합니다.<br>
+      • 🔴 67.2V(100% 완충) 상태로 장기간 방치 시 셀 열화가 가속화됩니다.<br>
+      • 🔴 과도한 방전 상태로 방치할 경우 자연 방전으로 인해 BMS 저전압 차단이 발생할 수 있습니다.<br><br>
+
+      🧠 <b>배터리 수명 연장을 위한 핵심 팁</b><br>
+      • ⭐ <b>권장 일상 사용 구간: 30%(62.8V) ~ 90%(66.6V)</b><br>
+      • ⚡ 80%(66.0V) 도달 이후부터는 속도가 줄어드는 CV(저속) 충전 구간으로 진입합니다.<br>
+      • 🔌 완충(녹색등 전환) 후에는 충전기를 오랫동안 꽂아두지 말고 분리해 주세요.
+    </div>
+  </div>
+</div>
+
+<script>
+const points = [
+  [0,   60.0, "약 5시간 35분", "약 6시간 35분", "약 7시간 50분", "💥 완전 방전 (BMS 저전압 보호)"],
+  [10,  61.2, "약 4시간 55분", "약 5시간 55분", "약 7시간 10분", "💢 위험: 심방전 상태"],
+  [20,  62.0, "약 4시간 12분", "약 5시간 12분", "약 6시간 27분", "⚠️ 주의: 최저 잔량"],
+  [30,  62.8, "약 3시간 30분", "약 4시간 30분", "약 5시간 45분", "🚩 권장 충전 시작점"],
+  [40,  63.5, "약 2시간 48분", "약 3시간 48분", "약 5시간 03분", "🟢 미리 충전 (장거리 대비)"],
+  [50,  64.0, "약 2시간 06분", "약 3시간 06분", "약 4시간 21분", "🅿️ 장기보관 권장 전압"],
+  [60,  64.6, "약 1시간 24분", "약 2시간 24분", "약 3시간 39분", "정상 사용 구간"],
+  [70,  65.3, "약 42분",       "약 1시간 42분", "약 2시간 27분", "정상 사용 구간"],
+  [80,  66.0, "완료 (CC)",     "약 1시간",       "약 2시간 15분", "⚡ 저속 충전 시작 | (CV1 시작)"],
+  [90,  66.6, "완료",          "완료 (CV1)",    "약 1시간 15분", "🚩 권장 충전 종료점 | (CV2 시작)"],
+  [100, 67.2, "완료",          "완료",          "완료 (CV2)",    "🔴 완충 종료(충전기 종료)"]
+];
+
+function socFromV(v){
+  if(v <= points[0][1]) return 0;
+  if(v >= points[points.length-1][1]) return 100;
+  for(let i=0; i<points.length-1; i++){
+    const [s1, v1] = points[i], [s2, v2] = points[i+1];
+    if(v >= v1 && v <= v2){
+      return s1 + (v - v1) * (s2 - s1) / (v2 - v1);
+    }
+  }
+  return 0;
+}
+
+function fmtTime(hours){
+  if(hours <= 0) return "완료";
+  let m = Math.round(hours * 60);
+  let h = Math.floor(m / 60), min = m % 60;
+  if(h === 0) return `약 ${min}분`;
+  if(min === 0) return `약 ${h}시간`;
+  return `약 ${h}시간 ${min}분`;
+}
+
+function chargeHours(soc, target, ah, amp){
+  if(soc >= target) return 0;
+  let hours = 0;
+
+  if(soc < 80){
+    let ccTarget = Math.min(target, 80);
+    hours += (ah * (ccTarget - soc) / 100) / amp;
+  }
+  if(target > 80 && soc < 90){
+    let startCV1 = Math.max(soc, 80);
+    let endCV1 = Math.min(target, 90);
+    hours += ((endCV1 - startCV1) / 10) * 1.0 * (ah / 70); 
+  }
+  if(target > 90 && soc < 100){
+    let startCV2 = Math.max(soc, 90);
+    let endCV2 = Math.min(target, 100);
+    hours += ((endCV2 - startCV2) / 10) * 1.25 * (ah / 70);
+  }
+
+  return hours;
+}
+
+function calcEnergyDetailed(soc, target, ah) {
+  if(soc >= target) return 0;
+  
+  const neededAh = (ah * (target - soc)) / 100;
+  const avgVoltage = 64.0;
+  const efficiency = 0.88;
+  
+  return (neededAh * avgVoltage) / 1000 / efficiency;
+}
+
+function toggleSettings(){
+  const el = document.getElementById('settings');
+  el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+}
+
+function buildRef(currentV, currentSoc, h80, h90, h100, ah, amp){
+  const ref = document.getElementById('ref');
+  ref.innerHTML = "";
+
+  let inserted = false;
+
+  points.forEach(([s, v, cc, cv1, cv2, note], idx) => {
+    if (!inserted && currentV <= v) {
+      ref.innerHTML += renderNowRow(currentV, currentSoc, h80, h90, h100);
+      inserted = true;
+    }
+
+    let rowClass = (s === 30 ? "row-start" : (s === 90 ? "row-end" : ""));
+
+    ref.innerHTML += `<tr class="${rowClass}">
+      <td>${s}%</td>
+      <td>${v.toFixed(1)}V</td>
+      <td>${cc}</td>
+      <td>${cv1}</td>
+      <td>${cv2}</td>
+      <td>${note}</td>
+    </tr>`;
+  });
+
+  if (!inserted) {
+    ref.innerHTML += renderNowRow(currentV, currentSoc, h80, h90, h100);
+  }
+}
+
+function renderNowRow(currentV, currentSoc, h80, h90, h100) {
+  const roundedSoc = Math.round(currentSoc);
+  
+  let ccTxt = currentSoc >= 80 ? "완료" : fmtTime(h80);
+  let cv1Txt = currentSoc >= 90 ? "완료" : fmtTime(h90);
+  let cv2Txt = currentSoc >= 100 ? "완료" : fmtTime(h100);
+
+  return `<tr class="row-now-detail">
+    <td>약 ${roundedSoc}%</td>
+    <td>${currentV.toFixed(1)}V</td>
+    <td>${ccTxt}</td>
+    <td>${cv1Txt}</td>
+    <td>${cv2Txt}</td>
+    <td>📍 현재 실시간 측정 위치</td>
+  </tr>`;
+}
+
+function calculate(){
+  const v = parseFloat(document.getElementById('voltage').value);
+  const ah = parseFloat(document.getElementById('ah').value);
+  const amp = parseFloat(document.getElementById('amp').value);
+  const price = parseFloat(document.getElementById('price').value);
+
+  if(!isFinite(v) || !isFinite(ah) || !isFinite(amp) || !isFinite(price)) return;
+  if(v < 55 || v > 67.2 || ah <= 0 || amp <= 0) return;
+
+  const soc = socFromV(v);
+  const h80 = chargeHours(soc, 80, ah, amp);
+  const h90 = chargeHours(soc, 90, ah, amp);
+  const h100 = chargeHours(soc, 100, ah, amp);
+
+  const need80 = Math.max(0, ah * (80 - soc) / 100);
+  const need90 = Math.max(0, ah * (90 - soc) / 100);
+  const need100 = Math.max(0, ah * (100 - soc) / 100);
+  
+  const e80 = calcEnergyDetailed(soc, 80, ah);
+  const e90 = calcEnergyDetailed(soc, 90, ah);
+  const e100 = calcEnergyDetailed(soc, 100, ah);
+
+  document.getElementById('soc').textContent = `약 ${Math.round(soc)}%`;
+  document.getElementById('t80').textContent = fmtTime(h80);
+  document.getElementById('t90').textContent = fmtTime(h90);
+  document.getElementById('t100').textContent = fmtTime(h100);
+
+  document.getElementById('s80').textContent = "약 66.0V";
+  document.getElementById('s90').textContent = "약 66.6V";
+  document.getElementById('s100').textContent = "67.2V";
+
+  document.getElementById('ah80').textContent = need80.toFixed(1) + "Ah";
+  document.getElementById('ah90').textContent = need90.toFixed(1) + "Ah";
+  document.getElementById('ah100').textContent = need100.toFixed(1) + "Ah";
+
+  document.getElementById('tt80').textContent = fmtTime(h80);
+  document.getElementById('tt90').textContent = fmtTime(h90);
+  document.getElementById('tt100').textContent = fmtTime(h100);
+
+  document.getElementById('k80').textContent = e80.toFixed(2) + " kWh";
+  document.getElementById('k90').textContent = e90.toFixed(2) + " kWh";
+  document.getElementById('k100').textContent = e100.toFixed(2) + " kWh";
+
+  document.getElementById('won80').textContent = Math.round(e80 * price).toLocaleString() + "원";
+  document.getElementById('won90').textContent = Math.round(e90 * price).toLocaleString() + "원";
+  document.getElementById('won100').textContent = Math.round(e100 * price).toLocaleString() + "원";
+
+  let msg = "";
+  if(soc <= 10) msg = "🔴 방전 위험 상태입니다. BMS 저전압 보호 작동 방지를 위해 즉시 충전을 권장합니다.";
+  else if(soc < 30) msg = "🟠 심방전을 방지하기 위해 30% 전후 구간에서 충전을 시작해 주세요.";
+  else if(soc <= 40) msg = "🚩 추천 충전 시작 구간입니다. 90%(66.6V)까지 충전하시면 배터리 수명 유지에 최적입니다.";
+  else if(soc < 80) msg = "🟢 안정적인 잔량 상태입니다. 고속(CC) 충전이 진행되는 구간입니다.";
+  else if(soc < 90) msg = "🟡 80%를 초과하여 저속(CV1) 충전 구간으로 진입했습니다. 90% 충전 종료를 권장합니다.";
+  else if(soc < 100) msg = "🟡 충전 완료에 가까운 구간입니다. 저속(CV2) 충전 모드가 진행됩니다.";
+  else msg = "🔴 완충 상태입니다 (67.2V). 충전기 연결 해제를 권장합니다.";
+  document.getElementById('message').textContent = msg;
+
+  buildRef(v, soc, h80, h90, h100, ah, amp);
+}
+
+calculate();
+
+['voltage','ah','amp','price'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calculate);
+});
+document.getElementById('voltage').addEventListener('keydown', e => { if(e.key === "Enter") calculate(); });
+</script>
+</body>
+</html>
