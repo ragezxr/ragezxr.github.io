@@ -17,28 +17,31 @@ body{
 }
 
 #top{
-  min-height:48px;
+  min-height:44px;
   display:flex;
   align-items:center;
   flex-wrap:wrap;
-  gap:10px;
+  gap:6px;
   padding:6px 12px;
   background:#252526;
   border-bottom:1px solid #3a3a3a;
 }
 
-button,select{
+/* 상단 컨트롤 크기 작게 통일 */
+button, select{
   background:#333;
   color:#ddd;
   border:1px solid #555;
   border-radius:4px;
-  padding:6px 12px;
+  padding:0 8px;
+  height:32px;
   cursor:pointer;
-  font-size:14px;
+  font-size:13px;
+  line-height:30px;
   white-space:nowrap;
   flex-shrink:0;
 }
-button:hover,select:hover{background:#444}
+button:hover, select:hover{background:#444}
 select{outline:none}
 
 #title-container{
@@ -49,14 +52,14 @@ select{outline:none}
 }
 #title{
   font-weight:bold;
-  font-size:16px;
+  font-size:15px;
   white-space:nowrap;
 }
 
-/* 계산기호 버튼 그룹 */
+/* 계산기호 버튼 그룹 (상단 버튼 크기와 통일) */
 .op-badge-group{
   display:flex;
-  gap:6px; /* 버튼 간격 (오클릭 방지) */
+  gap:4px;
   margin-left:4px;
   flex-wrap:wrap;
 }
@@ -65,10 +68,11 @@ select{outline:none}
   color:#4ec9b0;
   border:1px solid #555;
   border-radius:4px;
-  padding:4px 10px;
-  font-size:16px; /* 폰트 시인성 강화 */
+  padding:0 8px;
+  height:32px;
+  font-size:14px;
   font-weight:bold;
-  line-height:1;
+  line-height:30px;
   cursor:pointer;
   user-select:none;
   display:inline-flex;
@@ -81,14 +85,15 @@ select{outline:none}
   color:#fff;
 }
 .op-btn.ans-btn{
-  color:#ce9178; /* ans 버튼 강조 색상 */
-  font-size:14px;
+  color:#ce9178;
+  font-size:13px;
 }
 
 #status{
-  font-size:14px;
+  font-size:13px;
   color:#999;
   white-space:nowrap;
+  margin-left:4px;
 }
 
 #wrap{
@@ -224,7 +229,6 @@ select{outline:none}
   <button onclick="resetToDefault()">초기화</button>
   <button onclick="openHelpModal()">도움말</button>
 
-  <!-- 확장된 계산기호 버튼 그룹 -->
   <div class="op-badge-group">
     <button class="op-btn ans-btn" onclick="insertSymbol('ans')">ans</button>
     <button class="op-btn" onclick="insertSymbol('+')">+</button>
@@ -312,7 +316,7 @@ select{outline:none}
       <span id="toastMsg" class="toast-msg">✓ 입력됨</span>
       <div>
         <button onclick="copyHelpText()">📋 도움말 전체 복사</button>
-        <button onclick="closeHelpModal()" style="background:#0e639c;color:#fff;border:none;padding:6px 16px;font-weight:bold;">적용하고 닫기</button>
+        <button onclick="closeHelpModal()" style="background:#0e639c;color:#fff;border:none;padding:0 16px;height:32px;font-weight:bold;">적용하고 닫기</button>
       </div>
     </div>
   </div>
