@@ -16,51 +16,111 @@ body{
   flex-direction:column;
 }
 
+/* 상단바 레이아웃 */
 #top{
-  min-height:44px;
+  min-height:36px;
   display:flex;
   align-items:center;
-  flex-wrap:wrap;
-  gap:6px;
-  padding:6px 12px;
+  flex-wrap:wrap;       /* 공간 부족 시 자동 줄바꿈 */
+  gap:6px 12px;         /* 기본 세로 6px, 가로 12px 간격 */
+  padding:4px 12px;
   background:#252526;
   border-bottom:1px solid #3a3a3a;
 }
 
-/* 상단 컨트롤 크기 작게 통일 */
-button, select{
+button, input[type="number"]{
   background:#333;
   color:#ddd;
   border:1px solid #555;
   border-radius:4px;
   padding:0 8px;
-  height:32px;
+  height:26px;
   cursor:pointer;
-  font-size:13px;
-  line-height:30px;
+  font-size:12px;
+  line-height:24px;
   white-space:nowrap;
   flex-shrink:0;
 }
-button:hover, select:hover{background:#444}
-select{outline:none}
+button:hover{background:#444}
 
 #title-container{
   display:flex;
   align-items:center;
-  gap:8px;
-  margin-right:auto;
+  gap:10px;
 }
 #title{
   font-weight:bold;
-  font-size:15px;
+  font-size:14px;
   white-space:nowrap;
 }
 
-/* 계산기호 버튼 그룹 (상단 버튼 크기와 통일) */
+/* 상태 메시지: 맨 오른쪽 우측 정렬 */
+#status{
+  font-size:12px;
+  color:#4ec9b0;
+  white-space:nowrap;
+  font-weight:500;
+  margin-left:auto; /* 맨 오른쪽으로 밀어내기 */
+}
+
+/* 폰트 크기 조절 입력창 */
+.font-size-wrapper{
+  display:inline-flex;
+  align-items:center;
+  background:#333;
+  border:1px solid #555;
+  border-radius:4px;
+  padding-right:6px;
+  height:26px;
+}
+.font-size-wrapper input[type="number"]{
+  border:none;
+  background:transparent;
+  width:36px;
+  text-align:right;
+  padding:0 2px 0 0;
+  outline:none;
+  -moz-appearance:textfield;
+}
+.font-size-wrapper input[type="number"]::-webkit-outer-spin-button,
+.font-size-wrapper input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.font-size-wrapper span{
+  font-size:12px;
+  color:#aaa;
+  user-select:none;
+}
+
+/* 상단 버튼 그룹 제어 */
+.top-action-group{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+/* 상단 버튼 강조 */
+.btn-option{
+  background:#0e639c;
+  color:#fff;
+  border:1px solid #1177bb;
+  font-weight:bold;
+}
+.btn-option:hover{background:#1177bb}
+
+.btn-reset{
+  background:#3a3a3c;
+  color:#f48771;
+  border:1px solid #666;
+}
+.btn-reset:hover{background:#505054}
+
+/* 계산기호 버튼 그룹 */
 .op-badge-group{
   display:flex;
   gap:4px;
-  margin-left:4px;
   flex-wrap:wrap;
 }
 .op-btn{
@@ -68,17 +128,17 @@ select{outline:none}
   color:#4ec9b0;
   border:1px solid #555;
   border-radius:4px;
-  padding:0 8px;
-  height:32px;
-  font-size:14px;
+  padding:0 6px;
+  height:26px;
+  font-size:13px;
   font-weight:bold;
-  line-height:30px;
+  line-height:24px;
   cursor:pointer;
   user-select:none;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-width:32px;
+  min-width:28px;
 }
 .op-btn:hover{
   background:#505054;
@@ -86,21 +146,14 @@ select{outline:none}
 }
 .op-btn.ans-btn{
   color:#ce9178;
-  font-size:13px;
-}
-
-#status{
-  font-size:13px;
-  color:#999;
-  white-space:nowrap;
-  margin-left:4px;
+  font-size:12px;
 }
 
 #wrap{
   flex:1;
   overflow:auto;
   background:#1e1e1e;
-  padding:16px 20px 80px;
+  padding:12px 16px 60px;
 }
 
 #editor-container{
@@ -120,7 +173,7 @@ select{outline:none}
 .result{
   flex:1;
   text-align:left;
-  padding-left:32px;
+  padding-left:24px;
   font-weight:500;
   color:#4ec9b0;
   cursor:text;
@@ -130,8 +183,9 @@ select{outline:none}
 .comment{color:#6a9955}
 .error{color:#f48771}
 
-#help-bar{position:fixed;right:16px;bottom:12px;color:#777;font-size:13px;pointer-events:none}
+#help-bar{position:fixed;right:16px;bottom:8px;color:#777;font-size:12px;pointer-events:none}
 
+/* 모달 레이아웃 공통 */
 .modal-overlay{
   display:none;
   position:fixed;
@@ -147,7 +201,7 @@ select{outline:none}
   border:1px solid #454545;
   border-radius:8px;
   width:90%;
-  max-width:750px;
+  max-width:700px;
   max-height:85vh;
   display:flex;
   flex-direction:column;
@@ -160,32 +214,55 @@ select{outline:none}
   justify-content:space-between;
   align-items:center;
 }
-.modal-header h2{margin:0;font-size:18px;color:#fff}
+.modal-header h2{margin:0;font-size:16px;color:#fff}
 .modal-body{
   padding:20px;
   overflow-y:auto;
-  font-size:14px;
+  font-size:13px;
   line-height:1.6;
   color:#ccc;
 }
-.modal-footer{
-  padding:12px 20px;
-  border-top:1px solid #3a3a3a;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
+
+/* 옵션 팝업 그리드 */
+.option-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));
+  gap:16px;
 }
+.opt-card{
+  background:#2d2d2d;
+  border:1px solid #3e3e42;
+  border-radius:6px;
+  padding:12px;
+}
+.opt-card h4{
+  margin:0 0 10px 0;
+  color:#4ec9b0;
+  font-size:13px;
+  border-bottom:1px solid #444;
+  padding-bottom:4px;
+}
+.opt-card button{
+  width:100%;
+  text-align:left;
+  margin-bottom:6px;
+  background:#383838;
+  height:30px;
+}
+.opt-card button:last-child{margin-bottom:0}
+.opt-card button:hover{background:#4a4a4a}
+.opt-card button.danger{color:#f48771;border-color:#a04040}
+
 .help-section{margin-bottom:20px}
-.help-section h3{margin:0 0 8px;color:#4ec9b0;font-size:15px;border-bottom:1px solid #333;padding-bottom:4px}
+.help-section h3{margin:0 0 8px;color:#4ec9b0;font-size:14px;border-bottom:1px solid #333;padding-bottom:4px}
 .chip{
   display:inline-block;
   background:#333;
   color:#ce9178;
   border:1px solid #555;
   border-radius:4px;
-  padding:4px 9px;
-  margin:3px;
+  padding:3px 8px;
+  margin:2px;
   font-family:monospace;
   cursor:pointer;
   transition:all 0.1s;
@@ -199,46 +276,45 @@ select{outline:none}
 .chip:active{
   transform:scale(0.95);
 }
-.toast-msg{
-  color:#4ec9b0;
-  font-size:13px;
-  display:none;
-}
 </style>
 </head>
 <body>
 <div id="top">
+  <!-- 1. 타이틀 -->
   <div id="title-container">
     <div id="title">🧮 메모 계산기</div>
   </div>
 
-  <select id="fontSizeSelect" onchange="changeFontSize(this.value)">
-    <option value="10">글자 크기: 10px (매우 작게)</option>
-    <option value="12">글자 크기: 12px (작게)</option>
-    <option value="14">글자 크기: 14px</option>
-    <option value="16">글자 크기: 16px</option>
-    <option value="18">글자 크기: 18px</option>
-    <option value="20" selected>글자 크기: 20px (기본값)</option>
-    <option value="24">글자 크기: 24px</option>
-    <option value="28">글자 크기: 28px</option>
-    <option value="32">글자 크기: 32px</option>
-    <option value="36">글자 크기: 36px (크게)</option>
-    <option value="40">글자 크기: 40px (매우 크게)</option>
-  </select>
-  <button onclick="copyAll()">전체 복사</button>
-  <button onclick="resetToDefault()">초기화</button>
-  <button onclick="openHelpModal()">도움말</button>
+  <!-- 2. 컨트롤 버튼 및 설정 제어 그룹 -->
+  <div class="top-action-group">
+    <!-- 폰트 크기 조절 입력창 -->
+    <div class="font-size-wrapper" title="마우스 휠이나 숫자 입력으로 폰트 크기 변경">
+      <input type="number" id="fontSizeInput" value="16" min="10" max="60" oninput="changeFontSize(this.value)">
+      <span>px</span>
+    </div>
 
+    <!-- 초기화 버튼 -->
+    <button class="btn-reset" onclick="resetToDefault()">🔄 초기화</button>
+
+    <!-- 옵션 팝업 오픈 버튼 -->
+    <button class="btn-option" onclick="openOptionModal()">⚙️ 옵션</button>
+  </div>
+
+  <!-- 숨겨진 파일 선택 태그 -->
+  <input type="file" id="fileInput" accept=".txt,.csv" style="display:none" onchange="loadFile(event)">
+
+  <!-- 3. 계산기호 버튼 그룹 (ans 맨 오른쪽) -->
   <div class="op-badge-group">
-    <button class="op-btn ans-btn" onclick="insertSymbol('ans')">ans</button>
     <button class="op-btn" onclick="insertSymbol('+')">+</button>
     <button class="op-btn" onclick="insertSymbol('-')">-</button>
     <button class="op-btn" onclick="insertSymbol('×')">×</button>
     <button class="op-btn" onclick="insertSymbol('÷')">÷</button>
     <button class="op-btn" onclick="insertSymbol('=')">=</button>
     <button class="op-btn" onclick="insertSymbol('( )')">( )</button>
+    <button class="op-btn ans-btn" onclick="insertSymbol('ans')">ans</button>
   </div>
 
+  <!-- 4. 상태 메시지 (맨 오른쪽 위치) -->
   <span id="status">준비</span>
 </div>
 
@@ -248,6 +324,51 @@ select{outline:none}
 
 <div id="help-bar">Enter: 다음 줄 · Ctrl+Enter: 현재 결과 복사 · Ctrl+S: HTML 저장</div>
 
+<!-- ⚙️ 확장된 옵션 모달 팝업 창 -->
+<div id="optionModal" class="modal-overlay" onclick="closeOptionModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h2>⚙️ 메모 계산기 고급 옵션</h2>
+      <button onclick="closeOptionModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="option-grid">
+        <div class="opt-card">
+          <h4>📋 클립보드 복사 (주석 제외)</h4>
+          <button onclick="copyFiltered('exprRes'); closeOptionModal();">수식 + 결과 전체 복사</button>
+          <button onclick="copyFiltered('exprOnly'); closeOptionModal();">수식만 복사</button>
+          <button onclick="copyFiltered('resOnly'); closeOptionModal();">결과값만 복사</button>
+        </div>
+
+        <div class="opt-card">
+          <h4>💾 파일 내보내기 &amp; 불러오기</h4>
+          <button onclick="document.getElementById('fileInput').click(); closeOptionModal();">📂 텍스트 / CSV 파일 불러오기</button>
+          <button onclick="downloadFile(getTextContent(), 'calc_memo.txt', 'text/plain'); closeOptionModal();">📄 TXT 파일 저장</button>
+          <button onclick="exportToCsv(); closeOptionModal();">📊 CSV(엑셀) 파일 생성</button>
+          <button onclick="saveHtml(); closeOptionModal();">🌐 HTML 파일 저장</button>
+        </div>
+
+        <div class="opt-card">
+          <h4>🧹 편집 및 서식 자동 정렬</h4>
+          <button onclick="formatOperators(); closeOptionModal();">🪄 연산자 띄어쓰기 자동 정렬</button>
+          <button onclick="removeComments(); closeOptionModal();">💬 주석/설명글 전체 삭제</button>
+          <button onclick="removeEmptyLines(); closeOptionModal();">✂️ 빈 줄 모아서 정리</button>
+          <button class="danger" onclick="clearAllData(); closeOptionModal();">🗑️ 수식 전체 삭제 (모두 비우기)</button>
+        </div>
+
+        <div class="opt-card">
+          <h4>⚙️ 결과 표기 &amp; 텍스트 변환</h4>
+          <button onclick="toggleCommaOpt(); closeOptionModal();" id="commaOptBtn">천단위 콤마(,) 표기: ON</button>
+          <button onclick="transformCase('upper'); closeOptionModal();">🔠 영어 변수 대문자로 변환</button>
+          <button onclick="transformCase('lower'); closeOptionModal();">🔡 영어 변수 소문자로 변환</button>
+          <button onclick="closeOptionModal(); openHelpModal();">💡 상세 사용 도움말 보기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 💡 도움말 모달 창 -->
 <div id="helpModal" class="modal-overlay" onclick="closeHelpModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <div class="modal-header">
@@ -284,10 +405,10 @@ select{outline:none}
       </div>
 
       <div class="help-section">
-        <h3>3. 단위 계산</h3>
-        <span class="chip" onclick="insertSymbol('1.5km + 500m')">1.5km + 500m</span>
-        <span class="chip" onclick="insertSymbol('2kg + 300g')">2kg + 300g</span>
-        <span class="chip" onclick="insertSymbol('1h + 30min')">1h + 30min</span>
+        <h3>3. 단위 자동 환산 지원</h3>
+        <span class="chip" onclick="insertSymbol('1.5km + 500m')">1.5km + 500m (거리: m통일)</span>
+        <span class="chip" onclick="insertSymbol('2kg + 300g')">2kg + 300g (무게: g통일)</span>
+        <span class="chip" onclick="insertSymbol('1h + 30min')">1h + 30min (시간: min통일)</span>
       </div>
 
       <div class="help-section">
@@ -299,24 +420,17 @@ select{outline:none}
         <span class="chip" onclick="insertSymbol('max(')">max( [최대]</span>
         <span class="chip" onclick="insertSymbol('min(')">min( [최소]</span>
         <span class="chip" onclick="insertSymbol('abs(')">abs( [절대값]</span>
-        <span class="chip" onclick="insertSymbol('pi')">pi</span>
+        <span class="chip" onclick="insertSymbol('pi')">pi (원주율)</span>
       </div>
 
       <div class="help-section">
-        <h3>5. 단축키</h3>
+        <h3>5. 유용한 단축키 모음</h3>
         <ul>
-          <li><b>Enter</b> : 새로운 줄 추가</li>
-          <li><b>Backspace</b> : 빈 줄 삭제</li>
-          <li><b>Ctrl + Enter</b> : 현재 행의 결과 복사</li>
-          <li><b>Ctrl + S</b> : HTML 저장</li>
+          <li><b>Enter</b> : 새로운 줄 추가 및 자동 계산</li>
+          <li><b>Backspace</b> : 줄이 비어있을 때 이전 줄과 병합/삭제</li>
+          <li><b>Ctrl + Enter</b> : 현재 선택한 행의 계산 결과만 클립보드 복사</li>
+          <li><b>Ctrl + S</b> : 오프라인에서 쓸 수 있는 HTML 웹앱 파일 저장</li>
         </ul>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <span id="toastMsg" class="toast-msg">✓ 입력됨</span>
-      <div>
-        <button onclick="copyHelpText()">📋 도움말 전체 복사</button>
-        <button onclick="closeHelpModal()" style="background:#0e639c;color:#fff;border:none;padding:0 16px;height:32px;font-weight:bold;">적용하고 닫기</button>
       </div>
     </div>
   </div>
@@ -327,8 +441,9 @@ select{outline:none}
 
 const container = document.getElementById("editor-container");
 const status = document.getElementById("status");
-const fontSizeSelect = document.getElementById("fontSizeSelect");
+const fontSizeInput = document.getElementById("fontSizeInput");
 let activeExpr = null;
+let useComma = true;
 
 const defaultText =
 `
@@ -414,7 +529,9 @@ function format(v){
     if(Math.abs(v) < 1e-12) v = 0;
     const numStr = Number(v.toPrecision(14)).toString();
     const parts = numStr.split(".");
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if(useComma){
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
     return parts.join(".");
   }
   if(typeof v === "boolean") return v ? "true" : "false";
@@ -422,9 +539,27 @@ function format(v){
 }
 
 function changeFontSize(size){
+  size = parseInt(size, 10);
+  if(!size || isNaN(size)) return;
+  if(size < 10) size = 10;
+  if(size > 60) size = 60;
+  
   container.style.fontSize = size + "px";
   localStorage.setItem("memoCalcFontSize", size);
 }
+
+/* 마우스 휠 폰트 조절 */
+fontSizeInput.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  let val = parseInt(fontSizeInput.value, 10) || 16;
+  if(e.deltaY < 0) val += 1;
+  else val -= 1;
+  
+  if(val >= 10 && val <= 60){
+    fontSizeInput.value = val;
+    changeFontSize(val);
+  }
+}, {passive: false});
 
 function getTextContent(){
   const rows = container.querySelectorAll(".expr");
@@ -512,6 +647,157 @@ function addRow(text = "", refNode = null){
   return expr;
 }
 
+function openOptionModal(){
+  document.getElementById("optionModal").classList.add("active");
+}
+function closeOptionModal(){
+  document.getElementById("optionModal").classList.remove("active");
+}
+
+function toggleCommaOpt(){
+  useComma = !useComma;
+  document.getElementById("commaOptBtn").textContent = `천단위 콤마(,) 표기: ${useComma ? 'ON' : 'OFF'}`;
+  calculate();
+  status.textContent = `콤마 표기 ${useComma ? '켜짐' : '꺼짐'}`;
+}
+
+/* 주석 및 예제 제외 복사 함수 */
+async function copyFiltered(type){
+  const rows = container.querySelectorAll(".calc-row");
+  const lines = [];
+
+  rows.forEach(r => {
+    const exprText = r.querySelector(".expr").innerText.replace(/\r?\n/g, "").trim();
+    const resText = r.querySelector(".result").textContent.replace(/^=\s*/, "").trim();
+
+    if(!exprText || exprText.startsWith("#")) return;
+
+    if(type === "exprRes"){
+      lines.push(resText ? `${exprText}    = ${resText}` : exprText);
+    }else if(type === "exprOnly"){
+      lines.push(exprText);
+    }else if(type === "resOnly"){
+      if(resText && !resText.startsWith("⚠")) lines.push(resText);
+    }
+  });
+
+  if(lines.length === 0){
+    status.textContent = "복사할 수식 내용 없음";
+    return;
+  }
+
+  await navigator.clipboard.writeText(lines.join("\n"));
+  status.textContent = "복사 완료! (주석 제외됨)";
+}
+
+/* 수식 전체 지우기 (전체 삭제) */
+function clearAllData(){
+  if(confirm("작성된 모든 내용을 지우시겠습니까?")){
+    initDOM("");
+    addRow("");
+    const first = container.querySelector(".expr");
+    if(first) first.focus();
+    status.textContent = "전체 삭제됨";
+  }
+}
+
+/* 주석 삭제 */
+function removeComments(){
+  const rows = container.querySelectorAll(".calc-row");
+  rows.forEach(r => {
+    const exprElem = r.querySelector(".expr");
+    const txt = exprElem.innerText.trim();
+    if(txt.startsWith("#")){
+      r.remove();
+    }
+  });
+  if(container.children.length === 0) addRow("");
+  calculate();
+  status.textContent = "주석 삭제됨";
+}
+
+/* 빈 줄 정리 */
+function removeEmptyLines(){
+  const rows = container.querySelectorAll(".calc-row");
+  let prevEmpty = false;
+  rows.forEach(r => {
+    const txt = r.querySelector(".expr").innerText.trim();
+    if(!txt){
+      if(prevEmpty) r.remove();
+      else prevEmpty = true;
+    }else{
+      prevEmpty = false;
+    }
+  });
+  calculate();
+  status.textContent = "빈 줄 정리 완료";
+}
+
+/* 연산자 띄어쓰기 가독성 자동 정렬 */
+function formatOperators(){
+  const rows = container.querySelectorAll(".expr");
+  rows.forEach(r => {
+    let txt = r.innerText;
+    if(!txt.trim().startsWith("#")){
+      txt = txt.replace(/\s*([\+\-\*\/%]|(?<!=)=(?!=))\s*/g, " $1 ");
+      r.innerText = txt.replace(/\s+/g, " ").trim();
+    }
+  });
+  calculate();
+  status.textContent = "연산자 공백 정렬됨";
+}
+
+/* 대소문자 변환 */
+function transformCase(mode){
+  const rows = container.querySelectorAll(".expr");
+  rows.forEach(r => {
+    let txt = r.innerText;
+    if(!txt.trim().startsWith("#")){
+      r.innerText = (mode === 'upper') ? txt.toUpperCase() : txt.toLowerCase();
+    }
+  });
+  calculate();
+  status.textContent = `영문 ${mode === 'upper' ? '대문자' : '소문자'} 변환 완료`;
+}
+
+/* 파일 저장 */
+function downloadFile(content, filename, contentType){
+  const blob = new Blob([content], {type: contentType + ";charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  status.textContent = `${filename} 저장 완료`;
+}
+
+/* CSV 내보내기 */
+function exportToCsv(){
+  const rows = container.querySelectorAll(".calc-row");
+  let csv = "\uFEFF수식,결과\n";
+  rows.forEach(r => {
+    const exprText = r.querySelector(".expr").innerText.replace(/\r?\n/g, "").trim();
+    const resText = r.querySelector(".result").textContent.replace(/^=\s*/, "").trim();
+    if(exprText && !exprText.startsWith("#")){
+      csv += `"${exprText.replace(/"/g, '""')}","${resText.replace(/"/g, '""')}"\n`;
+    }
+  });
+  downloadFile(csv, "계산결과.csv", "text/csv");
+}
+
+/* 외부 파일 로드 */
+function loadFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    initDOM(evt.target.result);
+    status.textContent = "파일 불러오기 완료";
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+}
+
 function insertSymbol(symbol){
   let target = activeExpr;
   if(!target || !document.body.contains(target)){
@@ -538,7 +824,6 @@ function insertSymbol(symbol){
   const isComment = target.innerText.trim().startsWith("#");
   target.classList.toggle("comment", isComment);
   calculate();
-  showToast();
 }
 
 function insertNewline(){
@@ -552,14 +837,6 @@ function insertNewline(){
   calculate();
   newExpr.focus();
   activeExpr = newExpr;
-  showToast();
-}
-
-function showToast(){
-  const toast = document.getElementById("toastMsg");
-  toast.style.display = "inline";
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => { toast.style.display = "none"; }, 1000);
 }
 
 function openHelpModal(){
@@ -567,12 +844,6 @@ function openHelpModal(){
 }
 function closeHelpModal(e){
   document.getElementById("helpModal").classList.remove("active");
-}
-
-async function copyHelpText(){
-  const helpText = document.getElementById("helpBody").innerText;
-  await navigator.clipboard.writeText(helpText);
-  status.textContent = "도움말 복사 완료";
 }
 
 container.addEventListener("focusin", (e) => {
@@ -652,20 +923,6 @@ async function copyCurrentResult(target){
   }
 }
 
-async function copyAll(){
-  const rows = container.querySelectorAll(".calc-row");
-  const textArr = [];
-  rows.forEach(r => {
-    const expr = r.querySelector(".expr").innerText.replace(/\r?\n/g, "");
-    const res = r.querySelector(".result").textContent;
-    if(!expr.trim()) textArr.push("");
-    else if(!res) textArr.push(expr);
-    else textArr.push(`${expr}    ${res}`);
-  });
-  await navigator.clipboard.writeText(textArr.join("\n"));
-  status.textContent = "전체 계산 결과 복사됨";
-}
-
 function resetToDefault(){
   if(confirm("모든 입력을 지우고 기본 예제 내용으로 초기화할까요?")){
     localStorage.removeItem("memoCalcText");
@@ -688,8 +945,8 @@ function saveHtml(){
   status.textContent = "HTML 저장됨";
 }
 
-const savedFontSize = localStorage.getItem("memoCalcFontSize") ?? "20";
-fontSizeSelect.value = savedFontSize;
+const savedFontSize = localStorage.getItem("memoCalcFontSize") ?? "16";
+fontSizeInput.value = savedFontSize;
 changeFontSize(savedFontSize);
 
 const savedText = localStorage.getItem("memoCalcText") ?? defaultText;
