@@ -54,7 +54,7 @@ button:hover{background:#444}
   white-space:nowrap;
 }
 
-/* 상태 및 실시간 집계 요약바: 우측 정렬 */
+/* 상태 및 실시간 집계 요약바: 우측 정렬 (상태 메시지 -> 집계바 순서) */
 #status-container{
   display:flex;
   align-items:center;
@@ -343,14 +343,14 @@ button:hover{background:#444}
     <button class="op-btn ans-btn" onclick="insertSymbol('ans')">ans</button>
   </div>
 
-  <!-- 4. 상태 메시지 및 자동 집계 요약바 (맨 오른쪽 위치) -->
+  <!-- 4. 상태 메시지 및 자동 집계 요약바 (계산 완료가 왼편에 위치) -->
   <div id="status-container">
+    <span id="status">준비</span>
     <div id="summary-bar" title="실제 계산 수식 실시간 요약 (#### 예제 구역 이하 제외)">
       <span>개수: <b id="sum-count">0</b></span> |
       <span>합계: <b id="sum-total">0</b></span> |
       <span>평균: <b id="sum-avg">0</b></span>
     </div>
-    <span id="status">준비</span>
   </div>
 </div>
 
