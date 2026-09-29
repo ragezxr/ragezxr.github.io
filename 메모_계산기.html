@@ -170,6 +170,14 @@ button:hover{background:#444}
   color:#fff;
   caret-color:#fff;
 }
+
+/* 천 단위 구분 쉼표 전용 스타일 */
+.expr .comma {
+  color: #8888c7;      /* 연산자 구분 쉼표와 명확히 구별되는 보랏빛 스타일 */
+  font-weight: bold;
+  user-select: none;
+}
+
 .result{
   flex:1;
   text-align:left;
@@ -493,6 +501,32 @@ const funcs = {
 
 const constants = {pi:Math.PI, e:Math.E, tau:Math.PI*2};
 
+/* HTML 기반 천 단위 구분 쉼표 포맷팅 (함수 인자 구분 쉼표와 명확히 분리) */
+function formatCommasInExprHtml(str) {
+  if (!str || str.startsWith("#")) return str;
+
+  const tokens = str.split(/([A-Za-z_가-힣][A-Za-z0-9_가-힣]*|\d+|\.\d*|[^\s\w가-힣]+|\s+)/g);
+
+  return tokens.map(token => {
+    if (/^\d+$/.test(token)) {
+      return token.replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="comma">,</span>');
+    }
+    return token.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }).join("");
+}
+
+/* 수식 평가 전 HTML 요소 제거 및 천 단위 쉼표 정제 (함수 쉼표 보존) */
+function cleanExprForEval(htmlString) {
+  const temp = document.createElement("div");
+  temp.innerHTML = htmlString;
+  
+  // 천 단위 구분을 위해 삽입된 <span class="comma">,</span> 요소만 선택적으로 제거
+  const commaSpans = temp.querySelectorAll("span.comma");
+  commaSpans.forEach(span => span.remove());
+  
+  return temp.innerText.replace(/\r?\n/g, "");
+}
+
 function normalize(s){
   return s
   .replace(/\u00A0/g, " ")
@@ -564,25 +598,26 @@ fontSizeInput.addEventListener("wheel", (e) => {
 function getTextContent(){
   const rows = container.querySelectorAll(".expr");
   const lines = [];
-  rows.forEach(r => lines.push(r.innerText.replace(/\r?\n/g, "")));
+  rows.forEach(r => lines.push(cleanExprForEval(r.innerHTML)));
   return lines.join("\n");
 }
 
 function calculate(){
-  const text = getTextContent();
-  const src = text.split("\n");
+  const rows = container.querySelectorAll(".calc-row");
   const vars = {};
   let last = 0;
   let errors = 0;
-  const results = [];
 
-  for(let i = 0; i < src.length; i++){
-    const raw = src[i];
-    const line = raw.trim();
+  rows.forEach((row) => {
+    const exprElem = row.querySelector(".expr");
+    const resElem = row.querySelector(".result");
+    const rawLine = cleanExprForEval(exprElem.innerHTML);
+    const line = rawLine.trim();
 
     if(!line || line.startsWith("#")){
-      results.push({result: "", comment: line.startsWith("#")});
-      continue;
+      resElem.textContent = "";
+      resElem.className = "result";
+      return;
     }
 
     try{
@@ -592,28 +627,23 @@ function calculate(){
         const v = safeEval(expr, vars);
         vars[name] = v;
         last = v;
-        results.push({result: format(v)});
+        resElem.textContent = "= " + format(v);
+        resElem.className = "result";
       }else{
         const v = safeEval(line, {...vars, ans: last});
         last = v;
-        results.push({result: format(v)});
+        resElem.textContent = "= " + format(v);
+        resElem.className = "result";
       }
     }catch(e){
       errors++;
-      results.push({result: "⚠ " + e.message, error: true});
-    }
-  }
-
-  localStorage.setItem("memoCalcText", text);
-  status.textContent = errors ? `${errors}개 오류` : "계산 완료";
-  
-  const resElems = container.querySelectorAll(".result");
-  results.forEach((item, i) => {
-    if(resElems[i]){
-      resElems[i].textContent = item.result ? "= " + item.result : "";
-      resElems[i].className = "result" + (item.error ? " error" : "");
+      resElem.textContent = "= ⚠ " + e.message;
+      resElem.className = "result error";
     }
   });
+
+  localStorage.setItem("memoCalcText", getTextContent());
+  status.textContent = errors ? `${errors}개 오류` : "계산 완료";
 }
 
 function initDOM(initialText){
@@ -631,7 +661,12 @@ function addRow(text = "", refNode = null){
   expr.className = "expr" + (text.trim().startsWith("#") ? " comment" : "");
   expr.contentEditable = "true";
   expr.spellcheck = false;
-  expr.innerText = text;
+  
+  if (text.trim().startsWith("#")) {
+    expr.innerText = text;
+  } else {
+    expr.innerHTML = formatCommasInExprHtml(text);
+  }
 
   const res = document.createElement("div");
   res.className = "result";
@@ -667,7 +702,7 @@ async function copyFiltered(type){
   const lines = [];
 
   rows.forEach(r => {
-    const exprText = r.querySelector(".expr").innerText.replace(/\r?\n/g, "").trim();
+    const exprText = cleanExprForEval(r.querySelector(".expr").innerHTML).trim();
     const resText = r.querySelector(".result").textContent.replace(/^=\s*/, "").trim();
 
     if(!exprText || exprText.startsWith("#")) return;
@@ -737,10 +772,10 @@ function removeEmptyLines(){
 function formatOperators(){
   const rows = container.querySelectorAll(".expr");
   rows.forEach(r => {
-    let txt = r.innerText;
+    let txt = cleanExprForEval(r.innerHTML);
     if(!txt.trim().startsWith("#")){
       txt = txt.replace(/\s*([\+\-\*\/%]|(?<!=)=(?!=))\s*/g, " $1 ");
-      r.innerText = txt.replace(/\s+/g, " ").trim();
+      r.innerHTML = formatCommasInExprHtml(txt.replace(/\s+/g, " ").trim());
     }
   });
   calculate();
@@ -751,9 +786,10 @@ function formatOperators(){
 function transformCase(mode){
   const rows = container.querySelectorAll(".expr");
   rows.forEach(r => {
-    let txt = r.innerText;
+    let txt = cleanExprForEval(r.innerHTML);
     if(!txt.trim().startsWith("#")){
-      r.innerText = (mode === 'upper') ? txt.toUpperCase() : txt.toLowerCase();
+      const transformed = (mode === 'upper') ? txt.toUpperCase() : txt.toLowerCase();
+      r.innerHTML = formatCommasInExprHtml(transformed);
     }
   });
   calculate();
@@ -776,7 +812,7 @@ function exportToCsv(){
   const rows = container.querySelectorAll(".calc-row");
   let csv = "\uFEFF수식,결과\n";
   rows.forEach(r => {
-    const exprText = r.querySelector(".expr").innerText.replace(/\r?\n/g, "").trim();
+    const exprText = cleanExprForEval(r.querySelector(".expr").innerHTML).trim();
     const resText = r.querySelector(".result").textContent.replace(/^=\s*/, "").trim();
     if(exprText && !exprText.startsWith("#")){
       csv += `"${exprText.replace(/"/g, '""')}","${resText.replace(/"/g, '""')}"\n`;
@@ -800,7 +836,7 @@ function loadFile(e){
 
 function insertSymbol(symbol){
   let target = activeExpr;
-  if(!target || !document.body.contains(target)){
+  if(!target || !document.contains(target)){
     const exprs = container.querySelectorAll(".expr");
     target = exprs[exprs.length - 1];
   }
@@ -823,12 +859,17 @@ function insertSymbol(symbol){
   
   const isComment = target.innerText.trim().startsWith("#");
   target.classList.toggle("comment", isComment);
-  calculate();
+  
+  if(!isComment) {
+    applyLiveComma(target);
+  } else {
+    calculate();
+  }
 }
 
 function insertNewline(){
   let target = activeExpr;
-  if(!target || !document.body.contains(target)){
+  if(!target || !document.contains(target)){
     const exprs = container.querySelectorAll(".expr");
     target = exprs[exprs.length - 1];
   }
@@ -862,11 +903,88 @@ container.addEventListener("click", (e) => {
   }
 });
 
+/* contentEditable 내 순수 텍스트 오프셋 구하기 (천 단위 쉼표 제외) */
+function getRawCaretOffset(element) {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return 0;
+
+  const range = sel.getRangeAt(0);
+  const preCaretRange = range.cloneRange();
+  preCaretRange.selectNodeContents(element);
+  preCaretRange.setEnd(range.endContainer, range.endOffset);
+
+  const containerDiv = document.createElement("div");
+  containerDiv.appendChild(preCaretRange.cloneContents());
+
+  // 천 단위 구분용 쉼표 요소만 삭제하여 오프셋 측정
+  const commaSpans = containerDiv.querySelectorAll("span.comma");
+  commaSpans.forEach(s => s.remove());
+
+  return containerDiv.innerText.replace(/\r?\n/g, "").length;
+}
+
+/* 지정 오프셋으로 커서 설정 헬퍼 */
+function setCaretByRawOffset(element, rawOffset) {
+  const sel = window.getSelection();
+  const range = document.createRange();
+  let currentRaw = 0;
+  let setDone = false;
+
+  function traverse(node) {
+    if (setDone) return;
+    if (node.nodeType === Node.TEXT_NODE) {
+      const parentIsComma = node.parentNode && node.parentNode.classList && node.parentNode.classList.contains("comma");
+      if (parentIsComma) return; // 자동 천단위 쉼표는 오프셋 카운트에서 제외
+
+      const len = node.length;
+      if (currentRaw + len >= rawOffset) {
+        const offsetInNode = rawOffset - currentRaw;
+        range.setStart(node, offsetInNode);
+        range.setEnd(node, offsetInNode);
+        setDone = true;
+        return;
+      }
+      currentRaw += len;
+    } else {
+      for (let i = 0; i < node.childNodes.length; i++) {
+        traverse(node.childNodes[i]);
+        if (setDone) return;
+      }
+    }
+  }
+
+  traverse(element);
+
+  if (!setDone) {
+    range.selectNodeContents(element);
+    range.collapse(false);
+  }
+
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+/* 천 단위 구분 쉼표 스타일 실시간 정렬 */
+function applyLiveComma(elem) {
+  const rawOffset = getRawCaretOffset(elem);
+  const cleanText = cleanExprForEval(elem.innerHTML);
+
+  elem.innerHTML = formatCommasInExprHtml(cleanText);
+  setCaretByRawOffset(elem, rawOffset);
+
+  calculate();
+}
+
 container.addEventListener("input", (e) => {
   if(e.target.classList.contains("expr")){
     const isComment = e.target.innerText.trim().startsWith("#");
     e.target.classList.toggle("comment", isComment);
-    calculate();
+
+    if(!isComment) {
+      applyLiveComma(e.target);
+    } else {
+      calculate();
+    }
   }
 });
 

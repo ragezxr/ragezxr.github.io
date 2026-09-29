@@ -262,13 +262,13 @@
 
         <div class="field">
           <label id="amountLabel">2. 개당 (g)</label>
-          <input id="amount" type="text" inputmode="decimal" placeholder="개당 (g)" autofocus autocomplete="off">
+          <input id="amount" type="text" inputmode="decimal" placeholder="개당 (g) (선택)" autofocus autocomplete="off">
         </div>
       </div>
 
       <div class="field" style="padding: 0 7px;">
         <label>3. 수량 (EA)</label>
-        <input id="qty" type="text" inputmode="numeric" placeholder="수량 (EA)" autocomplete="off">
+        <input id="qty" type="text" inputmode="numeric" placeholder="수량 (EA) (선택)" autocomplete="off">
       </div>
 
       <div class="field" style="padding: 0 7px;">
@@ -325,19 +325,33 @@ const $ = id => document.getElementById(id);
 let selectedUnit = 'g';
 let currentActiveInput = $('amount');
 
-const inputs = [$('amount'), $('qty'), $('totalPriceInput')];
+const inputs = [$('amount'), $('qty'),$('totalPriceInput')];
+
+// 숫자 및 소수점을 콤마 포함한 천단위 포맷으로 변경
+function formatNumberWithCommas(val) {
+  let cleanVal = val.replace(/[^0-9.]/g, '');
+  const parts = cleanVal.split('.');
+  if (parts.length > 2) {
+    cleanVal = parts[0] + '.' + parts.slice(1).join('');
+  }
+  const integerPart = parts[0];
+  const decimalPart = parts.length > 1 ? '.' + parts.slice(1).join('') : '';
+
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return formattedInteger + decimalPart;
+}
+
+// 콤마 제거 후 pure 숫자 형태 반환
+function parseNumber(val) {
+  return Number(val.replace(/,/g, ''));
+}
 
 inputs.forEach(input => {
   input.addEventListener('focus', () => currentActiveInput = input);
   input.addEventListener('click', () => currentActiveInput = input);
 
   input.addEventListener('input', () => {
-    let val = input.value.replace(/[^0-9.]/g, '');
-    const parts = val.split('.');
-    if (parts.length > 2) {
-      val = parts[0] + '.' + parts.slice(1).join('');
-    }
-    input.value = val;
+    input.value = formatNumberWithCommas(input.value);
   });
 });
 
@@ -371,7 +385,7 @@ function selectUnit(unit) {
 
   let unitDisplay = unit === 'l' ? 'L' : unit;
   $('amountLabel').textContent = `2. 개당 (${unitDisplay})`;
-  $('amount').placeholder = `개당 (${unitDisplay})`;
+  $('amount').placeholder = `개당 (${unitDisplay}) (선택)`;
 }
 
 function pressKey(key) {
@@ -386,27 +400,21 @@ function pressKey(key) {
   const end = input.selectionEnd ?? input.value.length;
   const val = input.value;
 
+  let newRawVal = val;
+
   if (key === 'back') {
     if (start !== end) {
-      input.value = val.slice(0, start) + val.slice(end);
-      input.setSelectionRange(start, start);
+      newRawVal = val.slice(0, start) + val.slice(end);
     } else if (start > 0) {
-      input.value = val.slice(0, start - 1) + val.slice(start);
-      input.setSelectionRange(start - 1, start - 1);
+      newRawVal = val.slice(0, start - 1) + val.slice(start);
     }
-    return;
+  } else {
+    if (key === '.' && val.includes('.')) return;
+    newRawVal = val.slice(0, start) + key + val.slice(end);
   }
 
-  let textToInsert = key;
-
-  if (key === '.' && val.includes('.')) {
-    return;
-  }
-
-  const newVal = val.slice(0, start) + textToInsert + val.slice(end);
-  input.value = newVal;
-
-  const newPos = start + textToInsert.length;
+  input.value = formatNumberWithCommas(newRawVal);
+  const newPos = input.value.length;
   input.setSelectionRange(newPos, newPos);
 }
 
@@ -417,46 +425,73 @@ function trimNumber(n) {
 }
 
 function calculate() {
-  const totalPrice = Number($('totalPriceInput').value);
-  const qty = Number($('qty').value);
-  const amount = Number($('amount').value);
+  const totalPrice = parseNumber($('totalPriceInput').value);
+  const rawQty = $('qty').value.trim();
+  const rawAmount = $('amount').value.trim();
+  
+  const qty = rawQty !== '' ? parseNumber(rawQty) : 1;
+  const amount = parseNumber(rawAmount);
   const unit = selectedUnit;
 
-  if (!(totalPrice > 0) || !(qty > 0) || !(amount > 0)) {
-    alert('모든 정보를 정확히 입력해 주세요.');
+  // 최종 가격 필수 입력 확인
+  if (!(totalPrice > 0)) {
+    alert('최종 가격을 정확히 입력해 주세요.');
+    return;
+  }
+
+  const hasAmount = rawAmount !== '' && amount > 0;
+  const hasQty = rawQty !== '' && qty > 0;
+
+  // 2번(용량/무게)과 3번(수량) 둘 다 비어있는 경우 예외 처리
+  if (!hasAmount && !hasQty) {
+    alert('용량/무게 또는 수량을 입력해 주세요.');
     return;
   }
 
   const eachPrice = Math.round(totalPrice / qty);
-
-  let totalBase;
-  let totalDisplay;
-
-  if (unit === 'ml') {
-    totalBase = amount * qty;
-    totalDisplay = totalBase >= 1000 ? trimNumber(totalBase / 1000) + 'L' : trimNumber(totalBase) + 'ml';
-  } else if (unit === 'l') {
-    totalBase = amount * 1000 * qty;
-    totalDisplay = trimNumber(totalBase / 1000) + 'L';
-  } else if (unit === 'g') {
-    totalBase = amount * qty;
-    totalDisplay = totalBase >= 1000 ? trimNumber(totalBase / 1000) + 'kg' : trimNumber(totalBase) + 'g';
-  } else {
-    totalBase = amount * 1000 * qty;
-    totalDisplay = trimNumber(totalBase / 1000) + 'kg';
-  }
-
-  const unitCost = totalPrice / totalBase * 100;
-  const roundedUnitCost = Math.round(unitCost);
-
   $('eachPrice').textContent = fmt(eachPrice) + '원';
-  $('totalAmount').textContent = totalDisplay;
-  $('unitPrice').textContent = '#' + fmt(roundedUnitCost) + '원';
 
   const copyTextElem = $('copyText');
-  copyTextElem.textContent = `${fmt(eachPrice)}(x${fmt(qty)})[${totalDisplay}#${fmt(roundedUnitCost)}]=${fmt(totalPrice)}`;
-  copyTextElem.classList.remove('hint-mode');
 
+  // 무게/용량이 입력되었을 때
+  if (hasAmount) {
+    let totalBase;
+    let totalDisplay;
+
+    if (unit === 'ml') {
+      totalBase = amount * qty;
+      totalDisplay = totalBase >= 1000 ? trimNumber(totalBase / 1000) + 'L' : trimNumber(totalBase) + 'ml';
+    } else if (unit === 'l') {
+      totalBase = amount * 1000 * qty;
+      totalDisplay = trimNumber(totalBase / 1000) + 'L';
+    } else if (unit === 'g') {
+      totalBase = amount * qty;
+      totalDisplay = totalBase >= 1000 ? trimNumber(totalBase / 1000) + 'kg' : trimNumber(totalBase) + 'g';
+    } else {
+      totalBase = amount * 1000 * qty;
+      totalDisplay = trimNumber(totalBase / 1000) + 'kg';
+    }
+
+    const unitCost = totalPrice / totalBase * 100;
+    const roundedUnitCost = Math.round(unitCost);
+
+    $('totalAmount').textContent = totalDisplay;
+    $('unitPrice').textContent = '#' + fmt(roundedUnitCost) + '원';
+
+    if (hasQty) {
+      // 수량과 중량 모두 있는 경우: 개당가격(x수량)[모든중량#단가]=최종가
+      copyTextElem.textContent = `${fmt(eachPrice)}(x${fmt(qty)})[${totalDisplay}#${fmt(roundedUnitCost)}]=${fmt(totalPrice)}`;
+    } else {
+      // 중량만 있고 수량이 없는 경우: [모든중량#단가]=최종가
+      copyTextElem.textContent = `[${totalDisplay}#${fmt(roundedUnitCost)}]=${fmt(totalPrice)}`;
+    }
+  } else {
+    // 수량만 입력된 경우
+    $('totalAmount').textContent = '-';$('unitPrice').textContent = '-';
+    copyTextElem.textContent = `${fmt(eachPrice)}(x${fmt(qty)})= ${fmt(totalPrice)}`.replace(')= ', ')=');
+  }
+
+  copyTextElem.classList.remove('hint-mode');
   copyResult();
 }
 
@@ -506,8 +541,7 @@ function clearAll() {
   });
   selectUnit('g');
   $('eachPrice').textContent = '-';
-  $('totalAmount').textContent = '-';
-  $('unitPrice').textContent = '-';
+  $('totalAmount').textContent = '-';$('unitPrice').textContent = '-';
   
   const copyTextElem = $('copyText');
   copyTextElem.textContent = HINT_TEXT;
