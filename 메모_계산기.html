@@ -218,9 +218,6 @@ button:hover{
 
 /* =========================================================
    상단 토글
-   아이콘만 표시
-   ON = 강조색
-   OFF = 일반색
    ========================================================= */
 
 .toggle-btn{
@@ -249,8 +246,6 @@ button:hover{
   background:#355746;
   color:#fff;
 }
-
-/* 개별 토글 색상 */
 
 #toggleOpBtn.active{
   color:#4ec9b0;
@@ -299,29 +294,27 @@ button:hover{
 }
 
 /* =========================================================
-   복사
+   복사 - 노란 계열
    ========================================================= */
 
 .btn-copy{
   width:30px;
   min-width:30px;
   padding:0;
-  background:#3a3a3c;
-  color:#dcdcaa;
-  border-color:#666;
+  background:#4d4525;
+  color:#f0d75a;
+  border-color:#7d702f;
   font-weight:bold;
   font-size:14px;
 }
 
 .btn-copy:hover{
-  background:#505054;
+  background:#655a2e;
   color:#fff;
 }
 
 /* =========================================================
    패드
-   OFF = 일반색
-   ON = 강조색
    ========================================================= */
 
 .btn-numpad{
@@ -351,7 +344,7 @@ button:hover{
 }
 
 /* =========================================================
-   초기화
+   초기화 - 붉은 계열
    ========================================================= */
 
 .btn-reset{
@@ -366,7 +359,7 @@ button:hover{
 }
 
 .btn-reset:hover{
-  background:#444;
+  background:#713030;
   color:#fff;
 }
 
@@ -406,34 +399,34 @@ button:hover{
 }
 
 /* =========================================================
-   메뉴 표시 방식
-   아이콘만 / 아이콘 + 이름
+   메뉴 표시 방식 - 흰색 계열
    ========================================================= */
 
 .menu-label-btn{
   width:30px;
   min-width:30px;
   padding:0;
-  background:#333;
-  color:#777;
-  border-color:#555;
+  background:#3a3a3a;
+  color:#eee;
+  border-color:#666;
   font-weight:bold;
   font-size:14px;
   text-align:center;
 }
 
 .menu-label-btn.active{
-  background:#2d4a3e;
-  color:#73e6cf;
-  border-color:#3b6e5d;
+  background:#444;
+  color:#fff;
+  border-color:#777;
 }
 
 .menu-label-btn:hover{
-  background:#444;
+  background:#4a4a4a;
+  color:#fff;
 }
 
 .menu-label-btn.active:hover{
-  background:#355746;
+  background:#555;
   color:#fff;
 }
 
@@ -571,6 +564,12 @@ button:hover{
   user-select:none;
 }
 
+/* =========================================================
+   PC 기본값
+   패드 버튼 세로 크기 = 60px
+   기존 30px의 2배
+   ========================================================= */
+
 #virtual-numpad.active{
   display:block;
 }
@@ -578,14 +577,14 @@ button:hover{
 .numpad-grid{
   display:grid;
   grid-template-columns:repeat(8,1fr);
-  gap:2px;
+  gap:4px;
   max-width:100%;
   margin:0 auto;
 }
 
 .np-btn{
-  height:30px;
-  font-size:12px;
+  height:60px;
+  font-size:14px;
   font-weight:bold;
   background:#2d2d30;
   color:#fff;
@@ -619,11 +618,107 @@ button:hover{
 .np-btn.func{
   color:#ce9178;
   background:#202022;
-  font-size:11px;
+  font-size:12px;
 }
 
 .np-btn.span-2{
   grid-column:span 2;
+}
+
+
+/* =========================================================
+   반응형
+   ========================================================= */
+
+@media(max-width:900px){
+
+  #top{
+    gap:7px 8px;
+  }
+
+  #action-section{
+    flex-basis:100%;
+    justify-content:flex-start;
+  }
+
+  #action-section{
+    border-left:0!important;
+    padding-left:0!important;
+    border-top:1px solid #454545;
+    padding-top:7px;
+  }
+
+  .top-action-group{
+    justify-content:flex-start;
+  }
+}
+
+
+/* =========================================================
+   모바일
+   기존 패드 크기 그대로 유지
+   ========================================================= */
+
+@media(max-width:600px){
+
+  #top{
+    gap:6px 5px;
+    padding:6px 4px;
+  }
+
+  #operator-section,
+  #summary-section,
+  #action-section{
+    flex-basis:100%;
+  }
+
+  #operator-section,
+  #summary-section{
+    border-left:0!important;
+    padding-left:0!important;
+  }
+
+  #summary-section{
+    border-top:1px solid #454545;
+    padding-top:6px;
+  }
+
+  #action-section{
+    border-top:1px solid #454545;
+    padding-top:6px;
+  }
+
+  #summary-bar{
+    width:100%;
+  }
+
+  .summary-item{
+    flex:0 1 auto;
+  }
+
+  .result{
+    flex-basis:180px;
+    width:180px;
+    padding-left:12px;
+  }
+
+  /* 모바일 패드는 기존 크기 */
+  .numpad-grid{
+    gap:2px;
+  }
+
+  .np-btn{
+    height:28px;
+    font-size:11px;
+  }
+
+  .np-btn.func{
+    font-size:10px;
+  }
+
+  #help-bar{
+    display:none;
+  }
 }
 
 /* =========================================================
@@ -824,13 +919,8 @@ button:hover{
 
 <body>
 
-<!-- =========================================================
-     상단 메뉴
-     ========================================================= -->
-
 <div id="top">
 
-  <!-- ① 계산 기호 -->
   <div class="menu-section" id="operator-section">
 
     <div class="op-badge-group" id="opBadgeGroup">
@@ -848,8 +938,6 @@ button:hover{
 
   </div>
 
-
-  <!-- ② 계산 요약 -->
   <div class="menu-section" id="summary-section">
 
     <div id="status-container">
@@ -877,13 +965,10 @@ button:hover{
 
   </div>
 
-
-  <!-- ③ 기능 -->
   <div class="menu-section" id="action-section">
 
     <div class="top-action-group">
 
-      <!-- 폰트 크기 -->
       <div class="font-size-wrapper" title="폰트 크기">
         <input
           type="number"
@@ -895,8 +980,6 @@ button:hover{
         >px
       </div>
 
-
-      <!-- 수식 기호 표시 -->
       <button
         id="toggleOpBtn"
         class="toggle-btn active"
@@ -908,8 +991,6 @@ button:hover{
         data-label="수식"
       >➗</button>
 
-
-      <!-- 계산 요약 표시 -->
       <button
         id="toggleSummaryBtn"
         class="toggle-btn active"
@@ -921,8 +1002,6 @@ button:hover{
         data-label="요약"
       >Σ</button>
 
-
-      <!-- 천단위 콤마 -->
       <button
         id="toggleCommaBtn"
         class="toggle-btn active"
@@ -934,8 +1013,6 @@ button:hover{
         data-label="콤마"
       >#,</button>
 
-
-      <!-- 연산자 자동정렬 -->
       <button
         id="toggleAutoFormatBtn"
         class="toggle-btn"
@@ -947,8 +1024,6 @@ button:hover{
         data-label="정렬"
       >↔</button>
 
-
-      <!-- 패드 -->
       <button
         id="numpadToggleBtn"
         class="btn-numpad"
@@ -960,8 +1035,6 @@ button:hover{
         data-label="패드"
       >🔢</button>
 
-
-      <!-- 예제 -->
       <button
         id="exampleToggleBtn"
         class="btn-example"
@@ -973,8 +1046,6 @@ button:hover{
         data-label="예제"
       >💡</button>
 
-
-      <!-- 도움말 -->
       <button
         id="helpBtn"
         class="btn-help"
@@ -985,8 +1056,6 @@ button:hover{
         data-label="도움말"
       >❓</button>
 
-
-      <!-- 복사 -->
       <button
         id="copyBtn"
         class="btn-copy"
@@ -997,8 +1066,6 @@ button:hover{
         data-label="복사"
       >📋</button>
 
-
-      <!-- 초기화 -->
       <button
         id="resetBtn"
         class="btn-reset"
@@ -1009,8 +1076,6 @@ button:hover{
         data-label="초기화"
       >🔄</button>
 
-
-      <!-- 옵션 -->
       <button
         id="optionBtn"
         class="btn-option"
@@ -1020,19 +1085,15 @@ button:hover{
         data-label="옵션"
       >⚙️ 옵션</button>
 
-
-      <!-- 옵션 오른쪽: 메뉴 표시 방식 -->
       <button
         id="menuLabelToggleBtn"
         class="menu-label-btn"
         onclick="toggleMenuLabels()"
-        title="메뉴 이름 표시/숨기기"
+        title="메뉴 이름 표시"
         aria-label="메뉴 이름 표시"
-        aria-pressed="false"
-      >🔖</button>
+        aria-pressed="true"
+      >🔤</button>
 
-
-      <!-- 계산 상태 -->
       <div
         id="status"
         class="top-status"
@@ -1042,7 +1103,6 @@ button:hover{
     </div>
 
   </div>
-
 
   <input
     type="file"
@@ -1054,19 +1114,9 @@ button:hover{
 
 </div>
 
-
-<!-- =========================================================
-     편집 영역
-     ========================================================= -->
-
 <div id="wrap">
   <div id="editor-container"></div>
 </div>
-
-
-<!-- =========================================================
-     가상 숫자 패드
-     ========================================================= -->
 
 <div id="virtual-numpad">
 
@@ -1110,26 +1160,13 @@ button:hover{
 
 </div>
 
-
 <div id="help-bar">
   Enter: 계산 후 다음 줄 · Ctrl+Enter: 결과 복사 · Ctrl+Shift+C: 보이는 내용 복사
 </div>
 
+<div id="optionModal" class="modal-overlay" onclick="closeOptionModal(event)">
 
-<!-- =========================================================
-     옵션 모달
-     ========================================================= -->
-
-<div
-  id="optionModal"
-  class="modal-overlay"
-  onclick="closeOptionModal(event)"
->
-
-  <div
-    class="modal-content"
-    onclick="event.stopPropagation()"
-  >
+  <div class="modal-content" onclick="event.stopPropagation()">
 
     <div class="modal-header">
       <h2>⚙️ 메모 계산기 고급 옵션</h2>
@@ -1162,7 +1199,6 @@ button:hover{
 
         </div>
 
-
         <div class="opt-card">
 
           <h4>⚙ 텍스트 기능</h4>
@@ -1181,7 +1217,6 @@ button:hover{
 
         </div>
 
-
         <div class="opt-card">
 
           <h4>ℹ️ 사용 안내</h4>
@@ -1190,7 +1225,7 @@ button:hover{
             상단 아이콘으로 수식 기호 · 계산 요약 ·<br>
             콤마 · 자동정렬 · 패드 · 예제를<br>
             바로 켜고 끌 수 있습니다.<br><br>
-            <b style="color:#ddd">🔖</b> 버튼으로 상단 메뉴를<br>
+            <b style="color:#ddd">🔤</b> 버튼으로 상단 메뉴를<br>
             아이콘만 표시하거나 이름과 함께 표시할 수 있습니다.
           </p>
 
@@ -1204,21 +1239,9 @@ button:hover{
 
 </div>
 
+<div id="helpModal" class="modal-overlay" onclick="closeHelpModal(event)">
 
-<!-- =========================================================
-     도움말
-     ========================================================= -->
-
-<div
-  id="helpModal"
-  class="modal-overlay"
-  onclick="closeHelpModal(event)"
->
-
-  <div
-    class="modal-content"
-    onclick="event.stopPropagation()"
-  >
+  <div class="modal-content" onclick="event.stopPropagation()">
 
     <div class="modal-header">
       <h2>❓ 상세 도움말</h2>
@@ -1242,7 +1265,6 @@ button:hover{
 
       </div>
 
-
       <div class="help-section">
 
         <h3>1. 쇼핑 및 견적</h3>
@@ -1261,7 +1283,6 @@ button:hover{
 
       </div>
 
-
       <div class="help-section">
 
         <h3>2. 금융</h3>
@@ -1271,7 +1292,6 @@ button:hover{
         >예금 계산</span>
 
       </div>
-
 
       <div class="help-section">
 
@@ -1291,7 +1311,6 @@ button:hover{
 
       </div>
 
-
       <div class="help-section">
 
         <h3>4. ans</h3>
@@ -1301,7 +1320,6 @@ button:hover{
         >이전 결과 사용</span>
 
       </div>
-
 
       <div class="help-section">
 
@@ -1318,7 +1336,6 @@ button:hover{
 
       </div>
 
-
       <div class="help-section">
 
         <h3>6. 주석</h3>
@@ -1327,7 +1344,6 @@ button:hover{
         <p>#### 아래 줄부터는 예제 항목으로 처리됩니다.</p>
 
       </div>
-
 
       <div class="help-section">
 
@@ -1348,7 +1364,6 @@ button:hover{
   </div>
 
 </div>
-
 
 <script>
 "use strict";
@@ -1408,7 +1423,10 @@ let showSummary = true;
 let autoFormatOp = false;
 
 let isNumpadActive = false;
+
+/* 이름 표시 초기값 = ON */
 let showMenuLabels = true;
+
 let composing = false;
 
 
@@ -1636,8 +1654,8 @@ function updateMenuLabels(){
 
   menuLabelToggleBtn.textContent =
     showMenuLabels
-      ? "🔖 이름"
-      : "🔖";
+      ? "🔤 이름"
+      : "🔤";
 
 }
 
@@ -2357,8 +2375,6 @@ function calculate(){
 
     }
 
-    /* 결과는 항상 표시 */
-
     res.classList.remove(
       "hidden"
     );
@@ -2636,10 +2652,7 @@ function updateNumpadButton(){
 }
 
 
-function toggleNumpad(){
-
-  isNumpadActive =
-    !isNumpadActive;
+function applyNumpadState(){
 
   numpadEl.classList.toggle(
     "active",
@@ -2697,6 +2710,23 @@ function toggleNumpad(){
       "40px";
 
   }
+
+}
+
+
+function toggleNumpad(){
+
+  isNumpadActive =
+    !isNumpadActive;
+
+  localStorage.setItem(
+    "memoCalcNumpad",
+    isNumpadActive
+      ? "1"
+      : "0"
+  );
+
+  applyNumpadState();
 
 }
 
@@ -3623,8 +3653,6 @@ container.addEventListener(
       return;
 
 
-    /* Enter */
-
     if(
       e.key === "Enter" &&
       !e.shiftKey &&
@@ -3656,8 +3684,6 @@ container.addEventListener(
 
     }
 
-
-    /* Backspace */
 
     if(
       e.key === "Backspace" &&
@@ -3718,8 +3744,6 @@ container.addEventListener(
     }
 
 
-    /* Ctrl + Shift + C */
-
     if(
       e.ctrlKey &&
       e.shiftKey &&
@@ -3734,8 +3758,6 @@ container.addEventListener(
 
     }
 
-
-    /* Ctrl + Enter */
 
     if(
       e.ctrlKey &&
@@ -3752,8 +3774,6 @@ container.addEventListener(
 
     }
 
-
-    /* Ctrl + S */
 
     if(
       e.ctrlKey &&
@@ -3799,21 +3819,48 @@ initDOM(
 showExample =
   false;
 
+
+/* ---------------------------------------------------------
+   메뉴 이름 표시 상태
+   최초 실행 기본값 = ON
+   기존 저장값이 있으면 저장값 우선
+   --------------------------------------------------------- */
+
 const savedMenuLabels =
   localStorage.getItem(
     "memoCalcMenuLabels"
   );
 
 showMenuLabels =
-  savedMenuLabels === "1";
+  savedMenuLabels === null
+    ? true
+    : savedMenuLabels === "1";
+
+
+/* ---------------------------------------------------------
+   패드 상태
+   최초 실행 기본값 = OFF
+   기존 저장값이 있으면 저장값 우선
+   --------------------------------------------------------- */
+
+const savedNumpad =
+  localStorage.getItem(
+    "memoCalcNumpad"
+  );
+
+isNumpadActive =
+  savedNumpad === null
+    ? false
+    : savedNumpad === "1";
+
 
 updateExampleButton();
 
 updateToggleButtons();
 
-updateNumpadButton();
-
 updateMenuLabels();
+
+applyNumpadState();
 
 calculate();
 
