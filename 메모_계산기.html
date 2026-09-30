@@ -325,7 +325,7 @@ button:hover{ background:#444; }
   min-width:100%;
 }
 
-/* 코드 블록 및 스크립트 출력 제한 (최대 높이 500px, 스크롤 생성) */
+/* 코드 블록 및 스크립트 출력 상자 높이 제한 (최대 500px, 스크롤 생성) */
 .calc-row{
   display:flex;
   align-items:baseline;
@@ -431,7 +431,9 @@ button:hover{ background:#444; }
 .np-btn:active{ background:#0e639c; border-color:#1177bb; }
 .np-btn.op{ color:#4ec9b0; background:#222225; }
 .np-btn.action{ color:#f48771; background:#2a2a2d; }
+.np-btn.danger{ color:#ff4d4d; background:#2a2a2d; font-weight:bold; }
 .np-btn.func{ color:#ce9178; background:#202022; font-size:clamp(10px, 2vh, 16px); }
+.np-btn.span-2{ grid-column:span 2; }
 
 /* =========================================================
    모달
@@ -617,7 +619,7 @@ button:hover{ background:#444; }
 
 <div id="virtual-numpad">
   <div class="numpad-grid">
-    <!-- 1행: 7, 8, 9, ÷, ×, (, ), ans -->
+    <!-- 1행 (8열): 7, 8, 9, ÷, ×, (, ), ans -->
     <button class="np-btn" data-action="symbol" data-val="7">7</button>
     <button class="np-btn" data-action="symbol" data-val="8">8</button>
     <button class="np-btn" data-action="symbol" data-val="9">9</button>
@@ -627,7 +629,7 @@ button:hover{ background:#444; }
     <button class="np-btn func" data-action="symbol" data-val=")">)</button>
     <button class="np-btn func" data-action="symbol" data-val="ans">ans</button>
 
-    <!-- 2행: 4, 5, 6, -, %, sqrt, ^, , -->
+    <!-- 2행 (8열): 4, 5, 6, -, %, sqrt, ^, , -->
     <button class="np-btn" data-action="symbol" data-val="4">4</button>
     <button class="np-btn" data-action="symbol" data-val="5">5</button>
     <button class="np-btn" data-action="symbol" data-val="6">6</button>
@@ -637,7 +639,7 @@ button:hover{ background:#444; }
     <button class="np-btn func" data-action="symbol" data-val="^">^</button>
     <button class="np-btn func" data-action="symbol" data-val=",">,</button>
 
-    <!-- 3행: 1, 2, 3, +, =, <, >, : -->
+    <!-- 3행 (8열): 1, 2, 3, +, =, <, >, : -->
     <button class="np-btn" data-action="symbol" data-val="1">1</button>
     <button class="np-btn" data-action="symbol" data-val="2">2</button>
     <button class="np-btn" data-action="symbol" data-val="3">3</button>
@@ -647,15 +649,13 @@ button:hover{ background:#444; }
     <button class="np-btn func" data-action="symbol" data-val=" > ">&gt;</button>
     <button class="np-btn func" data-action="symbol" data-val=":">:</button>
 
-    <!-- 4행: 0, ., ⌫, ↵ Enter, CE, 초기화, pi, abs -->
+    <!-- 4행 (총 8열): 0(1열), .(1열), ⌫(1열), ↵ Enter(2열), CE(1열), 초기화(2열) -->
     <button class="np-btn" data-action="symbol" data-val="0">0</button>
     <button class="np-btn" data-action="symbol" data-val=".">.</button>
     <button class="np-btn action" data-action="backspace">⌫</button>
-    <button class="np-btn op" data-action="newline">↵ Enter</button>
-    <button class="np-btn action" data-action="clear">CE</button>
-    <button class="np-btn action" data-action="reset">초기화</button>
-    <button class="np-btn func" data-action="symbol" data-val="pi">pi</button>
-    <button class="np-btn func" data-action="symbol" data-val="abs(">abs</button>
+    <button class="np-btn op span-2" data-action="newline">↵ Enter</button>
+    <button class="np-btn danger" data-action="clear">CE</button>
+    <button class="np-btn danger span-2" data-action="reset">초기화</button>
   </div>
 </div>
 
@@ -1175,7 +1175,7 @@ function calculate(){
 }
 
 /* =========================================================
-   심볼/줄 바꿈 및 제어 (오류 수정 핵심 영역)
+   심볼/줄 바꿈 및 제어
    ========================================================= */
 
 function insertSymbol(symbol){
@@ -1189,7 +1189,6 @@ function insertSymbol(symbol){
   var left = text.slice(0, startCaret);
   var right = text.slice(startCaret);
 
-  // 연산자 양옆 자동 띄어쓰기 옵션이 활성화된 경우 스마트 공백 처리
   if (autoFormatOp && /^[\s]*[+\-×÷%*=><]+[\s]*$/.test(symbol)){
     var sym = symbol.trim();
     var insertVal = (left.length > 0 && !left.endsWith(" ") ? " " : "") + sym + (right.length > 0 && !right.startsWith(" ") ? " " : " ");
@@ -1490,14 +1489,13 @@ function resetToDefault(){
 }
 
 /* =========================================================
-   이벤트 리스너 (포커스 및 키보드 제어 정교화)
+   이벤트 리스너
    ========================================================= */
 
 container.addEventListener("focusin", function(e){
   if (e.target.classList.contains("expr")){ activeExpr = e.target; }
 });
 
-// 포커스가 빠져나갈 때만 수식 전체 자동 정렬 적용 (타이핑 도중 커서가 뒤집히는 것 방지)
 container.addEventListener("focusout", function(e){
   if (e.target.classList.contains("expr") && autoFormatOp){
     var target = e.target;
@@ -1522,7 +1520,6 @@ container.addEventListener("compositionend", function(e){
   }
 });
 
-// 타이핑 중에는 커서 위치 유지를 위해 천단위 콤마 서식만 적용
 container.addEventListener("input", function(e){
   if (!e.target.classList.contains("expr")){ return; }
   var target = e.target;
