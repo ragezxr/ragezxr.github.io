@@ -7,8 +7,8 @@
 <style>
 *{box-sizing:border-box}
 html,body{height:100%;height:100dvh;margin:0;padding:0;overflow:hidden}
-body{font-family:Consolas,"Noto Sans KR",monospace;background:#1e1e1e;color:#ddd;display:flex;flex-direction:column;user-select:text;-webkit-user-select:text}
-#top{display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px;padding:2px 8px;background:#252526;border-bottom:1px solid #3a3a3a;z-index:100;flex-shrink:0}
+body{font-family:Consolas,"Noto Sans KR",monospace;background:#1e1e1e;color:#ddd;display:flex;flex-direction:column}
+#top{display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px;padding:2px 8px;background:#252526;border-bottom:1px solid #3a3a3a;z-index:100;flex-shrink:0;-webkit-user-select:none;user-select:none}
 .menu-section{display:flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:0}
 #operator-section{display:none!important}
 #summary-section{flex:0 1 auto;align-items:center}
@@ -48,15 +48,13 @@ button:hover{background:#444}
 #action-section.labels-on .toggle-btn,#action-section.labels-on .btn-example,#action-section.labels-on .btn-copy,#action-section.labels-on .btn-numpad,#action-section.labels-on .btn-reset,#action-section.labels-on .btn-help,#action-section.labels-on .menu-label-btn{width:auto;min-width:26px;padding:0 5px}
 .top-status{height:24px;display:flex;align-items:center;padding:0 6px;background:#1b2d29;border:1px solid #285e52;border-radius:3px;color:#4ec9b0;white-space:nowrap;flex:0 1 auto}
 #wrap{flex:1;overflow:auto;background:#1e1e1e;padding:12px 16px 40px;transition:padding-bottom 0.15s ease;-webkit-overflow-scrolling:touch}
-#editor-container{font-family:Consolas,"Noto Sans KR",monospace;line-height:1.6;min-height:100%;width:max-content;min-width:100%}
-.calc-row{display:flex;align-items:baseline;width:max-content;min-width:100%;white-space:pre;max-height:500px;overflow-y:auto}
-.expr{flex:0 0 auto;width:max-content;min-width:80px;outline:none;color:#fff;caret-color:#fff}
-.expr .comma{color:#8888c7;font-weight:bold}
-.result{flex:0 0 220px;width:220px;padding-left:24px;color:#4ec9b0;font-weight:500;white-space:pre}
-.result.error{color:#f48771}
-.result.hidden,.calc-row.example-row.hidden{display:none!important}
-.comment{color:#6a9955}
-#help-bar{position:fixed;right:16px;bottom:8px;color:#777;font-size:11px;pointer-events:none;z-index:10}
+#editor-container{font-family:Consolas,"Noto Sans KR",monospace;line-height:1.6;min-height:100%;width:max-content;min-width:100%;outline:none;color:#fff;user-select:text;-webkit-user-select:text}
+.calc-row{display:block;width:max-content;min-width:100%;white-space:pre;caret-color:#fff;color:#fff;min-height:1.6em}
+.calc-row.example-row.hidden{display:none!important}
+.comma{color:#8888c7;font-weight:bold;user-select:none;-webkit-user-select:none}
+.result-text{color:#4ec9b0;font-weight:500;user-select:text;-webkit-user-select:text;display:inline-block}
+.result-text.error{color:#f48771}
+#help-bar{position:fixed;right:16px;bottom:8px;color:#777;font-size:11px;pointer-events:none;z-index:10;-webkit-user-select:none;user-select:none}
 #virtual-numpad{display:none;position:fixed;left:0;right:0;bottom:0;background:#181819;border-top:2px solid #0e639c;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));z-index:999999;box-shadow:0 -2px 10px rgba(0,0,0,.8);touch-action:none;overscroll-behavior:contain;-webkit-user-select:none;user-select:none;max-height:500px}
 #virtual-numpad.active{display:block}
 .numpad-grid{display:grid;grid-template-columns:repeat(8, 1fr);grid-template-rows:repeat(4, minmax(36px, 1fr));gap:4px;max-width:100%;margin:0 auto}
@@ -67,7 +65,7 @@ button:hover{background:#444}
 .np-btn.danger{color:#ff4d4d;background:#2a2a2d;font-weight:bold}
 .np-btn.func{color:#ce9178;background:#202022;font-size:clamp(10px, 2vh, 16px)}
 .np-btn.span-2{grid-column:span 2}
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000000;justify-content:center;align-items:center}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000000;justify-content:center;align-items:center;-webkit-user-select:none;user-select:none}
 .modal-overlay.active{display:flex}
 .modal-content{background:#252526;border:1px solid #454545;border-radius:8px;width:90%;max-width:760px;max-height:500px;display:flex;flex-direction:column}
 .modal-header{padding:12px 20px;border-bottom:1px solid #3a3a3a;display:flex;justify-content:space-between;align-items:center}
@@ -82,7 +80,7 @@ button:hover{background:#444}
 .chip{display:inline-block;background:#333;color:#ce9178;border:1px solid #555;border-radius:4px;padding:3px 8px;margin:2px;font-family:monospace;cursor:pointer}
 .chip:hover{background:#4ec9b0;color:#1e1e1e}
 @media(max-width:900px){#top{gap:3px 6px}#action-section{flex-basis:100%;justify-content:flex-start;padding-top:2px}.top-action-group{justify-content:flex-start}}
-@media(max-width:600px){#top{gap:3px 4px;padding:2px 4px}#operator-section,#summary-section,#action-section{flex-basis:100%}#summary-section,#action-section{padding-top:2px}#summary-bar{width:100%}.summary-item{flex:0 1 auto}.result{flex-basis:180px;width:180px;padding-left:12px}.numpad-grid{gap:2px}.np-btn{font-size:clamp(10px, 1.8vh, 15px)}#help-bar{display:none}}
+@media(max-width:600px){#top{gap:3px 4px;padding:2px 4px}#operator-section,#summary-section,#action-section{flex-basis:100%}#summary-section,#action-section{padding-top:2px}#summary-bar{width:100%}.summary-item{flex:0 1 auto}.numpad-grid{gap:2px}.np-btn{font-size:clamp(10px, 1.8vh, 15px)}#help-bar{display:none}}
 </style>
 </head>
 <body>
@@ -117,7 +115,7 @@ button:hover{background:#444}
   <input type="file" id="fileInput" accept=".txt,.csv" style="display:none" onchange="loadFile(event)">
 </div>
 
-<div id="wrap"><div id="editor-container"></div></div>
+<div id="wrap"><div id="editor-container" contenteditable="true" spellcheck="false"></div></div>
 
 <div id="virtual-numpad">
   <div class="numpad-grid">
@@ -178,7 +176,7 @@ button:hover{background:#444}
           <button onclick="transformCase('lower');closeOptionModal()">🔡 영어 소문자</button>
         </div>
         <div class="opt-card">
-          <h4>ℹ️ 사용 안내</h4>
+          <h4>ℹ️️ 사용 안내</h4>
           <p style="margin:0;color:#aaa;line-height:1.8">상단 아이콘으로 패드 · 계산 요약 ·<br>예제를 바로 켜고 끌 수 있습니다.<br><br><b style="color:#ddd">🔤</b> 버튼으로 상단 메뉴를<br>아이콘만 표시하거나 이름과 함께 표시할 수 있습니다.</p>
         </div>
       </div>
@@ -208,7 +206,7 @@ button:hover{background:#444}
       </div>
       <div class="help-section">
         <h3>4. ans</h3>
-        <span class="chip" onclick="appendHelpExample('125,000 * 3\nans - 50,000\nans / 4')">이전 결과 사용</span>
+        <span class="chip" onclick="appendHelpExample('125,000 * 3\nans - 50,000\nans / 4')">이전 결과 수식</span>
       </div>
       <div class="help-section">
         <h3>5. 함수</h3>
@@ -236,23 +234,33 @@ const sumCountEl = document.getElementById("sum-count");
 const sumTotalEl = document.getElementById("sum-total");
 const sumAvgEl = document.getElementById("sum-avg");
 
-let activeExpr = null, useComma = true, showExample = false, showSummary = true, isNumpadActive = false, showMenuLabels = true, composing = false;
+let activeRow = null, useComma = true, showExample = false, showSummary = true, isNumpadActive = false, showMenuLabels = true, composing = false;
 
-numpadEl.addEventListener("touchmove", e => e.preventDefault(), {passive:false});
-numpadEl.querySelectorAll(".np-btn").forEach(btn => {
-  btn.addEventListener("mousedown", e => e.preventDefault());
-  btn.addEventListener("touchstart", e => e.preventDefault(), {passive:false});
-  const run = e => {
-    e.preventDefault(); e.stopPropagation();
+// 터치 이벤트 발생 시 포커스 강제 해제 방지
+numpadEl.addEventListener("touchstart", function(e){
+  e.preventDefault();
+}, {passive: false});
+
+numpadEl.addEventListener("touchmove", function(e){
+  e.preventDefault();
+}, {passive: false});
+
+numpadEl.querySelectorAll(".np-btn").forEach(function(btn){
+  btn.addEventListener("mousedown", function(e){ e.preventDefault(); e.stopPropagation(); });
+  btn.addEventListener("touchstart", function(e){ e.preventDefault(); e.stopPropagation(); }, {passive:false});
+  
+  const runAction = function(e){
+    if (e) { e.preventDefault(); e.stopPropagation(); }
     const act = btn.getAttribute("data-action"), val = btn.getAttribute("data-val");
     if (act === "symbol") insertSymbol(val);
     else if (act === "newline") insertNewline();
     else if (act === "backspace") handleBackspace();
-    else if (act === "clear") clearCurrentExpr();
+    else if (act === "clear") clearCurrentRow();
     else if (act === "reset") resetToDefault();
   };
-  btn.addEventListener("touchend", run, {passive:false});
-  btn.addEventListener("click", run);
+
+  btn.addEventListener("touchend", runAction, {passive:false});
+  btn.addEventListener("click", runAction);
 });
 
 const defaultText = `\n\n\n\n\n\n\n\n
@@ -288,12 +296,12 @@ const funcs = {
 };
 const constants = {pi:Math.PI,e:Math.E,tau:Math.PI*2};
 
-const updateStatusText = t => { if (statusEl) statusEl.textContent = t; };
-const escapeHtml = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const updateStatusText = function(t){ if (statusEl) statusEl.textContent = t; };
+const escapeHtml = function(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); };
 
 function updateMenuLabels(){
   actionSectionEl.classList.toggle("labels-on", showMenuLabels);
-  actionSectionEl.querySelectorAll("button[data-icon]").forEach(btn => {
+  actionSectionEl.querySelectorAll("button[data-icon]").forEach(function(btn){
     btn.textContent = showMenuLabels ? (btn.getAttribute("data-icon") + " " + btn.getAttribute("data-label")) : btn.getAttribute("data-icon");
   });
   menuLabelToggleBtn.classList.toggle("active", showMenuLabels);
@@ -302,38 +310,39 @@ function updateMenuLabels(){
   menuLabelToggleBtn.setAttribute("title", t); menuLabelToggleBtn.setAttribute("aria-label", t);
   menuLabelToggleBtn.textContent = showMenuLabels ? "🔤 이름" : "🔤";
 }
-const toggleMenuLabels = () => { showMenuLabels = !showMenuLabels; localStorage.setItem("memoCalcMenuLabels", showMenuLabels ? "1" : "0"); updateMenuLabels(); };
+const toggleMenuLabels = function(){ showMenuLabels = !showMenuLabels; localStorage.setItem("memoCalcMenuLabels", showMenuLabels ? "1" : "0"); updateMenuLabels(); };
 
 function formatOperatorsAndCommasHtml(str){
   const cleaned = str.replace(/\s*([+\-*/%=<>:])\s*/g, " $1 ").replace(/\s+/g, " ");
-  return cleaned.split(/(\d+(?:\.\d+)?|[^\d]+)/).map(t => /^\d+$/.test(t) ? t.replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="comma">,</span>') : escapeHtml(t)).join("");
+  return cleaned.split(/(\d+(?:\.\d+)?|[^\d]+)/).map(function(t){ return /^\d+$/.test(t) ? t.replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="comma" contenteditable="false">,</span>') : escapeHtml(t); }).join("");
 }
 
-function cleanExprForEval(html){
-  const d = document.createElement("div");
-  d.innerHTML = html;
-  d.querySelectorAll(".comma").forEach(x => x.remove());
-  return d.innerText.replace(/\r?\n/g,"");
+function getRawExprText(row){
+  if (!row) return "";
+  const clone = row.cloneNode(true);
+  clone.querySelectorAll(".comma, .result-text").forEach(function(x){ x.remove(); });
+  return clone.innerText.replace(/\r?\n/g,"");
 }
 
 function getCaretOffset(el){
   const sel = window.getSelection();
-  if (!sel.rangeCount || !el.contains(sel.anchorNode) || !el.contains(sel.focusNode)) return cleanExprForEval(el.innerHTML).length;
+  if (!sel.rangeCount || !el.contains(sel.anchorNode) || !el.contains(sel.focusNode)) return getRawExprText(el).length;
   const r = sel.getRangeAt(0), pre = r.cloneRange();
   pre.selectNodeContents(el); pre.setEnd(r.endContainer, r.endOffset);
   const d = document.createElement("div"); d.appendChild(pre.cloneContents());
-  d.querySelectorAll(".comma").forEach(x => x.remove());
+  d.querySelectorAll(".comma, .result-text").forEach(function(x){ x.remove(); });
   return d.innerText.length;
 }
 
 function setCaretOffset(el, offset){
+  if (!el) return;
   let pos = 0, node = null, nodeOffset = 0;
-  const walk = n => {
+  const walk = function(n){
     if (n.nodeType === 3){
       if (pos + n.length >= offset){ node = n; nodeOffset = offset - pos; return true; }
       pos += n.length;
     } else if (n.nodeType === 1){
-      if (n.classList && n.classList.contains("comma")) return false;
+      if (n.classList && (n.classList.contains("comma") || n.classList.contains("result-text"))) return false;
       for (let i = 0; i < n.childNodes.length; i++) if (walk(n.childNodes[i])) return true;
     }
     return false;
@@ -343,16 +352,6 @@ function setCaretOffset(el, offset){
   const range = document.createRange();
   range.setStart(node, Math.max(0, nodeOffset)); range.collapse(true);
   const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-}
-
-function applyFormattingToTarget(target){
-  if (!target || composing) return;
-  const text = cleanExprForEval(target.innerHTML);
-  if (!text.trim() || text.trim().startsWith("#")) return;
-  const caret = getCaretOffset(target), formatted = formatOperatorsAndCommasHtml(text);
-  if (target.innerHTML === formatted) return;
-  target.innerHTML = formatted;
-  setCaretOffset(target, Math.min(caret, text.length));
 }
 
 function normalize(s){
@@ -374,7 +373,7 @@ function safeEval(expr, vars){
   if (!/^[0-9+\-*/%().<>=!&|?:,'"A-Za-z_가-힣\s*]+$/.test(expr)) throw Error("허용되지 않은 문자");
   if (/\b(?:constructor|prototype|window|document|globalThis|Function|eval|import|fetch|location|alert|prompt)\b/i.test(expr)) throw Error("허용되지 않은 표현");
   const scope = Object.assign({}, constants, funcs, vars), names = Object.keys(scope);
-  return Function(...names, `"use strict";return (${expr});`)(...names.map(k => scope[k]));
+  return Function(...names, `"use strict";return (${expr});`)(...names.map(function(k){ return scope[k]; }));
 }
 
 function format(v){
@@ -394,45 +393,61 @@ function changeFontSize(v){
   localStorage.setItem("memoCalcFontSize", n);
 }
 
-fontSizeInput.addEventListener("input", () => { if (fontSizeInput.value !== "") changeFontSize(fontSizeInput.value); });
-fontSizeInput.addEventListener("change", () => { fontSizeInput.value = Math.max(10, Math.min(60, parseInt(fontSizeInput.value, 10) || 16)); changeFontSize(fontSizeInput.value); });
-fontSizeInput.addEventListener("wheel", e => {
+fontSizeInput.addEventListener("input", function(){ if (fontSizeInput.value !== "") changeFontSize(fontSizeInput.value); });
+fontSizeInput.addEventListener("change", function(){ fontSizeInput.value = Math.max(10, Math.min(60, parseInt(fontSizeInput.value, 10) || 16)); changeFontSize(fontSizeInput.value); });
+fontSizeInput.addEventListener("wheel", function(e){
   e.preventDefault();
   const n = Math.max(10, Math.min(60, (parseInt(fontSizeInput.value, 10) || 16) + (e.deltaY < 0 ? 1 : -1)));
   fontSizeInput.value = n; changeFontSize(n);
 }, {passive:false});
 
-const getTextContent = () => Array.from(container.querySelectorAll(".calc-row")).map(row => cleanExprForEval(row.querySelector(".expr").innerHTML)).join("\n");
+const getTextContent = function(){ return Array.from(container.querySelectorAll(".calc-row")).map(function(row){ return getRawExprText(row); }).join("\n"); };
+
+function getCurrentRow(){
+  const sel = window.getSelection();
+  if (!sel || !sel.anchorNode) return activeRow || container.querySelector(".calc-row:last-child");
+  let el = sel.anchorNode;
+  while (el && el !== container){
+    if (el.classList && el.classList.contains("calc-row")) return el;
+    el = el.parentNode;
+  }
+  return activeRow || container.querySelector(".calc-row:last-child");
+}
 
 function addRow(text="", ref=null){
   const row = document.createElement("div"); row.className = "calc-row";
-  const expr = document.createElement("div"); expr.className = "expr"; expr.contentEditable = "true"; expr.spellcheck = false;
-  if (isNumpadActive) expr.inputMode = "none";
-  if (text.trim().startsWith("#")){ expr.textContent = text; expr.classList.add("comment"); }
-  else { expr.innerHTML = formatOperatorsAndCommasHtml(text); }
-  const res = document.createElement("div"); res.className = "result";
-  row.append(expr, res);
+  if (isNumpadActive) row.setAttribute("inputmode", "none");
+  
+  if (text.trim().startsWith("#") || text.trim().startsWith("####")){
+    row.textContent = text;
+    if(text.trim().startsWith("#")) row.classList.add("comment");
+  } else {
+    row.innerHTML = formatOperatorsAndCommasHtml(text);
+  }
+  
   if (ref) container.insertBefore(row, ref.nextSibling);
   else container.appendChild(row);
-  return expr;
+  return row;
 }
 
 function initDOM(text){
   container.innerHTML = "";
-  text.split("\n").forEach(x => addRow(x));
+  text.split("\n").forEach(function(x){ addRow(x); });
   calculate();
+  if (isNumpadActive) applyNumpadState();
 }
 
 const assignRegex = /^([A-Za-z_가-힣][A-Za-z0-9_가-힣]*)\s*=\s*(.+)$/;
 
-function calculate(){
+function calculate(forceFormatRow = null){
   const rows = Array.from(container.querySelectorAll(".calc-row"));
   const vars = {};
   let last = 0, errors = 0, total = 0, count = 0, example = false;
+  const active = getCurrentRow();
 
-  rows.forEach(row => {
-    const expr = row.querySelector(".expr"), res = row.querySelector(".result");
-    const line = cleanExprForEval(expr.innerHTML).trim();
+  rows.forEach(function(row){
+    const rawText = getRawExprText(row);
+    const line = rawText.trim();
     if (line.startsWith("####")) example = true;
 
     if (example){
@@ -441,22 +456,38 @@ function calculate(){
     } else {
       row.classList.remove("example-row", "hidden");
     }
-    res.classList.remove("hidden");
 
-    if (!line || line.startsWith("#")){ res.textContent = ""; return; }
+    if (row !== active || row === forceFormatRow) {
+      if (!line.startsWith("#") && line !== "") {
+        row.innerHTML = formatOperatorsAndCommasHtml(rawText);
+      }
+    }
+
+    const oldRes = row.querySelector(".result-text");
+    if (oldRes) oldRes.remove();
+
+    if (!line || line.startsWith("#")) return;
 
     try {
       const m = line.match(assignRegex);
       const v = m ? safeEval(m[2], vars) : safeEval(line, Object.assign({}, vars, { ans: last }));
       if (m) vars[m[1]] = v;
       last = v;
-      res.textContent = "= " + format(v);
-      res.className = "result";
+      
+      const resSpan = document.createElement("span");
+      resSpan.className = "result-text";
+      resSpan.contentEditable = "false";
+      resSpan.textContent = "    = " + format(v);
+      row.appendChild(resSpan);
+
       if (!example && typeof v === "number" && Number.isFinite(v)){ total += v; count++; }
     } catch(e) {
       errors++;
-      res.textContent = "= ⚠ " + e.message;
-      res.className = "result error";
+      const resSpan = document.createElement("span");
+      resSpan.className = "result-text error";
+      resSpan.contentEditable = "false";
+      resSpan.textContent = "    = ⚠ " + e.message;
+      row.appendChild(resSpan);
     }
   });
 
@@ -468,59 +499,87 @@ function calculate(){
 }
 
 function insertSymbol(symbol){
-  const target = activeExpr || container.querySelector(".expr:last-child");
+  const target = getCurrentRow();
   if (!target) return;
-  target.focus();
-  const startCaret = getCaretOffset(target), text = cleanExprForEval(target.innerHTML);
+  const startCaret = getCaretOffset(target), text = getRawExprText(target);
   const newText = text.slice(0, startCaret) + symbol + text.slice(startCaret);
   target.innerHTML = formatOperatorsAndCommasHtml(newText);
   const newPos = startCaret + symbol.length;
+  
+  if (isNumpadActive) {
+    container.focus();
+  }
   setCaretOffset(target, newPos);
-  requestAnimationFrame(() => { if (document.activeElement === target) setCaretOffset(target, newPos); });
   calculate();
+  requestAnimationFrame(function(){ setCaretOffset(target, newPos); });
 }
 
 function insertNewline(){
-  const target = activeExpr || container.querySelector(".expr:last-child");
+  const target = getCurrentRow();
   if (!target) return;
-  applyFormattingToTarget(target);
+  calculate(target);
+  const next = addRow("", target);
   calculate();
-  const next = addRow("", target.closest(".calc-row"));
-  calculate();
-  next.focus();
-  activeExpr = next;
+  if (isNumpadActive) {
+    container.focus();
+  }
+  setCaretOffset(next, 0);
+  activeRow = next;
 }
 
 function handleBackspace(){
-  const target = activeExpr || container.querySelector(".expr:last-child");
+  const target = getCurrentRow();
   if (!target) return;
-  target.focus();
-  document.execCommand("delete", false, null);
+  const caret = getCaretOffset(target);
+  const text = getRawExprText(target);
+  if (caret > 0) {
+    const newText = text.slice(0, caret - 1) + text.slice(caret);
+    target.innerHTML = formatOperatorsAndCommasHtml(newText);
+    setCaretOffset(target, caret - 1);
+  } else {
+    const prev = target.previousElementSibling;
+    if (prev && prev.classList.contains("calc-row")) {
+      const prevLen = getRawExprText(prev).length;
+      const combined = getRawExprText(prev) + text;
+      prev.innerHTML = formatOperatorsAndCommasHtml(combined);
+      target.remove();
+      activeRow = prev;
+      setCaretOffset(prev, prevLen);
+    }
+  }
   calculate();
 }
 
-function clearCurrentExpr(){
-  const target = activeExpr || container.querySelector(".expr:last-child");
+function clearCurrentRow(){
+  const target = getCurrentRow();
   if (!target) return;
-  target.focus();
   target.innerHTML = "";
   calculate();
 }
 
-const updateNumpadButton = () => { numpadToggleBtn.classList.toggle("active", isNumpadActive); numpadToggleBtn.setAttribute("aria-pressed", isNumpadActive ? "true" : "false"); };
+const updateNumpadButton = function(){ numpadToggleBtn.classList.toggle("active", isNumpadActive); numpadToggleBtn.setAttribute("aria-pressed", isNumpadActive ? "true" : "false"); };
 
 function applyNumpadState(){
   numpadEl.classList.toggle("active", isNumpadActive);
   updateNumpadButton();
-  container.querySelectorAll(".expr").forEach(el => {
-    if (isNumpadActive) el.setAttribute("inputmode", "none");
-    else el.removeAttribute("inputmode");
-  });
+  
+  if (isNumpadActive) {
+    container.setAttribute("inputmode", "none");
+    container.querySelectorAll(".calc-row").forEach(function(el){
+      el.setAttribute("inputmode", "none");
+    });
+  } else {
+    container.removeAttribute("inputmode");
+    container.querySelectorAll(".calc-row").forEach(function(el){
+      el.removeAttribute("inputmode");
+    });
+  }
+  
   document.getElementById("wrap").style.paddingBottom = isNumpadActive ? ((numpadEl.offsetHeight || 130) + 15) + "px" : "40px";
 }
 
-const toggleNumpad = () => { isNumpadActive = !isNumpadActive; localStorage.setItem("memoCalcNumpad", isNumpadActive ? "1" : "0"); applyNumpadState(); };
-const updateExampleButton = () => { exampleToggleBtn.classList.toggle("active", showExample); exampleToggleBtn.setAttribute("aria-pressed", showExample ? "true" : "false"); };
+const toggleNumpad = function(){ isNumpadActive = !isNumpadActive; localStorage.setItem("memoCalcNumpad", isNumpadActive ? "1" : "0"); applyNumpadState(); };
+const updateExampleButton = function(){ exampleToggleBtn.classList.toggle("active", showExample); exampleToggleBtn.setAttribute("aria-pressed", showExample ? "true" : "false"); };
 
 function toggleExample(){
   showExample = !showExample;
@@ -544,23 +603,24 @@ function toggleSummaryOpt(){
 
 async function copyVisibleWithResults(){
   const rows = Array.from(container.querySelectorAll(".calc-row")), lines = [];
-  rows.forEach(row => {
+  rows.forEach(function(row){
     if (row.classList.contains("hidden") || (row.classList.contains("example-row") && !showExample)) return;
-    const expr = cleanExprForEval(row.querySelector(".expr").innerHTML), result = row.querySelector(".result").textContent.trim();
-    lines.push(expr.trim() ? (result ? (expr + "  " + result) : expr) : "");
+    const text = row.innerText.trim();
+    if (text) lines.push(text);
   });
   try { await navigator.clipboard.writeText(lines.join("\n")); updateStatusText("보이는 내용 복사 완료!"); } catch(e) { updateStatusText("복사 실패"); }
 }
 
 async function copyCurrentResult(target){
-  const text = target.closest(".calc-row").querySelector(".result").textContent.replace(/^=\s*/, "");
+  const resSpan = target.querySelector(".result-text");
+  const text = resSpan ? resSpan.textContent.replace(/^=\s*/, "").trim() : "";
   if (text && !text.startsWith("⚠")){ await navigator.clipboard.writeText(text); updateStatusText("결과 복사됨"); }
 }
 
 function removeEmptyLines(){
   let empty = false;
-  Array.from(container.querySelectorAll(".calc-row")).forEach(row => {
-    const t = row.querySelector(".expr").innerText.trim();
+  Array.from(container.querySelectorAll(".calc-row")).forEach(function(row){
+    const t = getRawExprText(row).trim();
     if (!t) { if (empty) row.remove(); else empty = true; }
     else { empty = false; }
   });
@@ -568,8 +628,8 @@ function removeEmptyLines(){
 }
 
 function transformCase(mode){
-  container.querySelectorAll(".expr").forEach(x => {
-    const t = cleanExprForEval(x.innerHTML);
+  container.querySelectorAll(".calc-row").forEach(function(x){
+    const t = getRawExprText(x);
     if (!t.trim().startsWith("#")) x.innerHTML = formatOperatorsAndCommasHtml(mode === "upper" ? t.toUpperCase() : t.toLowerCase());
   });
   calculate();
@@ -578,17 +638,18 @@ function transformCase(mode){
 function downloadFile(content, name, type){
   const blob = new Blob([content], { type: type + ";charset=utf-8" }), a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = name; a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   updateStatusText(name + " 저장 완료");
 }
 
 function exportToCsv(){
   let csv = "\uFEFF수식,결과\n";
-  container.querySelectorAll(".calc-row").forEach(row => {
+  container.querySelectorAll(".calc-row").forEach(function(row){
     if (row.classList.contains("hidden")) return;
-    const e = cleanExprForEval(row.querySelector(".expr").innerHTML).trim();
-    const r = row.querySelector(".result").textContent.replace(/^=\s*/, "").trim();
-    if (e && !e.startsWith("#")) csv += `"${e.replace(/"/g, '""')}","${r.replace(/"/g, '""')}"\n`;
+    const raw = getRawExprText(row).trim();
+    const resSpan = row.querySelector(".result-text");
+    const r = resSpan ? resSpan.textContent.replace(/^=\s*/, "").trim() : "";
+    if (raw && !raw.startsWith("#")) csv += `"${raw.replace(/"/g, '""')}","${r.replace(/"/g, '""')}"\n`;
   });
   downloadFile(csv, "계산결과.csv", "text/csv");
 }
@@ -597,27 +658,27 @@ function loadFile(e){
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = x => { initDOM(x.target.result); updateStatusText("파일 불러오기 완료"); };
+  reader.onload = function(x){ initDOM(x.target.result); updateStatusText("파일 불러오기 완료"); };
   reader.readAsText(file);
   e.target.value = "";
 }
 
 function appendHelpExample(text){
-  const target = activeExpr || container.querySelector(".expr:last-child");
-  let r = target ? target.closest(".calc-row") : null;
-  text.split("\n").forEach(line => { const e = addRow(line, r); r = e.closest(".calc-row"); });
+  const target = getCurrentRow();
+  let r = target;
+  text.split("\n").forEach(function(line){ const e = addRow(line, r); r = e; });
   calculate(); closeHelpModal(); updateStatusText("예제가 추가되었습니다");
 }
 
-const openOptionModal = () => document.getElementById("optionModal").classList.add("active");
-const closeOptionModal = e => { if (!e || e.target.classList.contains("modal-overlay")) document.getElementById("optionModal").classList.remove("active"); };
-const openHelpModal = () => document.getElementById("helpModal").classList.add("active");
-const closeHelpModal = e => { if (!e || e.target.classList.contains("modal-overlay")) document.getElementById("helpModal").classList.remove("active"); };
+const openOptionModal = function(){ document.getElementById("optionModal").classList.add("active"); };
+const closeOptionModal = function(e){ if (!e || e.target.classList.contains("modal-overlay")) document.getElementById("optionModal").classList.remove("active"); };
+const openHelpModal = function(){ document.getElementById("helpModal").classList.add("active"); };
+const closeHelpModal = function(e){ if (!e || e.target.classList.contains("modal-overlay")) document.getElementById("helpModal").classList.remove("active"); };
 
 function saveHtml(){
   const blob = new Blob([document.documentElement.outerHTML], { type: "text/html;charset=utf-8" }), a = document.createElement("a");
   a.href = URL.createObjectURL(blob); a.download = "메모_계산기.html"; a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   updateStatusText("HTML 저장됨");
 }
 
@@ -625,53 +686,66 @@ function resetToDefault(){
   if (!confirm("모든 입력을 지우고 기본 예제 내용으로 초기화할까요?")) return;
   localStorage.removeItem("memoCalcText");
   initDOM(defaultText);
-  showExample = false; updateExampleButton(); calculate();
-  const first = container.querySelector(".expr"); if (first){ first.focus(); activeExpr = first; }
+  showExample = false; 
+  updateExampleButton(); 
+  calculate();
+  
+  // 가상 패드가 활성화된 상태라면 초기화 완료 후 inputmode="none" 및 패드 상태를 완벽 복원
+  if (isNumpadActive) {
+    applyNumpadState();
+  }
+  
+  const first = container.querySelector(".calc-row"); 
+  if (first){ 
+    setCaretOffset(first, 0); 
+    activeRow = first; 
+  }
 }
 
-container.addEventListener("focusin", e => { if (e.target.classList.contains("expr")) activeExpr = e.target; });
-container.addEventListener("focusout", e => { if (e.target.classList.contains("expr")) applyFormattingToTarget(e.target); });
-container.addEventListener("compositionstart", e => { if (e.target.classList.contains("expr")) composing = true; });
-container.addEventListener("compositionend", e => {
-  if (e.target.classList.contains("expr")){
-    composing = false;
-    e.target.classList.toggle("comment", e.target.innerText.trim().startsWith("#"));
-    calculate();
+container.addEventListener("focusin", function(e){
+  const r = getCurrentRow();
+  if (r) activeRow = r;
+  if (isNumpadActive) {
+    container.setAttribute("inputmode", "none");
   }
-});
-container.addEventListener("input", e => {
-  if (!e.target.classList.contains("expr")) return;
-  e.target.classList.toggle("comment", e.target.innerText.trim().startsWith("#"));
-  calculate();
 });
 
-container.addEventListener("keydown", e => {
-  if (!e.target.classList.contains("expr")) return;
+container.addEventListener("focusout", function(){ calculate(); });
+container.addEventListener("compositionstart", function(){ composing = true; });
+container.addEventListener("compositionend", function(){
+  composing = false;
+  calculate();
+});
+container.addEventListener("input", function(){
+  if (!composing) calculate();
+});
+
+container.addEventListener("keydown", function(e){
+  const target = getCurrentRow();
   if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey){
     e.preventDefault(); e.stopPropagation();
-    applyFormattingToTarget(e.target);
+    calculate(target);
+    const next = addRow("", target);
     calculate();
-    const next = addRow("", e.target.closest(".calc-row"));
-    calculate(); next.focus(); activeExpr = next;
+    setCaretOffset(next, 0);
+    activeRow = next;
     return;
   }
-  if (e.key === "Backspace" && e.target.innerText === ""){
+  if (e.key === "Backspace" && target && getRawExprText(target).trim() === ""){
     const rows = container.querySelectorAll(".calc-row");
     if (rows.length > 1){
       e.preventDefault();
-      const row = e.target.closest(".calc-row"), prev = row.previousElementSibling;
+      const prev = target.previousElementSibling;
       if (prev){
-        const p = prev.querySelector(".expr");
-        row.remove(); calculate(); p.focus();
-        const r = document.createRange(), s = window.getSelection();
-        r.selectNodeContents(p); r.collapse(false);
-        s.removeAllRanges(); s.addRange(r); activeExpr = p;
+        target.remove(); calculate();
+        setCaretOffset(prev, getRawExprText(prev).length);
+        activeRow = prev;
       }
     }
     return;
   }
   if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c"){ e.preventDefault(); copyVisibleWithResults(); return; }
-  if (e.ctrlKey && e.key.toLowerCase() === "enter"){ e.preventDefault(); copyCurrentResult(e.target); return; }
+  if (e.ctrlKey && e.key.toLowerCase() === "enter"){ e.preventDefault(); if (target) copyCurrentResult(target); return; }
   if (e.ctrlKey && e.key.toLowerCase() === "s"){ e.preventDefault(); saveHtml(); }
 });
 
@@ -685,7 +759,7 @@ isNumpadActive = (localStorage.getItem("memoCalcNumpad") ?? "0") === "1";
 showSummary = (localStorage.getItem("memoCalcShowSummary") ?? "1") === "1";
 
 updateExampleButton(); updateToggleButtons(); updateMenuLabels(); applyNumpadState(); calculate();
-const firstExpr = container.querySelector(".expr"); if (firstExpr){ firstExpr.focus(); activeExpr = firstExpr; }
+const firstRow = container.querySelector(".calc-row"); if (firstRow){ setCaretOffset(firstRow, 0); activeRow = firstRow; }
 </script>
 </body>
 </html>
