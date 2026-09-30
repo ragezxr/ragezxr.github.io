@@ -43,7 +43,6 @@ body{
   flex-shrink:0;
 }
 
-/* 메뉴 영역을 독립적으로 분리 */
 .menu-section{
   display:flex;
   align-items:center;
@@ -52,31 +51,30 @@ body{
   min-width:0;
 }
 
-/* 영역 사이에 시각적 분리 */
 .menu-section + .menu-section{
   padding-left:10px;
   border-left:1px solid #454545;
 }
 
-/* 수식 기호 영역 */
 #operator-section{
   flex:0 1 auto;
 }
 
-/* 계산 요약 영역 */
 #summary-section{
   flex:0 1 auto;
   align-items:flex-start;
 }
 
-/* 우측 기능 영역 */
 #action-section{
   flex:1 1 auto;
   justify-content:flex-end;
   align-items:flex-start;
 }
 
-/* 기본 버튼 */
+/* =========================================================
+   기본 버튼
+   ========================================================= */
+
 button,
 input[type=number]{
   background:#333;
@@ -97,7 +95,7 @@ button:hover{
 }
 
 /* =========================================================
-   수식 기호 버튼
+   수식 기호
    ========================================================= */
 
 .op-badge-group{
@@ -108,8 +106,7 @@ button:hover{
 
 .op-badge-group.hidden,
 .summary-item.hidden,
-#summary-bar.hidden,
-#status.hidden{
+#summary-bar.hidden{
   display:none!important;
 }
 
@@ -139,7 +136,6 @@ button:hover{
 
 /* =========================================================
    계산 요약
-   개수 / 합계 / 평균 각각 독립 항목
    ========================================================= */
 
 #status-container{
@@ -150,11 +146,6 @@ button:hover{
   min-width:0;
 }
 
-/*
-  summary-bar 자체도 줄바꿈 가능.
-  따라서 폭이 부족하면 각각의 summary-item이
-  개별적으로 다음 줄로 내려갈 수 있음.
-*/
 #summary-bar{
   display:flex;
   align-items:flex-start;
@@ -164,12 +155,7 @@ button:hover{
   max-width:100%;
 }
 
-/*
-  flex: 0 1 auto
-  → 공간이 부족하면 개별 항목 단위로 줄바꿈
-*/
-.summary-item,
-#status{
+.summary-item{
   height:28px;
   display:flex;
   align-items:center;
@@ -178,9 +164,6 @@ button:hover{
   border-radius:4px;
   white-space:nowrap;
   padding:0 8px;
-}
-
-.summary-item{
   gap:5px;
   color:#73e6cf;
   flex:0 1 auto;
@@ -190,14 +173,8 @@ button:hover{
   color:#fff;
 }
 
-/* 상태 메시지도 독립 */
-#status{
-  color:#4ec9b0;
-  flex:0 1 auto;
-}
-
 /* =========================================================
-   우측 컨트롤 영역
+   우측 기능
    ========================================================= */
 
 .top-action-group{
@@ -239,11 +216,71 @@ button:hover{
   margin:0;
 }
 
-.btn-example{
+/* =========================================================
+   상단 토글
+   아이콘만 표시
+   ON = 강조색
+   OFF = 일반색
+   ========================================================= */
+
+.toggle-btn{
+  width:30px;
+  min-width:30px;
+  padding:0;
   background:#333;
   color:#777;
   border-color:#555;
   font-weight:bold;
+  font-size:14px;
+  text-align:center;
+}
+
+.toggle-btn.active{
+  color:#73e6cf;
+  background:#2d4a3e;
+  border-color:#3b6e5d;
+}
+
+.toggle-btn:hover{
+  background:#444;
+}
+
+.toggle-btn.active:hover{
+  background:#355746;
+  color:#fff;
+}
+
+/* 개별 토글 색상 */
+
+#toggleOpBtn.active{
+  color:#4ec9b0;
+}
+
+#toggleSummaryBtn.active{
+  color:#73e6cf;
+}
+
+#toggleCommaBtn.active{
+  color:#ce9178;
+}
+
+#toggleAutoFormatBtn.active{
+  color:#dcdcaa;
+}
+
+/* =========================================================
+   예제
+   ========================================================= */
+
+.btn-example{
+  width:30px;
+  min-width:30px;
+  padding:0;
+  background:#333;
+  color:#777;
+  border-color:#555;
+  font-weight:bold;
+  font-size:14px;
 }
 
 .btn-example.active{
@@ -252,17 +289,110 @@ button:hover{
   border-color:#3b6e5d;
 }
 
+.btn-example:hover{
+  background:#444;
+}
+
+.btn-example.active:hover{
+  background:#355746;
+  color:#fff;
+}
+
+/* =========================================================
+   복사
+   ========================================================= */
+
 .btn-copy{
+  width:30px;
+  min-width:30px;
+  padding:0;
   background:#3a3a3c;
   color:#dcdcaa;
   border-color:#666;
   font-weight:bold;
+  font-size:14px;
 }
 
 .btn-copy:hover{
   background:#505054;
   color:#fff;
 }
+
+/* =========================================================
+   패드
+   OFF = 일반색
+   ON = 강조색
+   ========================================================= */
+
+.btn-numpad{
+  width:30px;
+  min-width:30px;
+  padding:0;
+  background:#333;
+  color:#777;
+  border-color:#555;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.btn-numpad.active{
+  background:#2d4a3e;
+  color:#73e6cf;
+  border-color:#3b6e5d;
+}
+
+.btn-numpad:hover{
+  background:#444;
+}
+
+.btn-numpad.active:hover{
+  background:#355746;
+  color:#fff;
+}
+
+/* =========================================================
+   초기화
+   ========================================================= */
+
+.btn-reset{
+  width:30px;
+  min-width:30px;
+  padding:0;
+  background:#333;
+  color:#f48771;
+  border-color:#555;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.btn-reset:hover{
+  background:#444;
+  color:#fff;
+}
+
+/* =========================================================
+   도움말
+   ========================================================= */
+
+.btn-help{
+  width:30px;
+  min-width:30px;
+  padding:0;
+  background:#333;
+  color:#aaa;
+  border-color:#555;
+  font-weight:bold;
+  font-size:15px;
+}
+
+.btn-help:hover{
+  background:#444;
+  color:#fff;
+}
+
+/* =========================================================
+   옵션
+   ========================================================= */
 
 .btn-option{
   background:#0e639c;
@@ -275,11 +405,74 @@ button:hover{
   background:#1177bb;
 }
 
-.btn-numpad{
+/* =========================================================
+   메뉴 표시 방식
+   아이콘만 / 아이콘 + 이름
+   ========================================================= */
+
+.menu-label-btn{
+  width:30px;
+  min-width:30px;
+  padding:0;
+  background:#333;
+  color:#777;
+  border-color:#555;
+  font-weight:bold;
+  font-size:14px;
+  text-align:center;
+}
+
+.menu-label-btn.active{
   background:#2d4a3e;
   color:#73e6cf;
   border-color:#3b6e5d;
-  font-weight:bold;
+}
+
+.menu-label-btn:hover{
+  background:#444;
+}
+
+.menu-label-btn.active:hover{
+  background:#355746;
+  color:#fff;
+}
+
+/* =========================================================
+   이름 표시 모드
+   ========================================================= */
+
+#action-section.labels-on .toggle-btn{
+  width:auto;
+  min-width:30px;
+  padding:0 7px;
+}
+
+#action-section.labels-on .btn-example,
+#action-section.labels-on .btn-copy,
+#action-section.labels-on .btn-numpad,
+#action-section.labels-on .btn-reset,
+#action-section.labels-on .btn-help,
+#action-section.labels-on .menu-label-btn{
+  width:auto;
+  min-width:30px;
+  padding:0 7px;
+}
+
+/* =========================================================
+   계산 완료 상태
+   ========================================================= */
+
+.top-status{
+  height:28px;
+  display:flex;
+  align-items:center;
+  padding:0 8px;
+  background:#1b2d29;
+  border:1px solid #285e52;
+  border-radius:4px;
+  color:#4ec9b0;
+  white-space:nowrap;
+  flex:0 1 auto;
 }
 
 /* =========================================================
@@ -603,10 +796,6 @@ button:hover{
     width:100%;
   }
 
-  /*
-    모바일에서는 개수/합계/평균을
-    필요하면 각각 개별 줄로 내릴 수 있도록 함
-  */
   .summary-item{
     flex:0 1 auto;
   }
@@ -641,9 +830,11 @@ button:hover{
 
 <div id="top">
 
-  <!-- ① 계산 기호 영역 -->
+  <!-- ① 계산 기호 -->
   <div class="menu-section" id="operator-section">
+
     <div class="op-badge-group" id="opBadgeGroup">
+
       <button class="op-btn" onclick="insertSymbol(' + ')">+</button>
       <button class="op-btn" onclick="insertSymbol(' - ')">-</button>
       <button class="op-btn" onclick="insertSymbol(' × ')">×</button>
@@ -652,10 +843,13 @@ button:hover{
       <button class="op-btn" onclick="insertSymbol(' = ')">=</button>
       <button class="op-btn" onclick="insertSymbol('()')">( )</button>
       <button class="op-btn ans-btn" onclick="insertSymbol('ans')">ans</button>
+
     </div>
+
   </div>
 
-  <!-- ② 계산 요약 영역 -->
+
+  <!-- ② 계산 요약 -->
   <div class="menu-section" id="summary-section">
 
     <div id="status-container">
@@ -680,13 +874,16 @@ button:hover{
       </div>
 
     </div>
+
   </div>
 
-  <!-- ③ 기능 메뉴 영역 -->
+
+  <!-- ③ 기능 -->
   <div class="menu-section" id="action-section">
 
     <div class="top-action-group">
 
+      <!-- 폰트 크기 -->
       <div class="font-size-wrapper" title="폰트 크기">
         <input
           type="number"
@@ -698,39 +895,154 @@ button:hover{
         >px
       </div>
 
+
+      <!-- 수식 기호 표시 -->
+      <button
+        id="toggleOpBtn"
+        class="toggle-btn active"
+        onclick="toggleOpBadgeOpt()"
+        title="수식 기호 버튼 표시/숨기기"
+        aria-label="수식 기호 버튼"
+        aria-pressed="true"
+        data-icon="➗"
+        data-label="수식"
+      >➗</button>
+
+
+      <!-- 계산 요약 표시 -->
+      <button
+        id="toggleSummaryBtn"
+        class="toggle-btn active"
+        onclick="toggleSummaryOpt()"
+        title="계산 요약 표시/숨기기"
+        aria-label="계산 요약"
+        aria-pressed="true"
+        data-icon="Σ"
+        data-label="요약"
+      >Σ</button>
+
+
+      <!-- 천단위 콤마 -->
+      <button
+        id="toggleCommaBtn"
+        class="toggle-btn active"
+        onclick="toggleCommaOpt()"
+        title="천단위 콤마 표시/숨기기"
+        aria-label="천단위 콤마"
+        aria-pressed="true"
+        data-icon="#,"
+        data-label="콤마"
+      >#,</button>
+
+
+      <!-- 연산자 자동정렬 -->
+      <button
+        id="toggleAutoFormatBtn"
+        class="toggle-btn"
+        onclick="toggleAutoFormatOpt()"
+        title="연산자 띄어쓰기 자동정렬"
+        aria-label="연산자 자동정렬"
+        aria-pressed="false"
+        data-icon="↔"
+        data-label="정렬"
+      >↔</button>
+
+
+      <!-- 패드 -->
+      <button
+        id="numpadToggleBtn"
+        class="btn-numpad"
+        onclick="toggleNumpad()"
+        title="숫자 패드"
+        aria-label="숫자 패드"
+        aria-pressed="false"
+        data-icon="🔢"
+        data-label="패드"
+      >🔢</button>
+
+
+      <!-- 예제 -->
       <button
         id="exampleToggleBtn"
         class="btn-example"
         onclick="toggleExample()"
         title="예제 항목 표시/숨기기"
-      >📋 예제</button>
+        aria-label="예제"
+        aria-pressed="false"
+        data-icon="💡"
+        data-label="예제"
+      >💡</button>
 
+
+      <!-- 도움말 -->
       <button
+        id="helpBtn"
+        class="btn-help"
+        onclick="openHelpModal()"
+        title="도움말"
+        aria-label="도움말"
+        data-icon="❓"
+        data-label="도움말"
+      >❓</button>
+
+
+      <!-- 복사 -->
+      <button
+        id="copyBtn"
         class="btn-copy"
         onclick="copyVisibleWithResults()"
         title="화면에 보이는 계산식과 결과 복사"
-      >📋 복사</button>
+        aria-label="복사"
+        data-icon="📋"
+        data-label="복사"
+      >📋</button>
 
-      <button
-        class="btn-numpad"
-        onclick="toggleNumpad()"
-      >🔢 패드</button>
 
+      <!-- 초기화 -->
       <button
+        id="resetBtn"
         class="btn-reset"
         onclick="resetToDefault()"
-      >🔄 초기화</button>
+        title="초기화"
+        aria-label="초기화"
+        data-icon="🔄"
+        data-label="초기화"
+      >🔄</button>
 
-      <button onclick="openHelpModal()">💡 도움말</button>
 
+      <!-- 옵션 -->
       <button
+        id="optionBtn"
         class="btn-option"
         onclick="openOptionModal()"
+        title="옵션"
+        data-icon="⚙️"
+        data-label="옵션"
       >⚙️ 옵션</button>
+
+
+      <!-- 옵션 오른쪽: 메뉴 표시 방식 -->
+      <button
+        id="menuLabelToggleBtn"
+        class="menu-label-btn"
+        onclick="toggleMenuLabels()"
+        title="메뉴 이름 표시/숨기기"
+        aria-label="메뉴 이름 표시"
+        aria-pressed="false"
+      >🔤</button>
+
+
+      <!-- 계산 상태 -->
+      <div
+        id="status"
+        class="top-status"
+        aria-live="polite"
+      >계산 완료</div>
 
     </div>
 
   </div>
+
 
   <input
     type="file"
@@ -753,14 +1065,13 @@ button:hover{
 
 
 <!-- =========================================================
-     초슬림 가상 숫자 패드
+     가상 숫자 패드
      ========================================================= -->
 
 <div id="virtual-numpad">
 
   <div class="numpad-grid">
 
-    <!-- 1행 -->
     <button class="np-btn" data-action="symbol" data-val="7">7</button>
     <button class="np-btn" data-action="symbol" data-val="8">8</button>
     <button class="np-btn" data-action="symbol" data-val="9">9</button>
@@ -770,7 +1081,6 @@ button:hover{
     <button class="np-btn func" data-action="symbol" data-val=")">)</button>
     <button class="np-btn action" data-action="clear">CE</button>
 
-    <!-- 2행 -->
     <button class="np-btn" data-action="symbol" data-val="4">4</button>
     <button class="np-btn" data-action="symbol" data-val="5">5</button>
     <button class="np-btn" data-action="symbol" data-val="6">6</button>
@@ -780,7 +1090,6 @@ button:hover{
     <button class="np-btn func" data-action="symbol" data-val=" < ">&lt;</button>
     <button class="np-btn func" data-action="symbol" data-val=" > ">&gt;</button>
 
-    <!-- 3행 -->
     <button class="np-btn" data-action="symbol" data-val="1">1</button>
     <button class="np-btn" data-action="symbol" data-val="2">2</button>
     <button class="np-btn" data-action="symbol" data-val="3">3</button>
@@ -790,7 +1099,6 @@ button:hover{
     <button class="np-btn func" data-action="symbol" data-val=",">,</button>
     <button class="np-btn func" data-action="symbol" data-val=":">:</button>
 
-    <!-- 4행 -->
     <button class="np-btn" data-action="symbol" data-val="0">0</button>
     <button class="np-btn" data-action="symbol" data-val=".">.</button>
     <button class="np-btn action" data-action="backspace">⌫</button>
@@ -833,6 +1141,7 @@ button:hover{
       <div class="option-grid">
 
         <div class="opt-card">
+
           <h4>💾 파일</h4>
 
           <button onclick="document.getElementById('fileInput').click();closeOptionModal()">
@@ -850,10 +1159,12 @@ button:hover{
           <button onclick="saveHtml();closeOptionModal()">
             🌐 HTML 저장
           </button>
+
         </div>
 
 
         <div class="opt-card">
+
           <h4>⚙ 텍스트 기능</h4>
 
           <button onclick="removeEmptyLines();closeOptionModal()">
@@ -867,36 +1178,21 @@ button:hover{
           <button onclick="transformCase('lower');closeOptionModal()">
             🔡 영어 소문자
           </button>
+
         </div>
 
 
         <div class="opt-card">
-          <h4>🧮 수식 및 메뉴</h4>
 
-          <button onclick="toggleOpBadgeOpt()">
-            <span>수식 기호 버튼 상단 표시</span>
-            <span id="opBadgeOptState">🟢 ON</span>
-          </button>
+          <h4>ℹ️ 사용 안내</h4>
 
-          <button onclick="toggleSummaryOpt()">
-            <span>계산 요약(합계/평균) 표시</span>
-            <span id="summaryOptState">🟢 ON</span>
-          </button>
-
-          <button onclick="toggleCommaOpt()">
-            <span>천단위 콤마 표기</span>
-            <span id="commaOptState">🟢 ON</span>
-          </button>
-
-          <button onclick="toggleResultOpt()">
-            <span>수식 결과 표시</span>
-            <span id="resultOptState">🟢 ON</span>
-          </button>
-
-          <button onclick="toggleAutoFormatOpt()">
-            <span>연산자 띄어쓰기 자동정렬</span>
-            <span id="autoFormatOptState">🔴 OFF</span>
-          </button>
+          <p style="margin:0;color:#aaa;line-height:1.8">
+            상단 아이콘으로 수식 기호 · 계산 요약 ·<br>
+            콤마 · 자동정렬 · 패드 · 예제를<br>
+            바로 켜고 끌 수 있습니다.<br><br>
+            <b style="color:#ddd">🔤</b> 버튼으로 상단 메뉴를<br>
+            아이콘만 표시하거나 이름과 함께 표시할 수 있습니다.
+          </p>
 
         </div>
 
@@ -910,7 +1206,7 @@ button:hover{
 
 
 <!-- =========================================================
-     도움말 모달
+     도움말
      ========================================================= -->
 
 <div
@@ -925,7 +1221,7 @@ button:hover{
   >
 
     <div class="modal-header">
-      <h2>💡 상세 도움말</h2>
+      <h2>❓ 상세 도움말</h2>
       <button onclick="closeHelpModal()">✕</button>
     </div>
 
@@ -951,18 +1247,15 @@ button:hover{
 
         <h3>1. 쇼핑 및 견적</h3>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('단가 = 25,000\n수량 = 12\n소계 = 단가 * 수량\n할인적용 = 소계 - 15%\n최종결제금액 = 할인적용 + 10%')"
         >할인/부가세</span>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('50,000 + 10%')"
         >50,000 + 10%</span>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('120,000 - 15%')"
         >120,000 - 15%</span>
 
@@ -973,8 +1266,7 @@ button:hover{
 
         <h3>2. 금융</h3>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('원금 = 10,000,000\n연이율 = 4.2%\n세전이자 = 원금 * 연이율\n세후실령액 = 원금 + (세전이자 - 15.4%)')"
         >예금 계산</span>
 
@@ -985,18 +1277,15 @@ button:hover{
 
         <h3>3. 단위 변환</h3>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('작업시간 = 2.5h + 45min')"
         >시간</span>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('총이동거리 = 3.2km + 850m')"
         >거리</span>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('자재총무게 = 1.5kg + 400g')"
         >무게</span>
 
@@ -1007,8 +1296,7 @@ button:hover{
 
         <h3>4. ans</h3>
 
-        <span
-          class="chip"
+        <span class="chip"
           onclick="appendHelpExample('125,000 * 3\nans - 50,000\nans / 4')"
         >이전 결과 사용</span>
 
@@ -1066,19 +1354,44 @@ button:hover{
 "use strict";
 
 /* =========================================================
-   DOM Elements
+   DOM
    ========================================================= */
 
-const container = document.getElementById("editor-container");
-const fontSizeInput = document.getElementById("fontSizeInput");
-const numpadEl = document.getElementById("virtual-numpad");
-const opBadgeGroupEl = document.getElementById("opBadgeGroup");
-const summaryBarEl = document.getElementById("summary-bar");
-const exampleToggleBtn = document.getElementById("exampleToggleBtn");
+const container =
+  document.getElementById("editor-container");
 
-const sumCountEl = document.getElementById("sum-count");
-const sumTotalEl = document.getElementById("sum-total");
-const sumAvgEl = document.getElementById("sum-avg");
+const fontSizeInput =
+  document.getElementById("fontSizeInput");
+
+const numpadEl =
+  document.getElementById("virtual-numpad");
+
+const numpadToggleBtn =
+  document.getElementById("numpadToggleBtn");
+
+const opBadgeGroupEl =
+  document.getElementById("opBadgeGroup");
+
+const summaryBarEl =
+  document.getElementById("summary-bar");
+
+const exampleToggleBtn =
+  document.getElementById("exampleToggleBtn");
+
+const menuLabelToggleBtn =
+  document.getElementById("menuLabelToggleBtn");
+
+const actionSectionEl =
+  document.getElementById("action-section");
+
+const sumCountEl =
+  document.getElementById("sum-count");
+
+const sumTotalEl =
+  document.getElementById("sum-total");
+
+const sumAvgEl =
+  document.getElementById("sum-avg");
 
 
 /* =========================================================
@@ -1089,13 +1402,13 @@ let activeExpr = null;
 
 let useComma = true;
 let showExample = false;
-let showResult = true;
 
 let showOpBadge = true;
 let showSummary = true;
 let autoFormatOp = false;
 
 let isNumpadActive = false;
+let showMenuLabels = false;
 let composing = false;
 
 
@@ -1103,9 +1416,13 @@ let composing = false;
    패드 스크롤 방지
    ========================================================= */
 
-numpadEl.addEventListener("touchmove",function(e){
-  e.preventDefault();
-},{passive:false});
+numpadEl.addEventListener(
+  "touchmove",
+  function(e){
+    e.preventDefault();
+  },
+  {passive:false}
+);
 
 
 /* =========================================================
@@ -1118,7 +1435,10 @@ numpadEl.querySelectorAll(".np-btn").forEach(btn => {
     e.preventDefault();
   };
 
-  btn.addEventListener("mousedown",preventFocusLoss);
+  btn.addEventListener(
+    "mousedown",
+    preventFocusLoss
+  );
 
   btn.addEventListener(
     "touchstart",
@@ -1126,36 +1446,42 @@ numpadEl.querySelectorAll(".np-btn").forEach(btn => {
     {passive:false}
   );
 
-  btn.addEventListener("pointerdown",function(e){
+  btn.addEventListener(
+    "pointerdown",
+    function(e){
 
-    e.preventDefault();
+      e.preventDefault();
 
-    const action = this.getAttribute("data-action");
-    const val = this.getAttribute("data-val");
+      const action =
+        this.getAttribute("data-action");
 
-    if(action === "symbol"){
-      insertSymbol(val);
-    }
-    else if(action === "newline"){
-      insertNewline();
-    }
-    else if(action === "backspace"){
-      handleBackspace();
-    }
-    else if(action === "clear"){
-      clearCurrentExpr();
-    }
-    else if(action === "close"){
-      toggleNumpad();
-    }
+      const val =
+        this.getAttribute("data-val");
 
-  });
+      if(action === "symbol"){
+        insertSymbol(val);
+      }
+      else if(action === "newline"){
+        insertNewline();
+      }
+      else if(action === "backspace"){
+        handleBackspace();
+      }
+      else if(action === "clear"){
+        clearCurrentExpr();
+      }
+      else if(action === "close"){
+        toggleNumpad();
+      }
+
+    }
+  );
 
 });
 
 
 /* =========================================================
-   Default Example Text
+   Default
    ========================================================= */
 
 const defaultText = `\n\n\n\n\n\n\n\n
@@ -1188,7 +1514,7 @@ sqrt(256)`;
 
 
 /* =========================================================
-   Math Functions & Constants
+   Math
    ========================================================= */
 
 const funcs = {
@@ -1232,20 +1558,12 @@ const constants = {
 
 function updateStatusText(text){
 
-  let status = document.getElementById("status");
+  const status =
+    document.getElementById("status");
 
-  if(!status){
+  if(status)
+    status.textContent = text;
 
-    status = document.createElement("div");
-
-    status.id = "status";
-
-    document.getElementById("status-container")
-      .appendChild(status);
-
-  }
-
-  status.textContent = text;
 }
 
 
@@ -1260,12 +1578,95 @@ function escapeHtml(s){
 
 
 /* =========================================================
-   Comma Formatter
+   메뉴 표시 방식
+   ========================================================= */
+
+function updateMenuLabels(){
+
+  actionSectionEl.classList.toggle(
+    "labels-on",
+    showMenuLabels
+  );
+
+  const buttons =
+    actionSectionEl.querySelectorAll(
+      "button[data-icon]"
+    );
+
+  buttons.forEach(btn => {
+
+    const icon =
+      btn.getAttribute("data-icon");
+
+    const label =
+      btn.getAttribute("data-label");
+
+    btn.textContent =
+      showMenuLabels
+        ? icon + " " + label
+        : icon;
+
+  });
+
+  menuLabelToggleBtn.classList.toggle(
+    "active",
+    showMenuLabels
+  );
+
+  menuLabelToggleBtn.setAttribute(
+    "aria-pressed",
+    showMenuLabels
+      ? "true"
+      : "false"
+  );
+
+  menuLabelToggleBtn.setAttribute(
+    "title",
+    showMenuLabels
+      ? "메뉴 이름 숨기기"
+      : "메뉴 이름 표시"
+  );
+
+  menuLabelToggleBtn.setAttribute(
+    "aria-label",
+    showMenuLabels
+      ? "메뉴 이름 숨기기"
+      : "메뉴 이름 표시"
+  );
+
+  menuLabelToggleBtn.textContent =
+    showMenuLabels
+      ? "🔤 이름"
+      : "🔤";
+
+}
+
+
+function toggleMenuLabels(){
+
+  showMenuLabels =
+    !showMenuLabels;
+
+  localStorage.setItem(
+    "memoCalcMenuLabels",
+    showMenuLabels
+      ? "1"
+      : "0"
+  );
+
+  updateMenuLabels();
+
+}
+
+
+/* =========================================================
+   Comma
    ========================================================= */
 
 function formatCommasInExprHtml(str){
 
-  if(!useComma) return escapeHtml(str);
+  if(!useComma)
+    return escapeHtml(str);
 
   return str
     .split(/(\d+(?:\.\d+)?|[^\d]+)/)
@@ -1286,11 +1687,14 @@ function formatCommasInExprHtml(str){
 
 function cleanExprForEval(html){
 
-  const d = document.createElement("div");
+  const d =
+    document.createElement("div");
 
   d.innerHTML = html;
 
-  d.querySelectorAll(".comma").forEach(x => x.remove());
+  d.querySelectorAll(".comma").forEach(
+    x => x.remove()
+  );
 
   return d.innerText.replace(/\r?\n/g,"");
 
@@ -1298,26 +1702,45 @@ function cleanExprForEval(html){
 
 
 /* =========================================================
-   Caret Control
+   Caret
    ========================================================= */
 
 function getCaretOffset(el){
 
-  const sel = window.getSelection();
+  const sel =
+    window.getSelection();
 
-  if(!sel.rangeCount) return 0;
+  if(
+    !sel.rangeCount ||
+    !el.contains(sel.anchorNode) ||
+    !el.contains(sel.focusNode)
+  )
+    return cleanExprForEval(
+      el.innerHTML
+    ).length;
 
-  const r = sel.getRangeAt(0);
-  const pre = r.cloneRange();
+  const r =
+    sel.getRangeAt(0);
+
+  const pre =
+    r.cloneRange();
 
   pre.selectNodeContents(el);
-  pre.setEnd(r.endContainer,r.endOffset);
+  pre.setEnd(
+    r.endContainer,
+    r.endOffset
+  );
 
-  const d = document.createElement("div");
+  const d =
+    document.createElement("div");
 
-  d.appendChild(pre.cloneContents());
+  d.appendChild(
+    pre.cloneContents()
+  );
 
-  d.querySelectorAll(".comma").forEach(x => x.remove());
+  d.querySelectorAll(".comma").forEach(
+    x => x.remove()
+  );
 
   return d.innerText.length;
 
@@ -1340,6 +1763,7 @@ function setCaretOffset(el,offset){
         nodeOffset = offset - pos;
 
         return true;
+
       }
 
       pos += n.length;
@@ -1347,10 +1771,15 @@ function setCaretOffset(el,offset){
     }
     else if(n.nodeType === 1){
 
-      if(n.classList?.contains("comma"))
+      if(
+        n.classList &&
+        n.classList.contains("comma")
+      )
         return false;
 
-      for(const child of n.childNodes){
+      for(
+        const child of n.childNodes
+      ){
 
         if(walk(child))
           return true;
@@ -1360,6 +1789,7 @@ function setCaretOffset(el,offset){
     }
 
     return false;
+
   }
 
   walk(el);
@@ -1371,12 +1801,18 @@ function setCaretOffset(el,offset){
 
   }
 
-  const range = document.createRange();
+  const range =
+    document.createRange();
 
-  range.setStart(node,nodeOffset);
+  range.setStart(
+    node,
+    Math.max(0,nodeOffset)
+  );
+
   range.collapse(true);
 
-  const sel = window.getSelection();
+  const sel =
+    window.getSelection();
 
   sel.removeAllRanges();
   sel.addRange(range);
@@ -1384,59 +1820,126 @@ function setCaretOffset(el,offset){
 }
 
 
-function formatCurrentExprPreserveCaret(target){
-
-  if(!target || composing) return;
-
-  const text = cleanExprForEval(target.innerHTML);
-
-  if(!text.trim() || text.trim().startsWith("#"))
-    return;
-
-  const caret = getCaretOffset(target);
-
-  const formatted = formatCommasInExprHtml(text);
-
-  if(target.innerHTML === formatted)
-    return;
-
-  target.innerHTML = formatted;
+function restoreCaretLater(
+  target,
+  offset
+){
 
   setCaretOffset(
     target,
-    Math.min(caret,text.length)
+    offset
+  );
+
+  requestAnimationFrame(() => {
+
+    if(
+      document.activeElement === target
+    ){
+
+      setCaretOffset(
+        target,
+        offset
+      );
+
+    }
+
+  });
+
+}
+
+
+function formatCurrentExprPreserveCaret(target){
+
+  if(!target || composing)
+    return;
+
+  const text =
+    cleanExprForEval(
+      target.innerHTML
+    );
+
+  if(
+    !text.trim() ||
+    text.trim().startsWith("#")
+  )
+    return;
+
+  const caret =
+    getCaretOffset(target);
+
+  const formatted =
+    formatCommasInExprHtml(text);
+
+  if(
+    target.innerHTML === formatted
+  )
+    return;
+
+  target.innerHTML =
+    formatted;
+
+  setCaretOffset(
+    target,
+    Math.min(
+      caret,
+      text.length
+    )
   );
 
 }
 
 
 /* =========================================================
-   Operator Formatting
+   Operator
    ========================================================= */
 
 function formatOperatorSpaces(s){
 
   return s
-    .replace(/\s*([+*\/%])\s*/g," $1 ")
-    .replace(/\s*-\s*/g," - ")
-    .replace(/\s*×\s*/g," × ")
-    .replace(/\s*÷\s*/g," ÷ ")
-    .replace(/\s*(?<![<>!=])=(?!=)\s*/g," = ")
-    .replace(/[ \t]+/g," ")
+    .replace(
+      /\s*([+*\/%])\s*/g,
+      " $1 "
+    )
+    .replace(
+      /\s*-\s*/g,
+      " - "
+    )
+    .replace(
+      /\s*×\s*/g,
+      " × "
+    )
+    .replace(
+      /\s*÷\s*/g,
+      " ÷ "
+    )
+    .replace(
+      /\s*(?<![<>!=])=(?!=)\s*/g,
+      " = "
+    )
+    .replace(
+      /[ \t]+/g,
+      " "
+    )
     .trim();
 
 }
 
 
 /* =========================================================
-   Evaluation Normalizer
+   Normalize
    ========================================================= */
 
 function normalize(s){
 
   s = s
-    .replace(/\u00a0/g," ")
-    .replace(/(\d),(?=\d{3}\b)/g,"$1");
+    .replace(
+      /\u00a0/g,
+      " "
+    )
+    .replace(
+      /(\d),(?=\d{3}\b)/g,
+      "$1"
+    );
 
   s = s.replace(
     /([0-9A-Za-z_가-힣.\)]+)\s*\+\s*(\d+(?:\.\d+)?)\s*%/g,
@@ -1464,12 +1967,30 @@ function normalize(s){
   );
 
   return s
-    .replace(/(\d+(?:\.\d+)?)\s*km\b/gi,"($1*1000)")
-    .replace(/(\d+(?:\.\d+)?)\s*m\b(?!\w)/gi,"$1")
-    .replace(/(\d+(?:\.\d+)?)\s*kg\b/gi,"($1*1000)")
-    .replace(/(\d+(?:\.\d+)?)\s*g\b(?!\w)/gi,"$1")
-    .replace(/(\d+(?:\.\d+)?)\s*h\b/gi,"($1*60)")
-    .replace(/(\d+(?:\.\d+)?)\s*min\b/gi,"$1")
+    .replace(
+      /(\d+(?:\.\d+)?)\s*km\b/gi,
+      "($1*1000)"
+    )
+    .replace(
+      /(\d+(?:\.\d+)?)\s*m\b(?!\w)/gi,
+      "$1"
+    )
+    .replace(
+      /(\d+(?:\.\d+)?)\s*kg\b/gi,
+      "($1*1000)"
+    )
+    .replace(
+      /(\d+(?:\.\d+)?)\s*g\b(?!\w)/gi,
+      "$1"
+    )
+    .replace(
+      /(\d+(?:\.\d+)?)\s*h\b/gi,
+      "($1*60)"
+    )
+    .replace(
+      /(\d+(?:\.\d+)?)\s*min\b/gi,
+      "$1"
+    )
     .replace(/×/g,"*")
     .replace(/÷/g,"/")
     .replace(/−/g,"-")
@@ -1481,15 +2002,22 @@ function normalize(s){
 
 function safeEval(expr,vars){
 
-  expr = normalize(expr.trim());
+  expr =
+    normalize(
+      expr.trim()
+    );
 
   if(!expr)
     return null;
 
-  if(!/^[0-9+\-*/%().<>=!&|?:,'"A-Za-z_가-힣\s*]+$/.test(expr))
+  if(
+    !/^[0-9+\-*/%().<>=!&|?:,'"A-Za-z_가-힣\s*]+$/.test(expr)
+  )
     throw Error("허용되지 않은 문자");
 
-  if(/\b(?:constructor|prototype|window|document|globalThis|Function|eval|import|fetch|location|alert|prompt)\b/i.test(expr))
+  if(
+    /\b(?:constructor|prototype|window|document|globalThis|Function|eval|import|fetch|location|alert|prompt)\b/i.test(expr)
+  )
     throw Error("허용되지 않은 표현");
 
   const scope = {
@@ -1498,13 +2026,16 @@ function safeEval(expr,vars){
     ...vars
   };
 
-  const names = Object.keys(scope);
+  const names =
+    Object.keys(scope);
 
   return Function(
     ...names,
     `"use strict";return (${expr});`
   )(
-    ...names.map(k => scope[k])
+    ...names.map(
+      k => scope[k]
+    )
   );
 
 }
@@ -1520,16 +2051,20 @@ function format(v){
     if(Math.abs(v) < 1e-12)
       v = 0;
 
-    let p = Number(v.toPrecision(14))
+    let p =
+      Number(
+        v.toPrecision(14)
+      )
       .toString()
       .split(".");
 
     if(useComma){
 
-      p[0] = p[0].replace(
-        /\B(?=(\d{3})+(?!\d))/g,
-        ","
-      );
+      p[0] =
+        p[0].replace(
+          /\B(?=(\d{3})+(?!\d))/g,
+          ","
+        );
 
     }
 
@@ -1545,22 +2080,25 @@ function format(v){
 
 
 /* =========================================================
-   Font Size
+   Font
    ========================================================= */
 
 function changeFontSize(v){
 
-  const n = parseInt(v,10);
+  const n =
+    parseInt(v,10);
 
   if(!Number.isFinite(n))
     return;
 
-  const size = Math.max(
-    10,
-    Math.min(60,n)
-  );
+  const size =
+    Math.max(
+      10,
+      Math.min(60,n)
+    );
 
-  container.style.fontSize = size + "px";
+  container.style.fontSize =
+    size + "px";
 
   localStorage.setItem(
     "memoCalcFontSize",
@@ -1570,31 +2108,44 @@ function changeFontSize(v){
 }
 
 
-fontSizeInput.addEventListener("input",() => {
+fontSizeInput.addEventListener(
+  "input",
+  () => {
 
-  if(fontSizeInput.value !== "")
-    changeFontSize(
-      parseInt(fontSizeInput.value,10)
-    );
+    if(fontSizeInput.value !== "")
+      changeFontSize(
+        parseInt(
+          fontSizeInput.value,
+          10
+        )
+      );
 
-});
+  }
+);
 
 
-fontSizeInput.addEventListener("change",() => {
+fontSizeInput.addEventListener(
+  "change",
+  () => {
 
-  let n =
-    parseInt(fontSizeInput.value,10) || 16;
+    let n =
+      parseInt(
+        fontSizeInput.value,
+        10
+      ) || 16;
 
-  n = Math.max(
-    10,
-    Math.min(60,n)
-  );
+    n =
+      Math.max(
+        10,
+        Math.min(60,n)
+      );
 
-  fontSizeInput.value = n;
+    fontSizeInput.value = n;
 
-  changeFontSize(n);
+    changeFontSize(n);
 
-});
+  }
+);
 
 
 fontSizeInput.addEventListener(
@@ -1604,13 +2155,23 @@ fontSizeInput.addEventListener(
     e.preventDefault();
 
     let n =
-      (parseInt(fontSizeInput.value,10) || 16)
-      + (e.deltaY < 0 ? 1 : -1);
+      (
+        parseInt(
+          fontSizeInput.value,
+          10
+        ) || 16
+      ) +
+      (
+        e.deltaY < 0
+          ? 1
+          : -1
+      );
 
-    n = Math.max(
-      10,
-      Math.min(60,n)
-    );
+    n =
+      Math.max(
+        10,
+        Math.min(60,n)
+      );
 
     fontSizeInput.value = n;
 
@@ -1622,17 +2183,21 @@ fontSizeInput.addEventListener(
 
 
 /* =========================================================
-   Editors & Rows
+   Rows
    ========================================================= */
 
 function getTextContent(){
 
   return [
-    ...container.querySelectorAll(".calc-row")
+    ...container.querySelectorAll(
+      ".calc-row"
+    )
   ]
     .map(row =>
       cleanExprForEval(
-        row.querySelector(".expr").innerHTML
+        row.querySelector(
+          ".expr"
+        ).innerHTML
       )
     )
     .join("\n");
@@ -1640,28 +2205,43 @@ function getTextContent(){
 }
 
 
-function addRow(text="",ref=null){
+function addRow(
+  text="",
+  ref=null
+){
 
-  const row = document.createElement("div");
+  const row =
+    document.createElement("div");
 
-  row.className = "calc-row";
+  row.className =
+    "calc-row";
 
-  const expr = document.createElement("div");
+  const expr =
+    document.createElement("div");
 
-  expr.className = "expr";
+  expr.className =
+    "expr";
 
-  expr.contentEditable = "true";
+  expr.contentEditable =
+    "true";
 
-  expr.spellcheck = false;
+  expr.spellcheck =
+    false;
 
   if(isNumpadActive)
-    expr.inputMode = "none";
+    expr.inputMode =
+      "none";
 
-  if(text.trim().startsWith("#")){
+  if(
+    text.trim().startsWith("#")
+  ){
 
-    expr.textContent = text;
+    expr.textContent =
+      text;
 
-    expr.classList.add("comment");
+    expr.classList.add(
+      "comment"
+    );
 
   }
   else{
@@ -1671,16 +2251,30 @@ function addRow(text="",ref=null){
 
   }
 
-  const res = document.createElement("div");
+  const res =
+    document.createElement("div");
 
-  res.className = "result";
+  res.className =
+    "result";
 
-  row.append(expr,res);
+  row.append(
+    expr,
+    res
+  );
 
-  if(ref)
-    container.insertBefore(row,ref.nextSibling);
-  else
+  if(ref){
+
+    container.insertBefore(
+      row,
+      ref.nextSibling
+    );
+
+  }
+  else{
+
     container.appendChild(row);
+
+  }
 
   return expr;
 
@@ -1689,10 +2283,11 @@ function addRow(text="",ref=null){
 
 function initDOM(text){
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
-  text.split("\n").forEach(x =>
-    addRow(x)
+  text.split("\n").forEach(
+    x => addRow(x)
   );
 
   calculate();
@@ -1701,14 +2296,17 @@ function initDOM(text){
 
 
 /* =========================================================
-   Main Calculation Loop
+   Calculation
    ========================================================= */
 
 function calculate(){
 
-  const rows = [
-    ...container.querySelectorAll(".calc-row")
-  ];
+  const rows =
+    [
+      ...container.querySelectorAll(
+        ".calc-row"
+      )
+    ];
 
   const vars = {};
 
@@ -1721,10 +2319,14 @@ function calculate(){
   rows.forEach(row => {
 
     const expr =
-      row.querySelector(".expr");
+      row.querySelector(
+        ".expr"
+      );
 
     const res =
-      row.querySelector(".result");
+      row.querySelector(
+        ".result"
+      );
 
     const line =
       cleanExprForEval(
@@ -1736,7 +2338,9 @@ function calculate(){
 
     if(example){
 
-      row.classList.add("example-row");
+      row.classList.add(
+        "example-row"
+      );
 
       row.classList.toggle(
         "hidden",
@@ -1753,14 +2357,19 @@ function calculate(){
 
     }
 
-    res.classList.toggle(
-      "hidden",
-      !showResult
+    /* 결과는 항상 표시 */
+
+    res.classList.remove(
+      "hidden"
     );
 
-    if(!line || line.startsWith("#")){
+    if(
+      !line ||
+      line.startsWith("#")
+    ){
 
-      res.textContent = "";
+      res.textContent =
+        "";
 
       return;
 
@@ -1775,26 +2384,30 @@ function calculate(){
 
       let v =
         m
-        ? safeEval(m[2],vars)
-        : safeEval(
-            line,
-            {
-              ...vars,
-              ans:last
-            }
-          );
+          ? safeEval(
+              m[2],
+              vars
+            )
+          : safeEval(
+              line,
+              {
+                ...vars,
+                ans:last
+              }
+            );
 
       if(m)
-        vars[m[1]] = v;
+        vars[m[1]] =
+          v;
 
-      last = v;
+      last =
+        v;
 
       res.textContent =
         "= " + format(v);
 
       res.className =
-        "result" +
-        (showResult ? "" : " hidden");
+        "result";
 
       if(
         !example &&
@@ -1816,8 +2429,7 @@ function calculate(){
         "= ⚠ " + e.message;
 
       res.className =
-        "result error" +
-        (showResult ? "" : " hidden");
+        "result error";
 
     }
 
@@ -1849,19 +2461,24 @@ function calculate(){
 
 
 /* =========================================================
-   User Actions
+   Insert
    ========================================================= */
 
 function insertSymbol(symbol){
 
   const target =
     activeExpr ||
-    container.querySelector(".expr:last-child");
+    container.querySelector(
+      ".expr:last-child"
+    );
 
   if(!target)
     return;
 
   target.focus();
+
+  const beforeCaret =
+    getCaretOffset(target);
 
   document.execCommand(
     "insertText",
@@ -1869,49 +2486,62 @@ function insertSymbol(symbol){
     symbol
   );
 
-  if(autoFormatOp && !composing){
+  const text =
+    cleanExprForEval(
+      target.innerHTML
+    );
 
-    const text =
-      cleanExprForEval(
-        target.innerHTML
-      );
+  let formatted =
+    text;
 
-    const caret =
-      getCaretOffset(target);
+  if(autoFormatOp){
 
-    const formatted =
+    formatted =
       formatOperatorSpaces(text);
 
+  }
+
+  const html =
+    formatCommasInExprHtml(
+      formatted
+    );
+
+  if(
+    target.innerHTML !== html
+  ){
+
     target.innerHTML =
-      formatCommasInExprHtml(formatted);
-
-    setCaretOffset(
-      target,
-      Math.min(
-        caret,
-        formatted.length
-      )
-    );
+      html;
 
   }
-  else{
 
-    formatCurrentExprPreserveCaret(
-      target
+  const desiredCaret =
+    Math.min(
+      beforeCaret + symbol.length,
+      formatted.length
     );
 
-  }
+  restoreCaretLater(
+    target,
+    desiredCaret
+  );
 
   calculate();
 
 }
 
 
+/* =========================================================
+   Newline
+   ========================================================= */
+
 function insertNewline(){
 
   const target =
     activeExpr ||
-    container.querySelector(".expr:last-child");
+    container.querySelector(
+      ".expr:last-child"
+    );
 
   if(!target)
     return;
@@ -1921,14 +2551,17 @@ function insertNewline(){
   const next =
     addRow(
       "",
-      target.closest(".calc-row")
+      target.closest(
+        ".calc-row"
+      )
     );
 
   calculate();
 
   next.focus();
 
-  activeExpr = next;
+  activeExpr =
+    next;
 
 }
 
@@ -1937,7 +2570,9 @@ function handleBackspace(){
 
   const target =
     activeExpr ||
-    container.querySelector(".expr:last-child");
+    container.querySelector(
+      ".expr:last-child"
+    );
 
   if(!target)
     return;
@@ -1963,14 +2598,17 @@ function clearCurrentExpr(){
 
   const target =
     activeExpr ||
-    container.querySelector(".expr:last-child");
+    container.querySelector(
+      ".expr:last-child"
+    );
 
   if(!target)
     return;
 
   target.focus();
 
-  target.innerHTML = "";
+  target.innerHTML =
+    "";
 
   calculate();
 
@@ -1978,8 +2616,25 @@ function clearCurrentExpr(){
 
 
 /* =========================================================
-   가상 패드
+   Numpad
    ========================================================= */
+
+function updateNumpadButton(){
+
+  numpadToggleBtn.classList.toggle(
+    "active",
+    isNumpadActive
+  );
+
+  numpadToggleBtn.setAttribute(
+    "aria-pressed",
+    isNumpadActive
+      ? "true"
+      : "false"
+  );
+
+}
+
 
 function toggleNumpad(){
 
@@ -1991,8 +2646,12 @@ function toggleNumpad(){
     isNumpadActive
   );
 
+  updateNumpadButton();
+
   const exprs =
-    container.querySelectorAll(".expr");
+    container.querySelectorAll(
+      ".expr"
+    );
 
   exprs.forEach(el => {
 
@@ -2019,10 +2678,12 @@ function toggleNumpad(){
     requestAnimationFrame(() => {
 
       const padHeight =
-        numpadEl.offsetHeight || 130;
+        numpadEl.offsetHeight ||
+        130;
 
-      document.getElementById("wrap")
-        .style.paddingBottom =
+      document.getElementById(
+        "wrap"
+      ).style.paddingBottom =
         (padHeight + 15) + "px";
 
     });
@@ -2030,8 +2691,9 @@ function toggleNumpad(){
   }
   else{
 
-    document.getElementById("wrap")
-      .style.paddingBottom =
+    document.getElementById(
+      "wrap"
+    ).style.paddingBottom =
       "40px";
 
   }
@@ -2040,7 +2702,7 @@ function toggleNumpad(){
 
 
 /* =========================================================
-   예제
+   Example
    ========================================================= */
 
 function updateExampleButton(){
@@ -2050,12 +2712,20 @@ function updateExampleButton(){
     showExample
   );
 
+  exampleToggleBtn.setAttribute(
+    "aria-pressed",
+    showExample
+      ? "true"
+      : "false"
+  );
+
 }
 
 
 function toggleExample(){
 
-  showExample = !showExample;
+  showExample =
+    !showExample;
 
   updateExampleButton();
 
@@ -2071,57 +2741,132 @@ function toggleExample(){
 
 
 /* =========================================================
-   Options
+   Top Toggle
+   ========================================================= */
+
+function updateToggleButtons(){
+
+  const op =
+    document.getElementById(
+      "toggleOpBtn"
+    );
+
+  const summary =
+    document.getElementById(
+      "toggleSummaryBtn"
+    );
+
+  const comma =
+    document.getElementById(
+      "toggleCommaBtn"
+    );
+
+  const auto =
+    document.getElementById(
+      "toggleAutoFormatBtn"
+    );
+
+
+  op.classList.toggle(
+    "active",
+    showOpBadge
+  );
+
+  op.setAttribute(
+    "aria-pressed",
+    showOpBadge
+      ? "true"
+      : "false"
+  );
+
+
+  summary.classList.toggle(
+    "active",
+    showSummary
+  );
+
+  summary.setAttribute(
+    "aria-pressed",
+    showSummary
+      ? "true"
+      : "false"
+  );
+
+
+  comma.classList.toggle(
+    "active",
+    useComma
+  );
+
+  comma.setAttribute(
+    "aria-pressed",
+    useComma
+      ? "true"
+      : "false"
+  );
+
+
+  auto.classList.toggle(
+    "active",
+    autoFormatOp
+  );
+
+  auto.setAttribute(
+    "aria-pressed",
+    autoFormatOp
+      ? "true"
+      : "false"
+  );
+
+}
+
+
+/* =========================================================
+   수식 기호
    ========================================================= */
 
 function toggleOpBadgeOpt(){
 
-  showOpBadge = !showOpBadge;
+  showOpBadge =
+    !showOpBadge;
 
   opBadgeGroupEl.classList.toggle(
     "hidden",
     !showOpBadge
   );
 
-  document.getElementById(
-    "opBadgeOptState"
-  ).textContent =
-    showOpBadge
-      ? "🟢 ON"
-      : "🔴 OFF";
+  updateToggleButtons();
 
 }
 
 
+/* =========================================================
+   계산 요약
+   ========================================================= */
+
 function toggleSummaryOpt(){
 
-  showSummary = !showSummary;
+  showSummary =
+    !showSummary;
 
   summaryBarEl.classList.toggle(
     "hidden",
     !showSummary
   );
 
-  document.getElementById(
-    "summaryOptState"
-  ).textContent =
-    showSummary
-      ? "🟢 ON"
-      : "🔴 OFF";
+  updateToggleButtons();
 
 }
 
 
+/* =========================================================
+   콤마
+   ========================================================= */
+
 function toggleCommaOpt(){
 
-  useComma = !useComma;
-
-  document.getElementById(
-    "commaOptState"
-  ).textContent =
-    useComma
-      ? "🟢 ON"
-      : "🔴 OFF";
+  useComma =
+    !useComma;
 
   container
     .querySelectorAll(".expr")
@@ -2132,7 +2877,9 @@ function toggleCommaOpt(){
           x.innerHTML
         );
 
-      if(!t.trim().startsWith("#")){
+      if(
+        !t.trim().startsWith("#")
+      ){
 
         x.innerHTML =
           formatCommasInExprHtml(t);
@@ -2141,38 +2888,23 @@ function toggleCommaOpt(){
 
     });
 
-  calculate();
-
-}
-
-
-function toggleResultOpt(){
-
-  showResult = !showResult;
-
-  document.getElementById(
-    "resultOptState"
-  ).textContent =
-    showResult
-      ? "🟢 ON"
-      : "🔴 OFF";
+  updateToggleButtons();
 
   calculate();
 
 }
 
+
+/* =========================================================
+   자동정렬
+   ========================================================= */
 
 function toggleAutoFormatOpt(){
 
   autoFormatOp =
     !autoFormatOp;
 
-  document.getElementById(
-    "autoFormatOptState"
-  ).textContent =
-    autoFormatOp
-      ? "🟢 ON"
-      : "🔴 OFF";
+  updateToggleButtons();
 
   if(autoFormatOp)
     formatOperators();
@@ -2191,7 +2923,9 @@ function formatOperators(){
           x.innerHTML
         );
 
-      if(!t.trim().startsWith("#")){
+      if(
+        !t.trim().startsWith("#")
+      ){
 
         x.innerHTML =
           formatCommasInExprHtml(
@@ -2214,16 +2948,24 @@ function formatOperators(){
 async function copyVisibleWithResults(){
 
   const rows =
-    [...container.querySelectorAll(".calc-row")];
+    [
+      ...container.querySelectorAll(
+        ".calc-row"
+      )
+    ];
 
   const lines = [];
 
   rows.forEach(row => {
 
     if(
-      row.classList.contains("hidden") ||
+      row.classList.contains(
+        "hidden"
+      ) ||
       (
-        row.classList.contains("example-row") &&
+        row.classList.contains(
+          "example-row"
+        ) &&
         !showExample
       )
     )
@@ -2231,13 +2973,15 @@ async function copyVisibleWithResults(){
 
     const expr =
       cleanExprForEval(
-        row.querySelector(".expr").innerHTML
+        row.querySelector(
+          ".expr"
+        ).innerHTML
       );
 
     const result =
-      row.querySelector(".result")
-        .textContent
-        .trim();
+      row.querySelector(
+        ".result"
+      ).textContent.trim();
 
     if(expr.trim()){
 
@@ -2281,11 +3025,14 @@ async function copyVisibleWithResults(){
 async function copyCurrentResult(target){
 
   const row =
-    target.closest(".calc-row");
+    target.closest(
+      ".calc-row"
+    );
 
   const text =
-    row.querySelector(".result")
-      .textContent
+    row.querySelector(
+      ".result"
+    ).textContent
       .replace(/^=\s*/,"");
 
   if(
@@ -2293,7 +3040,9 @@ async function copyCurrentResult(target){
     !text.startsWith("⚠")
   ){
 
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(
+      text
+    );
 
     updateStatusText(
       "결과 복사됨"
@@ -2305,7 +3054,7 @@ async function copyCurrentResult(target){
 
 
 /* =========================================================
-   Text Functions
+   Text
    ========================================================= */
 
 function removeEmptyLines(){
@@ -2313,13 +3062,15 @@ function removeEmptyLines(){
   let empty = false;
 
   [
-    ...container.querySelectorAll(".calc-row")
+    ...container.querySelectorAll(
+      ".calc-row"
+    )
   ].forEach(row => {
 
     const t =
-      row.querySelector(".expr")
-        .innerText
-        .trim();
+      row.querySelector(
+        ".expr"
+      ).innerText.trim();
 
     if(!t){
 
@@ -2353,7 +3104,9 @@ function transformCase(mode){
           x.innerHTML
         );
 
-      if(!t.trim().startsWith("#")){
+      if(
+        !t.trim().startsWith("#")
+      ){
 
         x.innerHTML =
           formatCommasInExprHtml(
@@ -2372,7 +3125,7 @@ function transformCase(mode){
 
 
 /* =========================================================
-   File IO
+   File
    ========================================================= */
 
 function downloadFile(
@@ -2397,7 +3150,8 @@ function downloadFile(
   a.href =
     URL.createObjectURL(blob);
 
-  a.download = name;
+  a.download =
+    name;
 
   a.click();
 
@@ -2420,20 +3174,29 @@ function exportToCsv(){
     "\uFEFF수식,결과\n";
 
   container
-    .querySelectorAll(".calc-row")
+    .querySelectorAll(
+      ".calc-row"
+    )
     .forEach(row => {
 
-      if(row.classList.contains("hidden"))
+      if(
+        row.classList.contains(
+          "hidden"
+        )
+      )
         return;
 
       const e =
         cleanExprForEval(
-          row.querySelector(".expr").innerHTML
+          row.querySelector(
+            ".expr"
+          ).innerHTML
         ).trim();
 
       const r =
-        row.querySelector(".result")
-          .textContent
+        row.querySelector(
+          ".result"
+        ).textContent
           .replace(/^=\s*/,"")
           .trim();
 
@@ -2472,7 +3235,9 @@ function loadFile(e){
   reader.onload =
     x => {
 
-      initDOM(x.target.result);
+      initDOM(
+        x.target.result
+      );
 
       updateStatusText(
         "파일 불러오기 완료"
@@ -2482,34 +3247,44 @@ function loadFile(e){
 
   reader.readAsText(file);
 
-  e.target.value = "";
+  e.target.value =
+    "";
 
 }
 
 
 /* =========================================================
-   Help Example
+   Help
    ========================================================= */
 
 function appendHelpExample(text){
 
   const target =
     activeExpr ||
-    container.querySelector(".expr:last-child");
+    container.querySelector(
+      ".expr:last-child"
+    );
 
   let r =
     target
-      ? target.closest(".calc-row")
+      ? target.closest(
+          ".calc-row"
+        )
       : null;
 
   text.split("\n")
     .forEach(line => {
 
       const e =
-        addRow(line,r);
+        addRow(
+          line,
+          r
+        );
 
       r =
-        e.closest(".calc-row");
+        e.closest(
+          ".calc-row"
+        );
 
     });
 
@@ -2531,8 +3306,12 @@ function appendHelpExample(text){
 function openOptionModal(){
 
   document
-    .getElementById("optionModal")
-    .classList.add("active");
+    .getElementById(
+      "optionModal"
+    )
+    .classList.add(
+      "active"
+    );
 
 }
 
@@ -2547,8 +3326,12 @@ function closeOptionModal(e){
   ){
 
     document
-      .getElementById("optionModal")
-      .classList.remove("active");
+      .getElementById(
+        "optionModal"
+      )
+      .classList.remove(
+        "active"
+      );
 
   }
 
@@ -2558,8 +3341,12 @@ function closeOptionModal(e){
 function openHelpModal(){
 
   document
-    .getElementById("helpModal")
-    .classList.add("active");
+    .getElementById(
+      "helpModal"
+    )
+    .classList.add(
+      "active"
+    );
 
 }
 
@@ -2574,8 +3361,12 @@ function closeHelpModal(e){
   ){
 
     document
-      .getElementById("helpModal")
-      .classList.remove("active");
+      .getElementById(
+        "helpModal"
+      )
+      .classList.remove(
+        "active"
+      );
 
   }
 
@@ -2590,9 +3381,12 @@ function saveHtml(){
 
   const blob =
     new Blob(
-      [document.documentElement.outerHTML],
+      [
+        document.documentElement.outerHTML
+      ],
       {
-        type:"text/html;charset=utf-8"
+        type:
+          "text/html;charset=utf-8"
       }
     );
 
@@ -2637,22 +3431,28 @@ function resetToDefault(){
     "memoCalcText"
   );
 
-  initDOM(defaultText);
+  initDOM(
+    defaultText
+  );
 
-  showExample = false;
+  showExample =
+    false;
 
   updateExampleButton();
 
   calculate();
 
   const first =
-    container.querySelector(".expr");
+    container.querySelector(
+      ".expr"
+    );
 
   if(first){
 
     first.focus();
 
-    activeExpr = first;
+    activeExpr =
+      first;
 
   }
 
@@ -2660,7 +3460,7 @@ function resetToDefault(){
 
 
 /* =========================================================
-   Global Listeners
+   Global
    ========================================================= */
 
 container.addEventListener(
@@ -2673,7 +3473,8 @@ container.addEventListener(
       )
     ){
 
-      activeExpr = e.target;
+      activeExpr =
+        e.target;
 
     }
 
@@ -2691,7 +3492,8 @@ container.addEventListener(
       )
     ){
 
-      composing = true;
+      composing =
+        true;
 
     }
 
@@ -2709,9 +3511,11 @@ container.addEventListener(
       )
     ){
 
-      composing = false;
+      composing =
+        false;
 
-      const target = e.target;
+      const target =
+        e.target;
 
       target.classList.toggle(
         "comment",
@@ -2743,7 +3547,8 @@ container.addEventListener(
     )
       return;
 
-    const target = e.target;
+    const target =
+      e.target;
 
     target.classList.toggle(
       "comment",
@@ -2767,10 +3572,14 @@ container.addEventListener(
           );
 
         const caret =
-          getCaretOffset(target);
+          getCaretOffset(
+            target
+          );
 
         const formatted =
-          formatOperatorSpaces(text);
+          formatOperatorSpaces(
+            text
+          );
 
         target.innerHTML =
           formatCommasInExprHtml(
@@ -2814,7 +3623,7 @@ container.addEventListener(
       return;
 
 
-    /* Enter → 다음 줄 */
+    /* Enter */
 
     if(
       e.key === "Enter" &&
@@ -2831,21 +3640,24 @@ container.addEventListener(
       const next =
         addRow(
           "",
-          e.target.closest(".calc-row")
+          e.target.closest(
+            ".calc-row"
+          )
         );
 
       calculate();
 
       next.focus();
 
-      activeExpr = next;
+      activeExpr =
+        next;
 
       return;
 
     }
 
 
-    /* 빈 줄 Backspace → 줄 삭제 */
+    /* Backspace */
 
     if(
       e.key === "Backspace" &&
@@ -2862,7 +3674,9 @@ container.addEventListener(
         e.preventDefault();
 
         const row =
-          e.target.closest(".calc-row");
+          e.target.closest(
+            ".calc-row"
+          );
 
         const prev =
           row.previousElementSibling;
@@ -2870,7 +3684,9 @@ container.addEventListener(
         if(prev){
 
           const p =
-            prev.querySelector(".expr");
+            prev.querySelector(
+              ".expr"
+            );
 
           row.remove();
 
@@ -2890,7 +3706,8 @@ container.addEventListener(
           s.removeAllRanges();
           s.addRange(r);
 
-          activeExpr = p;
+          activeExpr =
+            p;
 
         }
 
@@ -2927,7 +3744,9 @@ container.addEventListener(
 
       e.preventDefault();
 
-      copyCurrentResult(e.target);
+      copyCurrentResult(
+        e.target
+      );
 
       return;
 
@@ -2973,23 +3792,43 @@ const savedText =
     "memoCalcText"
   ) ?? defaultText;
 
-initDOM(savedText);
+initDOM(
+  savedText
+);
 
-showExample = false;
+showExample =
+  false;
+
+const savedMenuLabels =
+  localStorage.getItem(
+    "memoCalcMenuLabels"
+  );
+
+showMenuLabels =
+  savedMenuLabels === "1";
 
 updateExampleButton();
+
+updateToggleButtons();
+
+updateNumpadButton();
+
+updateMenuLabels();
 
 calculate();
 
 
 const firstExpr =
-  container.querySelector(".expr");
+  container.querySelector(
+    ".expr"
+  );
 
 if(firstExpr){
 
   firstExpr.focus();
 
-  activeExpr = firstExpr;
+  activeExpr =
+    firstExpr;
 
 }
 
