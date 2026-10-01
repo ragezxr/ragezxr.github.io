@@ -4,29 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>메모_계산기</title>
-<!-- D2Coding 웹폰트 추가 -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/neodgm/neodgm-webfont@latest/neodgm.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/d2coding/d2coding-webfont@master/d2coding-subset.css">
-<style>
-@import url('https://cdn.jsdelivr.net/gh/joungkyun/font-d2coding/d2coding.css');
 
+<style>
 *{box-sizing:border-box}
 html,body{height:100%;height:100dvh;margin:0;padding:0;overflow:hidden}
 body{font-family:'D2Coding', 'D2 coding', Consolas, "Noto Sans KR", monospace;background:#1e1e1e;color:#ddd;display:flex;flex-direction:column}
 #top{display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px;padding:2px 8px;background:#252526;border-bottom:1px solid #3a3a3a;z-index:100;flex-shrink:0;-webkit-user-select:none;user-select:none}
 .menu-section{display:flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:0}
 #operator-section{display:none!important}
-#summary-section{flex:0 1 auto;align-items:center}
-#action-section{flex:1 1 auto;justify-content:flex-end;align-items:center}
+#summary-section{flex:0 1 auto;display:flex;align-items:center;margin-left:auto}
+#action-section{flex:1 1 auto;display:flex;align-items:center;gap:3px}
 button,input[type=number]{background:#333;color:#ddd;border:1px solid #555;border-radius:3px;padding:0 6px;height:24px;cursor:pointer;font-size:12px;line-height:22px;white-space:nowrap;flex-shrink:0;font-family:'D2Coding', 'D2 coding', Consolas, monospace}
 button:hover{background:#444}
 .op-badge-group{display:none!important}
 .op-badge-group.hidden,.summary-item.hidden,#summary-bar.hidden{display:none!important}
 #status-container,#summary-bar{display:flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:0;max-width:100%}
-.summary-item{height:24px;display:flex;align-items:center;background:#1b2d29;border:1px solid #285e52;border-radius:3px;white-space:nowrap;padding:0 6px;gap:4px;color:#73e6cf;flex:0 1 auto}
+.summary-item{height:24px;display:flex;align-items:center;background:#1b2d29;border:1px solid #285e52;border-radius:3px;white-space:nowrap;padding:0 6px;gap:4px;color:#a6e22e;flex:0 1 auto}
 .summary-item b{color:#fff}
-.top-action-group{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:3px;min-width:0}
+.top-action-group{display:flex;align-items:center;flex-wrap:wrap;gap:3px;min-width:0;width:100%}
 .font-size-wrapper{display:flex;align-items:center;height:24px;padding:0 4px;background:#333;border:1px solid #555;border-radius:3px;color:#aaa;font-size:11px}
 .font-size-wrapper input{width:28px;height:20px;border:0;background:transparent;color:#ddd;text-align:center;outline:none;padding:0;font-family:'D2Coding', 'D2 coding', Consolas, monospace;-moz-appearance:textfield}
 .font-size-wrapper input::-webkit-outer-spin-button,.font-size-wrapper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
@@ -42,7 +37,7 @@ button:hover{background:#444}
 .toggle-btn.active{color:#73e6cf;background:#2d4a3e;border-color:#3b6e5d}
 .toggle-btn:hover{background:#444}
 .toggle-btn.active:hover{background:#355746;color:#fff}
-#toggleSummaryBtn.active{color:#73e6cf}
+#toggleSummaryBtn.active{color:#a6e22e}
 .btn-example,.btn-numpad,.btn-reset,.btn-help,.btn-copy,.btn-option,.btn-func-menu,.menu-label-btn{width:26px;min-width:26px;padding:0;background:#333;color:#777;border:1px solid #555;border-radius:3px;font-weight:bold;font-size:13px;height:24px;line-height:22px;cursor:pointer;flex-shrink:0}
 .btn-example.active,.btn-numpad.active{background:#2d4a3e;color:#73e6cf;border-color:#3b6e5d}
 .btn-example:hover,.btn-numpad:hover,.btn-func-menu:hover{background:#444}
@@ -62,19 +57,25 @@ button:hover{background:#444}
 .menu-label-btn:hover{background:#4a4a4a;color:#fff}
 .menu-label-btn.active:hover{background:#555;color:#fff}
 #action-section.labels-on .toggle-btn,#action-section.labels-on .btn-example,#action-section.labels-on .btn-copy,#action-section.labels-on .btn-numpad,#action-section.labels-on .btn-reset,#action-section.labels-on .btn-help,#action-section.labels-on .btn-func-menu,#action-section.labels-on .menu-label-btn,#action-section.labels-on .btn-calc-mode{width:auto;min-width:26px;padding:0 5px}
-.top-status{height:24px;display:flex;align-items:center;padding:0 6px;background:#1b2d29;border:1px solid #285e52;border-radius:3px;color:#4ec9b0;white-space:nowrap;flex:0 1 auto}
+.top-status{height:24px;display:flex;align-items:center;padding:0 6px;background:#1b2d29;border:1px solid #285e52;border-radius:3px;color:#a6e22e;white-space:nowrap;flex:0 1 auto}
 #wrap{flex:1;overflow:auto;background:#1e1e1e;padding:12px 16px 40px;transition:padding-bottom 0.15s ease;-webkit-overflow-scrolling:touch}
 #editor-container{font-family:'D2Coding', 'D2 coding', Consolas, "Noto Sans KR", monospace;line-height:1.6;min-height:100%;width:max-content;min-width:100%;outline:none;color:#fff;user-select:text;-webkit-user-select:text}
 .calc-row{display:block;width:max-content;min-width:100%;white-space:pre;caret-color:#fff;color:#fff;min-height:1.6em}
 .calc-row.example-row.hidden{display:none!important}
-.comma{color:#8888c7;font-weight:bold;user-select:none;-webkit-user-select:none}
-.result-container{display:inline-flex;align-items:center;gap:4px;user-select:none;-webkit-user-select:none}
-.result-text{color:#4ec9b0;font-weight:500;user-select:text;-webkit-user-select:text;display:inline-block}
+
+/* 수식 구문 강조 스타일 */
+.comma{color:#8888c7 !important;font-weight:bold;user-select:none;-webkit-user-select:none}
+.hl-op{color:#4ec9b0 !important;font-weight:bold;}
+.hl-kw{color:#ce9178 !important;font-weight:bold;}
+
+/* 드래그 복사 및 결과값 화려한 라임색 계열 적용 */
+.result-container{display:inline-flex;align-items:center;gap:4px;user-select:text;-webkit-user-select:text;margin-left:8px}
+.result-text{color:#a6e22e;font-weight:bold;user-select:text;-webkit-user-select:text;display:inline-block}
 .result-text.error{color:#f48771}
 
 .ans-insert-btn{display:inline-block;opacity:0;visibility:hidden;font-size:9px;color:#888;background:#2a2a2a;border:1px solid #444;border-radius:3px;padding:0 3px;height:15px;line-height:13px;cursor:pointer;transition:all 0.2s ease;vertical-align:middle;user-select:none;-webkit-user-select:none;font-family:'D2Coding', 'D2 coding', Consolas, monospace}
 .result-container:hover .ans-insert-btn{opacity:0.3;visibility:visible}
-.ans-insert-btn:hover{opacity:1!important;color:#73e6cf;border-color:#3b6e5d;background:#2d4a3e}
+.ans-insert-btn:hover{opacity:1!important;color:#a6e22e;border-color:#3b6e5d;background:#2d4a3e}
 
 #help-bar{position:fixed;right:16px;bottom:8px;color:#777;font-size:11px;pointer-events:none;z-index:10;-webkit-user-select:none;user-select:none}
 #virtual-numpad{display:none;position:fixed;left:0;right:0;bottom:0;background:#181819;border-top:2px solid #0e639c;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));z-index:999999;box-shadow:0 -2px 10px rgba(0,0,0,.8);touch-action:none;overscroll-behavior:contain;-webkit-user-select:none;user-select:none;max-height:500px}
@@ -85,6 +86,8 @@ button:hover{background:#444}
 .np-btn.op{color:#4ec9b0;background:#222225}
 .np-btn.action{color:#f48771;background:#2a2a2d}
 .np-btn.danger{color:#ff4d4d;background:#2a2a2d;font-weight:bold}
+.np-btn.close-pad{color:#aaa;background:#222;border-color:#444}
+.np-btn.close-pad:hover{color:#fff;background:#333}
 .np-btn.func{color:#ce9178;background:#202022;font-size:clamp(10px, 2vh, 16px)}
 .np-btn.span-2{grid-column:span 2}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000000;justify-content:center;align-items:center;-webkit-user-select:none;user-select:none}
@@ -121,7 +124,6 @@ button:hover{background:#444}
   font-size: clamp(15px, 1.05em, 19px);
 }
 
-/* 상단 메뉴: 버튼 높이를 넘지 않는 범위에서 글자 최대화 */
 #action-section > button,
 #action-section .btn-calc-mode,
 #action-section .btn-copy,
@@ -131,14 +133,12 @@ button:hover{background:#444}
   font-weight: 700;
 }
 
-/* 계산 모드가 토글 활성색처럼 보이지 않도록 항상 다크 그레이 */
 #action-section .btn-calc-mode{
   background: #3a3a3a !important;
   color: #f2f2f2 !important;
   border-color: #505050 !important;
 }
 
-/* 수식/복사/초기화/메뉴이름 버튼도 공통 다크 그레이 */
 #action-section .btn-func-menu,
 #action-section .btn-copy,
 #action-section .btn-reset,
@@ -148,49 +148,75 @@ button:hover{background:#444}
   border-color: #505050 !important;
 }
 
-/* 초기화는 아이콘만 빨간색 */
 #action-section .btn-reset{
   color: #ff4d4d !important;
 }
 
-/* 버튼 내부 아이콘/텍스트가 별도 색상을 갖는 경우에도 초기화 아이콘은 빨강 */
 #action-section .btn-reset::first-letter{
   color: #ff4d4d !important;
 }
 
-/* 숫자패드: 버튼 크기 안에서 글자를 최대한 크게 */
 #virtual-numpad .np-btn{
   font-size: clamp(18px, 1.25em, 24px);
   font-weight: 700;
 }
 
-/* 숫자패드의 함수/연산 기호도 동일한 가독성 기준 */
 #virtual-numpad .np-btn.op,
 #virtual-numpad .np-btn.func{
   font-size: clamp(17px, 1.2em, 23px);
   font-weight: 700;
 }
 
-/* 이름 표시 버튼은 활성 상태여도 토글 색을 쓰지 않음 */
 #action-section .menu-label-btn.active{
   background: #3a3a3a !important;
   color: #f2f2f2 !important;
   border-color: #505050 !important;
 }
 
-
-/* 상단 수식/함수 버튼: 숫자패드 함수 계열과 동일한 주황색 + 기울임 */
 #action-section .btn-func-menu{color:#ff9d3d !important;font-style:italic !important;font-weight:700;}
-#action-section #status{order:0;flex-shrink:0;white-space:nowrap;}
-#action-section #menuLabelToggleBtn{order:1;}
+
+/* 상단 버튼 순서 정의 */
+#action-section #status{order:1;}
 #action-section #calcModeBtn{order:2;}
+#action-section .font-size-wrapper{order:3;}
+#action-section #menuLabelToggleBtn{order:4;} /* 상단 메뉴 이름 표시를 숫자패드 왼편으로 이동 */
+#action-section #numpadToggleBtn{order:5;}
+#action-section #toggleSummaryBtn{order:6;}
+#action-section #exampleToggleBtn{order:7;}
+#action-section #funcMenuBtn{order:8;}
+#action-section #helpBtn{order:9;}
+#action-section #copyBtn{order:10;}
+#action-section #resetBtn{order:11;}
+#action-section #optionBtn{order:12;}
+
 #virtual-numpad .np-btn[data-action="reset"]{color:#ff4d4d !important;}
+
+#editor-container, #editor-container .calc-row{color:#fff !important;}
 </style>
 </head>
 <body>
 
 <div id="top">
   <div class="menu-section" id="operator-section"></div>
+  <div class="menu-section" id="action-section">
+    <div class="top-action-group">
+      <div id="status" class="top-status" aria-live="polite">계산 완료</div>
+      <button id="calcModeBtn" class="btn-calc-mode mode-seq" onclick="toggleCalcMode()" title="순차연산(SEQ): 왼쪽에서 오른쪽으로 순서대로 계산합니다." data-icon="→" data-label="순차연산 SEQ">→ 순차연산 SEQ</button>
+      <div class="font-size-wrapper" title="폰트 크기">
+        <input type="number" id="fontSizeInput" value="16" min="10" max="60" inputmode="numeric">px
+      </div>
+      <button id="menuLabelToggleBtn" class="menu-label-btn" onclick="toggleMenuLabels()" title="메뉴 이름 표시" aria-label="메뉴 이름 표시" aria-pressed="true">🔤</button>
+      <button id="numpadToggleBtn" class="btn-numpad" onclick="toggleNumpad()" title="숫자 패드" aria-label="숫자 패드" aria-pressed="false" data-icon="🔢" data-label="패드">🔢</button>
+      <button id="toggleSummaryBtn" class="toggle-btn active" onclick="toggleSummaryOpt()" title="계산 요약 표시/숨기기" aria-label="계산 요약" aria-pressed="true" data-icon="Σ" data-label="요약">Σ</button>
+      <button id="exampleToggleBtn" class="btn-example" onclick="toggleExample()" title="예제 항목 표시/숨기기" aria-label="예제" aria-pressed="false" data-icon="💡" data-label="예제">💡</button>
+      <button id="funcMenuBtn" class="btn-func-menu" onclick="openFuncModal()" title="수식 및 함수 목록 열기" aria-label="수식 목록" data-icon="ƒx" data-label="수식">ƒx</button>
+      <button id="helpBtn" class="btn-help" onclick="openHelpModal()" title="도움말" aria-label="도움말" data-icon="❓" data-label="도움말">❓</button>
+      <button id="copyBtn" class="btn-copy" onclick="copyVisibleWithResults()" title="화면에 보이는 계산식과 결과 복사" aria-label="복사" data-icon="📋" data-label="복사">📋</button>
+      <button id="resetBtn" class="btn-reset" onclick="resetToDefault()" title="초기화" aria-label="초기화" data-icon="🚨" data-label="초기화">🚨</button>
+      <button id="optionBtn" class="btn-option" onclick="openOptionModal()" title="옵션" data-icon="⚙" data-label="옵션">⚙ 옵션</button>
+    </div>
+  </div>
+  <!-- 요약 섹션을 옵션 오른편으로 배치 -->
   <div class="menu-section" id="summary-section">
     <div id="status-container">
       <div id="summary-bar">
@@ -200,27 +226,6 @@ button:hover{background:#444}
       </div>
     </div>
   </div>
-  <div class="menu-section" id="action-section">
-    <div class="top-action-group">
-      <div id="status" class="top-status" aria-live="polite">계산 완료</div>
-      <button id="menuLabelToggleBtn" class="menu-label-btn" onclick="toggleMenuLabels()" title="메뉴 이름 표시" aria-label="메뉴 이름 표시" aria-pressed="true">🔤</button>
-      <button id="calcModeBtn" class="btn-calc-mode mode-seq" onclick="toggleCalcMode()" title="순차연산(SEQ): 왼쪽에서 오른쪽으로 순서대로 계산합니다." data-icon="→" data-label="순차연산 SEQ">→ 순차연산 SEQ</button>
-
-      <div class="font-size-wrapper" title="폰트 크기">
-        <input type="number" id="fontSizeInput" value="16" min="10" max="60" inputmode="numeric">px
-      </div>
-      <button id="numpadToggleBtn" class="btn-numpad" onclick="toggleNumpad()" title="숫자 패드" aria-label="숫자 패드" aria-pressed="false" data-icon="🔢" data-label="패드">🔢</button>
-      <button id="toggleSummaryBtn" class="toggle-btn active" onclick="toggleSummaryOpt()" title="계산 요약 표시/숨기기" aria-label="계산 요약" aria-pressed="true" data-icon="Σ" data-label="요약">Σ</button>
-      <button id="exampleToggleBtn" class="btn-example" onclick="toggleExample()" title="예제 항목 표시/숨기기" aria-label="예제" aria-pressed="false" data-icon="💡" data-label="예제">💡</button>
-      
-      <button id="funcMenuBtn" class="btn-func-menu" onclick="openFuncModal()" title="수식 및 함수 목록 열기" aria-label="수식 목록" data-icon="ƒx" data-label="수식">ƒx</button>
-
-      <button id="helpBtn" class="btn-help" onclick="openHelpModal()" title="도움말" aria-label="도움말" data-icon="❓" data-label="도움말">❓</button>
-      <button id="copyBtn" class="btn-copy" onclick="copyVisibleWithResults()" title="화면에 보이는 계산식과 결과 복사" aria-label="복사" data-icon="📋" data-label="복사">📋</button>
-      <button id="resetBtn" class="btn-reset" onclick="resetToDefault()" title="초기화" aria-label="초기화" data-icon="🚨" data-label="초기화">🚨</button>
-      <button id="optionBtn" class="btn-option" onclick="openOptionModal()" title="옵션" data-icon="⚙" data-label="옵션">⚙ 옵션</button>
-    </div>
-  </div>
   <input type="file" id="fileInput" accept=".txt,.csv" style="display:none" onchange="loadFile(event)">
 </div>
 
@@ -228,7 +233,6 @@ button:hover{background:#444}
 
 <div id="virtual-numpad">
   <div class="numpad-grid">
-
     <button class="np-btn" data-action="symbol" data-val="7" title="숫자 7">7</button>
     <button class="np-btn" data-action="symbol" data-val="8" title="숫자 8">8</button>
     <button class="np-btn" data-action="symbol" data-val="9" title="숫자 9">9</button>
@@ -261,8 +265,8 @@ button:hover{background:#444}
     <button class="np-btn action" data-action="backspace" title="한 글자 지우기 (Backspace)">⌫</button>
     <button class="np-btn op span-2" data-action="newline" title="다음 줄 생성 (Enter)">↵ Enter</button>
     <button class="np-btn danger" data-action="clear" title="현재 줄 내용 삭제">CE</button>
-    <button class="np-btn danger span-2" data-action="reset" title="전체 초기화">🚨</button>
-
+    <button class="np-btn danger" data-action="reset" title="전체 초기화">🚨</button>
+    <button class="np-btn close-pad" data-action="close_pad" title="숫자패드 닫기">🔢</button>
   </div>
 </div>
 
@@ -275,7 +279,8 @@ button:hover{background:#444}
     <div class="modal-body">
       <div class="option-grid">
         <div class="opt-card">
-          <h4>💾 파일</h4>
+          <h4>💾 파일 & 폰트</h4>
+          <button id="webFontBtn" onclick="toggleWebFont()">🌐 D2Coding 웹 폰트 읽어오기</button>
           <button onclick="document.getElementById('fileInput').click();closeOptionModal()">📂 텍스트 / CSV 불러오기</button>
           <button onclick="downloadFile(getTextContent(),'calc_memo.txt','text/plain');closeOptionModal()">📄 TXT 저장</button>
           <button onclick="exportToCsv();closeOptionModal()">📊 CSV 저장</button>
@@ -289,7 +294,7 @@ button:hover{background:#444}
         </div>
         <div class="opt-card">
           <h4>ℹ 사용 안내</h4>
-          <p style="margin:0;color:#aaa;line-height:1.8">상단 아이콘으로 연산모드 · 패드 · 요약 ·<br>예제 · 수식 팝업을 바로 켜고 끌 수 있습니다.<br><br><b style="color:#ddd">🔤</b> 버튼으로 상단 메뉴를<br>아이콘만 표시하거나 이름과 함께 표시할 수 있습니다.</p>
+          <p style="margin:0;color:#aaa;line-height:1.8">기본적으로 오프라인에 설치된 D2Coding 폰트를 우선적으로 사용합니다.<br><br>폰트가 미설치된 환경인 경우 상단 <b>'D2Coding 웹 폰트 읽어오기'</b> 옵션을 켜주세요.</p>
         </div>
       </div>
     </div>
@@ -300,8 +305,7 @@ button:hover{background:#444}
 <div id="funcModal" class="modal-overlay" onclick="closeFuncModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <div class="modal-header"><h2>ƒx 수식 및 함수 선택</h2><button onclick="closeFuncModal()">✕</button></div>
-    <div class="modal-body" id="funcModalContainer">
-    </div>
+    <div class="modal-body" id="funcModalContainer"></div>
   </div>
 </div>
 
@@ -349,7 +353,7 @@ const sumTotalEl = document.getElementById("sum-total");
 const sumAvgEl = document.getElementById("sum-avg");
 const calcModeBtn = document.getElementById("calcModeBtn");
 
-let activeRow = null, useComma = true, showExample = false, showSummary = true, isNumpadActive = true, showMenuLabels = true, composing = false, calcMode = "seq";
+let activeRow = null, useComma = true, showExample = false, showSummary = true, isNumpadActive = true, showMenuLabels = true, composing = false, calcMode = "seq", useWebFont = false;
 
 const funcCategories = [
   {
@@ -391,6 +395,31 @@ const funcCategories = [
     ]
   }
 ];
+
+function applyWebFontState(){
+  let link = document.getElementById("d2coding-webfont-link");
+  const fontBtn = document.getElementById("webFontBtn");
+  if (useWebFont) {
+    if (!link) {
+      link = document.createElement("link");
+      link.id = "d2coding-webfont-link";
+      link.rel = "stylesheet";
+      link.href = "https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.0/D2Coding.woff";
+      document.head.appendChild(link);
+    }
+    if (fontBtn) fontBtn.textContent = "🌐 D2Coding 웹 폰트 적용됨 (클릭시 해제)";
+  } else {
+    if (link) link.remove();
+    if (fontBtn) fontBtn.textContent = "🌐 D2Coding 웹 폰트 읽어오기";
+  }
+}
+
+function toggleWebFont(){
+  useWebFont = !useWebFont;
+  localStorage.setItem("memoCalcUseWebFont", useWebFont ? "1" : "0");
+  applyWebFontState();
+  updateStatusText(useWebFont ? "D2Coding 웹 폰트 적용됨" : "오프라인 시스템 폰트 적용됨");
+}
 
 function buildFuncModalUI(){
   const container = document.getElementById("funcModalContainer");
@@ -452,6 +481,7 @@ numpadEl.querySelectorAll(".np-btn").forEach(function(btn){
     else if (act === "backspace") handleBackspace();
     else if (act === "clear") clearCurrentRow();
     else if (act === "reset") resetToDefault();
+    else if (act === "close_pad") toggleNumpad();
     else if (act === "open_func_modal") openFuncModal();
   };
 
@@ -534,9 +564,25 @@ function updateMenuLabels(){
 }
 const toggleMenuLabels = function(){ showMenuLabels = !showMenuLabels; localStorage.setItem("memoCalcMenuLabels", showMenuLabels ? "1" : "0"); updateMenuLabels(); };
 
+/* 연산자는 청록색, 함수/키워드/ans는 주황색, 천단위 콤마는 보라색으로 구문 하이라이트 */
 function formatOperatorsAndCommasHtml(str){
-  const cleaned = str.replace(/\s*([+\-*/%=<>:])\s*/g, " $1 ").replace(/\s+/g, " ");
-  return cleaned.split(/(\d+(?:\.\d+)?|[^\d]+)/).map(function(t){ return /^\d+$/.test(t) ? t.replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="comma" contenteditable="false">,</span>') : escapeHtml(t); }).join("");
+  const cleaned = str.replace(/\s*([+\-*/%=<>:×÷−])\s*/g, " $1 ").replace(/\s+/g, " ");
+  
+  const tokens = cleaned.split(/(\d+(?:\.\d+)?|[+\-*/%=<>:×÷−]|ans|sqrt|abs|round|ceil|floor|max|min|pi|e|sin|cos|tan|pow|log|[^\d\s+\-*/%=<>:×÷−]+)/gi);
+
+  return tokens.map(function(t){
+    if (!t) return "";
+    if (/^\d+$/.test(t)) {
+      return t.replace(/\B(?=(\d{3})+(?!\d))/g, '<span class="comma" contenteditable="false">,</span>');
+    }
+    if (/^[+\-*/%=<>:×÷−]$/.test(t.trim())) {
+      return `<span class="hl-op">${escapeHtml(t)}</span>`;
+    }
+    if (/^(ans|sqrt|abs|round|ceil|floor|max|min|pi|e|sin|cos|tan|pow|log)$/i.test(t.trim())) {
+      return `<span class="hl-kw">${escapeHtml(t)}</span>`;
+    }
+    return escapeHtml(t);
+  }).join("");
 }
 
 function getRawExprText(row){
@@ -576,9 +622,6 @@ function setCaretOffset(el, offset){
   const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
 }
 
-// 계산 모드용 안전한 토큰화/파서
-// SEQ: 괄호·함수 내부는 그대로 계산하고, 괄호 밖의 이항 연산만 왼쪽→오른쪽.
-// ALG: 일반적인 연산 우선순위(괄호/함수 → ^ → */% → +-).
 function tokenizeExpression(expr) {
   const tokens = [];
   let i = 0;
@@ -777,7 +820,6 @@ function parseExpressionSafe(expr, vars, mode) {
 
   function parseAdditive() {
     if (mode === "seq") {
-      // 명시적 괄호/함수 인자 내부를 제외하면 모든 산술 연산을 입력 순서대로 처리.
       let left = parseUnary();
       while (["+", "-", "*", "/", "%", "^"].includes(peek().value)) {
         const op = tokens[pos++].value;
@@ -854,8 +896,6 @@ function safeEval(expr, vars){
   const normalized = normalize(expr);
   if (!normalized) return null;
 
-  // 계산 모드별 파서는 Function/eval을 사용하지 않으므로
-  // 문자열을 실행 코드로 취급하지 않고 토큰 단위로만 평가합니다.
   const result = parseExpressionSafe(normalized, vars, calcMode);
   if (typeof result === "number" && !Number.isFinite(result)) throw Error("계산 결과가 유효하지 않습니다");
   return result;
@@ -1019,22 +1059,16 @@ function markNewRow(row){
 
 function prependAnsIfLeadingOperator(row){
   if (!row || row.dataset.newRow !== "1") return false;
-  const text = getRawExprText(row);
-  const trimmed = text.trim();
+  const text = getRawExprText(row), trimmed = text.trim();
   if (!trimmed || /^ans\b/i.test(trimmed) || trimmed.startsWith("#")) return false;
-  if (!/^[+\-*/%^]/.test(trimmed)) { row.dataset.newRow = "0"; return false; }
-  const lead = text.search(/\S/);
-  const pos = lead < 0 ? 0 : lead;
-  const prefix = text.slice(0,pos);
-  const rest = text.slice(pos);
+  if (!/^[+\-*/%^×÷−]/.test(trimmed)) { row.dataset.newRow = "0"; return false; }
+  const lead = text.search(/\S/), pos = lead < 0 ? 0 : lead;
+  const prefix = text.slice(0,pos), rest = text.slice(pos);
   const result = prefix + "ans " + rest;
   row.innerHTML = formatOperatorsAndCommasHtml(result);
   row.dataset.newRow = "0";
-  // ans를 앞에 붙인 뒤에는 반드시 원래 입력했던 연산자 뒤에 커서를 둔다.
-  // 기존 pos+4는 "ans" 뒤에 커서를 두어 다음 숫자가 ans와 연산자 사이로 들어가는 오류가 있었다.
-  const opMatch = rest.match(/^[+\-*/%^]+/);
-  const caretPos = pos + 4 + (opMatch ? opMatch[0].length : 0);
-  setCaretOffset(row, caretPos);
+  const opMatch = rest.match(/^[+\-*/%^×÷−]+/);
+  setCaretOffset(row, pos + 4 + (opMatch ? opMatch[0].length : 0));
   return true;
 }
 
@@ -1042,15 +1076,18 @@ function insertSymbol(symbol){
   const target = getCurrentRow();
   if (!target) return;
   const currentText = getRawExprText(target);
-  if (!currentText.trim() && /^[+\-*/%^]/.test(symbol.trim())) {
-    const newText = "ans " + symbol.trim() + " ";
+  
+  if (/^\s*$/.test(currentText) && /^[+\-*/%^×÷−]/.test(symbol.trim())) {
+    const op = symbol.trim(), newText = "ans " + op + " ";
     target.innerHTML = formatOperatorsAndCommasHtml(newText);
     target.dataset.newRow = "0";
-    setCaretOffset(target, newText.length);
+    const caret = 4 + op.length + 1;
+    setCaretOffset(target, caret);
     calculate();
-    requestAnimationFrame(function(){ setCaretOffset(target, newText.length); });
+    requestAnimationFrame(function(){ setCaretOffset(target, caret); });
     return;
   }
+  
   prependAnsIfLeadingOperator(target);
   const startCaret = getCaretOffset(target), text = getRawExprText(target);
   const newText = text.slice(0, startCaret) + symbol + text.slice(startCaret);
@@ -1068,15 +1105,15 @@ function insertSymbol(symbol){
 function insertNewline(){
   const target = getCurrentRow();
   if (!target) return;
-  calculate(target);
-  const next = addRow("", target);
+  const text = getRawExprText(target);
+  const caret = Math.max(0, Math.min(getCaretOffset(target), text.length));
+  const before = text.slice(0, caret), after = text.slice(caret);
+  target.innerHTML = formatOperatorsAndCommasHtml(before);
+  const next = addRow(after, target);
   markNewRow(next);
-  calculate();
-  if (isNumpadActive) {
-    container.focus();
-  }
-  setCaretOffset(next, 0);
-  activeRow = next;
+  calculate(target); calculate(next);
+  if (isNumpadActive) container.focus();
+  setCaretOffset(next, 0); activeRow = next;
 }
 
 function handleBackspace(){
@@ -1242,6 +1279,11 @@ function resetToDefault(){
   localStorage.setItem("memoCalcMode", "seq");
   updateCalcModeUI();
 
+  // 오프라인 폰트로 복구
+  useWebFont = false;
+  localStorage.setItem("memoCalcUseWebFont", "0");
+  applyWebFontState();
+
   initDOM(defaultText);
   showExample = false; 
   updateExampleButton(); 
@@ -1284,12 +1326,15 @@ container.addEventListener("keydown", function(e){
   const target = getCurrentRow();
   if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey){
     e.preventDefault(); e.stopPropagation();
-    calculate(target);
-    const next = addRow("", target);
+    if (!target) return;
+    const text = getRawExprText(target);
+    const caret = Math.max(0, Math.min(getCaretOffset(target), text.length));
+    const before = text.slice(0, caret), after = text.slice(caret);
+    target.innerHTML = formatOperatorsAndCommasHtml(before);
+    const next = addRow(after, target);
     markNewRow(next);
-    calculate();
-    setCaretOffset(next, 0);
-    activeRow = next;
+    calculate(target); calculate(next);
+    setCaretOffset(next, 0); activeRow = next;
     return;
   }
   if (e.key === "Backspace" && target && getRawExprText(target).trim() === ""){
@@ -1317,6 +1362,9 @@ calcMode = localStorage.getItem("memoCalcMode");
 calcMode = (calcMode === "alg" || calcMode === "seq") ? calcMode : "seq";
 localStorage.setItem("memoCalcMode", calcMode);
 updateCalcModeUI();
+
+useWebFont = (localStorage.getItem("memoCalcUseWebFont") ?? "0") === "1";
+applyWebFontState();
 
 initDOM(localStorage.getItem("memoCalcText") ?? defaultText);
 showExample = false;
