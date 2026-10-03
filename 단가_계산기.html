@@ -251,7 +251,7 @@
     <div class="grid">
       <div class="sub-group">
         <div class="field">
-          <label>1. 개당 단위</label>
+          <label>1. 개당 무게 단위</label>
           <div class="unit-selector">
             <button type="button" class="unit-btn active" data-unit="g" onclick="selectUnit('g')">g</button>
             <button type="button" class="unit-btn" data-unit="kg" onclick="selectUnit('kg')">kg</button>
@@ -261,8 +261,8 @@
         </div>
 
         <div class="field">
-          <label id="amountLabel">2. 개당 (g)</label>
-          <input id="amount" type="text" inputmode="decimal" placeholder="개당 (g) (선택)" autofocus autocomplete="off">
+          <label id="amountLabel">2. 개당 무게 (g)</label>
+          <input id="amount" type="text" inputmode="decimal" placeholder="개당 무게 (g) (선택)" autofocus autocomplete="off">
         </div>
       </div>
 
@@ -384,8 +384,8 @@ function selectUnit(unit) {
   });
 
   let unitDisplay = unit === 'l' ? 'L' : unit;
-  $('amountLabel').textContent = `2. 개당 (${unitDisplay})`;
-  $('amount').placeholder = `개당 (${unitDisplay}) (선택)`;
+  $('amountLabel').textContent = `2. 개당 무게 (${unitDisplay})`;
+  $('amount').placeholder = `개당 무게 (${unitDisplay}) (선택)`;
 }
 
 function pressKey(key) {
