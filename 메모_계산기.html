@@ -49,7 +49,7 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 .btn-option:hover{background:#4a4a4a}
 
 .menu-label-btn{background:#3a3a3a;color:#eee;border-color:#666;text-align:center}
-#action-section.labels-on .toggle-btn,#action-section.labels-on .btn-example,#action-section.labels-on .btn-copy,#action-section.labels-on .btn-numpad,#action-section.labels-on .btn-reset,#action-section.labels-on #insertBlank5Btn,#action-section.labels-on .btn-func-menu,#action-section.labels-on .menu-label-btn,#action-section.labels-on .btn-calc-mode,#action-section.labels-on .btn-undo,#action-section.labels-on .btn-redo{width:auto;min-width:26px;padding:0 5px}
+#action-section.labels-on .toggle-btn,#action-section.labels-on .btn-example,#action-section.labels-on .btn-copy,#action-section.labels-on .btn-numpad,#action-section.labels-on .btn-reset,#action-section.labels-on .btn-func-menu,#action-section.labels-on .menu-label-btn,#action-section.labels-on .btn-calc-mode,#action-section.labels-on .btn-undo,#action-section.labels-on .btn-redo{width:auto;min-width:26px;padding:0 5px}
 
 .top-status{height:24px;display:flex;align-items:center;padding:0 6px;background:#1b2d29;border:1px solid #285e52;border-radius:3px;color:#4ec9b0;white-space:nowrap;flex:0 1 auto}
 
@@ -60,25 +60,35 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 
 .calc-row.comment, .comment * { color: #6a9955 !important; }
 .comma{color:#8888c7 !important;font-weight:bold;user-select:none;-webkit-user-select:none}
+/* [수정] 수식 설명 팝업(레이어2에서 입력한 수식을 클릭하면 입력칸 아래에 표시) */
+#formula-popup{position:fixed;display:none;z-index:1000000;max-width:min(560px,calc(100vw - 16px));padding:8px 10px;background:#17251c;border:1px solid #73a86a;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.65);color:#c8d6ca;font-size:13px;line-height:1.6;cursor:pointer;white-space:normal;-webkit-user-select:none;user-select:none}
+#formula-popup .fp-name{color:#ffe066;font-weight:bold}
+#formula-popup .fp-code{color:#b9f0d3;font-weight:bold;margin:2px 0 4px;overflow-wrap:anywhere;word-break:break-word}
+#formula-popup .fp-note{overflow-wrap:anywhere;word-break:break-word}
+/* [수정] 수식 글자색: hl-op=연산자, hl-kw=함수명, hl-ko=한글 변수명, comment=#주석 */
 .hl-op{color:#4ec9b0 !important;font-weight:bold}
 .hl-kw{color:#ce9178 !important;font-weight:bold}
 .hl-ko{color:#ffe066 !important;font-weight:bold}
 
+/* [수정] 결과값 표시 색상은 아래 .result-text(정상) / .result-text.error(오류) */
 .result-container{display:inline-flex;align-items:center;gap:4px;margin-left:16px;user-select:text;-webkit-user-select:text}
 .result-text{color:#b5ed3d !important;font-weight:bold;user-select:text;-webkit-user-select:text;display:inline-block}
 .result-text.error{color:#f48771 !important}
 
 .ans-insert-btn{display:inline-block;opacity:0;visibility:hidden;font-size:11px;color:#888;background:#2a2a2a;border:1px solid #444;border-radius:3px;padding:0 4px;height:18px;line-height:16px;cursor:pointer;transition:all 0.2s ease;vertical-align:middle;user-select:none;-webkit-user-select:none;font-family:'D2Coding', 'D2 coding', Consolas, monospace}
 .result-container:hover .ans-insert-btn{opacity:0.3;visibility:visible}
+/* [수정] 터치 기기(hover 없음)에서는 ans 버튼을 항상 흐리게 표시 */
+@media (hover:none){.ans-insert-btn{opacity:0.35;visibility:visible}}
 .ans-insert-btn:hover{opacity:1!important;color:#73e6cf;border-color:#3b6e5d;background:#2d4a3e}
 
 #virtual-numpad{display:none;position:fixed;left:0;right:0;bottom:0;background:#181819;border-top:2px solid #555;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));z-index:999999;box-shadow:0 -2px 10px rgba(0,0,0,.8);touch-action:none;overscroll-behavior:contain;-webkit-user-select:none;user-select:none;max-height:500px}
 #virtual-numpad.active{display:block}
+/* [수정] 숫자패드 칸 수: repeat(8,1fr)=8열, repeat(4,...)=4행 → 버튼 목록(Layer1_pad)의 개수와 맞출 것 */
 .numpad-grid{display:grid;grid-template-columns:repeat(8, 1fr);grid-template-rows:repeat(4, minmax(38px, 1fr));gap:4px;max-width:100%;margin:0 auto}
-/* Layer 2는 기능 확장을 위해 5행까지 사용합니다. Layer 1의 4행 구조는 그대로 유지합니다. */
-.numpad-grid.layer2-grid{grid-template-rows:repeat(6, minmax(38px, 1fr));}
+/* 레이어1=숫자패드 4행 8열 / 레이어2=수식목록은 별도 칠판 영역 */
 
-/* Layer 2 예제 칠판 · 이전 칠판 테마 / 스크롤 / 리사이즈 */
+/* Layer 2 수식 목록 / 스크롤 / 리사이즈 */
+/* [수정] 레이어2(수식목록) 높이 범위·배경색. 기본 높이는 JS의 Layer2_Height(기본 56vh) */
 #virtual-numpad.layer2-active{
   height:var(--layer2-height,56vh);
   max-height:90vh;
@@ -86,6 +96,7 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
   background:#17251c;
   border-top:1px solid #31533b;
 }
+/* 레이어2 전체화면 표시용 (보통 수정 불필요) */
 #virtual-numpad.layer2-fullscreen{
   height:100dvh !important;
   max-height:100dvh !important;
@@ -170,6 +181,7 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
   box-shadow:none;
 }
 /* 탭과 카드는 서로 다른 블록. 카드가 탭의 좌우에 끼어들지 않도록 grid를 별도 행으로 강제 */
+/* [수정] 카드 열 수·간격: 이 값과 아래 @media(화면 폭별) 4곳에서 조절 */
 .layer2-board-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));
@@ -254,8 +266,8 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
   height:auto;
   max-height:none;
   margin-top:4px;
-  color:#b9c8bb;
-  font-size:calc(11px * var(--l2-scale));
+  color:#c8d6ca;
+  font-size:calc(13px * var(--l2-scale));   /* [수정] 설명글 크기 (이름·수식과 동일한 13px 기준) */
   line-height:1.6;
   overflow:visible;
   overflow-wrap:anywhere;
@@ -282,6 +294,7 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 
 .np-btn{height:100%;min-height:38px;max-height:80px;font-size:clamp(16px, 3vh, 26px);font-weight:bold;background:#2d2d30;color:#fff;border:1px solid #3e3e42;border-radius:4px;display:flex;align-items:center;justify-content:center;padding:2px;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;cursor:pointer;font-family:'D2Coding', 'D2 coding', Consolas, monospace;position:relative}
 .np-btn:active{background:#444;border-color:#666}
+/* [수정] 버튼 색상 종류: 기본 / op(연산자) / action / danger / plain-symbol / layer-btn / undo-redo-btn  ← Layer1_pad의 cls 값과 연결 */
 .np-btn.op{color:#4ec9b0;background:#222225}
 .np-btn.action{color:#f48771;background:#2a2a2d}
 .np-btn.danger{color:#ff4d4d;background:#2a2a2d;font-weight:bold}
@@ -291,8 +304,9 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 .np-btn.layer-btn{color:#f0d75a;background:#38321a;border-color:#6e6128;font-size:clamp(11px, 2vh, 16px)}
 
 .np-btn.opt-btn{color:#eee;background:#3a3a3a;border-color:#555}
-.np-btn.undo-redo-btn{background:#3a3a3a;border-color:#555;color:#ff4d4d;font-size:clamp(16px, 2.5vh, 24px)}
-.np-btn.undo-redo-btn:disabled{color:#555!important;border-color:#444!important;background:#2a2a2a!important;cursor:not-allowed;opacity:0.5}
+.np-btn.undo-redo-btn{background:#2d2d30;border-color:#555;color:#ff4d4d;font-size:clamp(16px, 2.5vh, 24px)}
+/* [수정] 비활성 상태: 숫자 버튼과 같은 다크 그레이 바탕/테두리 유지(버튼이 사라져 보이지 않게), 글자만 흐리게 */
+.np-btn.undo-redo-btn:disabled{color:#777!important;border-color:#3e3e42!important;background:#2d2d30!important;cursor:not-allowed;opacity:1}
 
 .np-btn.span-2{grid-column:span 2}
 
@@ -326,7 +340,6 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 #action-section #toggleSummaryBtn{order:3}
 #action-section #exampleToggleBtn{order:4}
 #action-section #funcMenuBtn{order:5}
-#action-section #insertBlank5Btn{order:6}
 #action-section #undoBtn{order:7}
 #action-section #redoBtn{order:8}
 #action-section #copyBtn{order:9}
@@ -410,13 +423,13 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 <div id="top">
   <div class="menu-section" id="action-section">
     <div class="top-action-group">
+      <button id="menuLabelToggleBtn" class="menu-label-btn" onclick="toggleMenuLabels()" title="상단 메뉴 이름 표시/숨기기" aria-label="메뉴 이름 표시" data-icon="🏷️" data-label="이름표시">🏷️</button>
       <button id="calcModeBtn" class="btn-calc-mode mode-seq" onclick="toggleCalcMode()" title="순차연산(SEQ): 왼쪽에서 오른쪽으로 순서대로 계산합니다." data-icon="→" data-label="순차연산 SEQ">→ 순차연산 SEQ</button>
-      <button id="numpadToggleBtn" class="btn-numpad" onclick="toggleNumpad()" title="숫자 패드" aria-label="숫자 패드" aria-pressed="false" data-icon="🔢" data-label="패드">🔢</button>
+      <button id="numpadToggleBtn" class="btn-numpad" onclick="toggleNumpad()" title="숫자 패드" aria-label="숫자 패드" aria-pressed="false" data-icon="🔢" data-label="숫자패드">🔢</button>
       <button id="toggleSummaryBtn" class="toggle-btn active" onclick="toggleSummaryOpt()" title="계산 요약 표시/숨기기" aria-label="계산 요약" aria-pressed="true" data-icon="Σ" data-label="요약">Σ</button>
       <button id="exampleToggleBtn" class="btn-example" onclick="toggleExample()" title="예제 항목 표시/숨기기" aria-label="예제" aria-pressed="false" data-icon="💡" data-label="예제">💡</button>
-      <button id="funcMenuBtn" class="btn-func-menu" onclick="showLayer2FullScreen()" title="ƒx 수식·함수 예제를 Layer 2 전체 화면으로 열기" aria-label="ƒx 수식·함수 목록" data-icon="📚" data-label="수식·함수 목록">📚</button>
+      <button id="funcMenuBtn" class="btn-func-menu" onclick="Layer2_showFullScreen()" title="레이어2 (전체화면)" aria-label="레이어2 (전체화면)" data-icon="📚" data-label="수식목록">📚</button>
       
-      <button id="insertBlank5Btn" class="menu-label-btn" onclick="insertFiveBlankLines()" title="현재 위치에 빈 줄 5칸을 삽입합니다." aria-label="빈 줄 5칸" data-icon="↵×5" data-label="빈줄 5칸">↵×5</button>
       <button id="undoBtn" class="btn-undo" onclick="undo()" title="실행 취소 (Ctrl+Z)" aria-label="실행 취소" data-icon="↶" data-label="실행취소" disabled>↶</button>
       <button id="redoBtn" class="btn-redo" onclick="redo()" title="재실행 (Ctrl+Y)" aria-label="재실행" data-icon="↷" data-label="재실행" disabled>↷</button>
 
@@ -448,7 +461,7 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
   가상 숫자패드
   ─────────────────────────────────────────────────────────────
   Layer 1 : 숫자 입력과 기본 연산/편집 기능 중심
-  Layer 2 : Layer 1과 겹치지 않는 공학·통계·금융·단위변환 예제 칠판
+  Layer 2 : Layer 1과 겹치지 않는 공학·통계·금융·단위변환 예제
 
   중요:
   • 패드 버튼은 실제 키보드 입력을 흉내 내는 방식이 아니라 현재 커서 위치에
@@ -460,11 +473,11 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 -->
 <div id="virtual-numpad">
   <div class="numpad-grid" id="numpad-grid">
-    <!-- Layer 1 동적 생성 -->
+    <!-- 레이어1=숫자패드 동적 생성 -->
   </div>
-  <div id="layer2-resizer" style="display:none" aria-label="Layer 2 높이 조절"></div>
+  <div id="layer2-resizer" style="display:none" aria-label="레이어2=수식목록 높이 조절"></div>
   <div class="layer2-board" id="layer2-board" style="display:none;">
-    <!-- Layer 2 예제 칠판 동적 생성 -->
+    <!-- 레이어2=수식목록 예제 칠판 동적 생성 -->
   </div>
 </div>
 
@@ -477,35 +490,21 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
         <div class="opt-card">
           <h4>🔤 폰트 크기 설정</h4>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px;font-size:13px;color:#ccc">
-            <span>📐 메모 글꼴 (10~60px)</span>
+            <span>📐 계산기 입력 글꼴 (10~60px)</span>
             <div class="font-size-wrapper" title="에디터 기본 글꼴 크기 설정">
               <input class="setting-value" type="number" id="fontSizeInput" value="20" min="10" max="60" inputmode="numeric">px
             </div>
             <input class="setting-range" type="range" id="fontSizeRange" min="10" max="60" step="1" value="20" aria-label="폰트 크기 슬라이더">
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0 8px;font-size:13px;color:#ccc">
-            <span>🧮 UI 예제 칠판 글꼴 비율</span>
-            <div class="font-size-wrapper" title="Layer 2 예제 칠판 글꼴 크기 비율"><input class="setting-value" type="number" id="layer2ScaleInput" value="100" min="70" max="200" step="5" inputmode="numeric">%</div>
-            <input class="setting-range" type="range" id="layer2ScaleRange" min="70" max="200" step="5" value="100" aria-label="칠판 예제 크기 슬라이더">
+            <span>📚 레이어2 수식목록 글꼴 비율</span>
+            <div class="font-size-wrapper" title="Layer 2 예제 칠판 글꼴 크기 비율"><input class="setting-value" type="number" id="Layer2_ScaleInput" value="100" min="70" max="200" step="5" inputmode="numeric">%</div>
+            <input class="setting-range" type="range" id="Layer2_ScaleRange" min="70" max="200" step="5" value="100" aria-label="칠판 예제 크기 슬라이더">
           </div>
           <label title="가독성이 뛰어난 D2Coding 웹폰트를 구글 CDN을 통해 적용합니다">
             <input type="checkbox" id="webFontToggle" onchange="toggleWebFont(this.checked)">
             <span>🌐 D2Coding 웹폰트 적용 (구글 CDN)</span>
           </label>
-        </div>
-        <div class="opt-card">
-          <h4>🎛️ 상단 메뉴 기능 제어</h4>
-          <button onclick="toggleCalcMode();closeOptionModal()" title="순차연산 및 사칙연산 모드를 전환합니다">→ 연산 모드 전환 (SEQ/ALG)</button>
-          <button onclick="toggleMenuLabels();closeOptionModal()" title="상단 버튼에 메뉴 이름 텍스트 표시 여부를 전환합니다">𔤤 상단 메뉴 이름 표시 토글</button>
-          <button onclick="toggleNumpad();closeOptionModal()" title="화면 하단의 가상 숫자 패드를 켜고 끕니다">🔢 숫자 패드 토글</button>
-          <button onclick="toggleSummaryOpt();closeOptionModal()" title="상단 요약 바(합계, 평균, 개수) 표시 여부를 전환합니다">Σ 계산 요약 표시 전환</button>
-          <button onclick="toggleExample();closeOptionModal()" title="기본 제공되는 예제 항목들을 표시하거나 숨깁니다">💡 예제 항목 토글</button>
-                    <button id="undoBtnOpt" onclick="undo();closeOptionModal()" title="직전 작업 상태로 되돌립니다 (Ctrl+Z)">↶ 실행 취소 (Ctrl+Z)</button>
-          <button id="redoBtnOpt" onclick="redo();closeOptionModal()" title="취소했던 작업을 다시 수행합니다 (Ctrl+Y)">↷ 재실행 (Ctrl+Y)</button>
-          <button onclick="copyVisibleWithResults();closeOptionModal()" title="현재 화면에 보이는 수식과 결과값을 클립보드에 복사합니다">📋 화면 내용 그대로 복사</button>
-          <button onclick="clearAllContent();closeOptionModal()" title="설정은 유지하고 계산 입력창 내용만 모두 지웁니다">🧹 계산 입력창 모두 지우기</button>
-          <button onclick="resetToDefault();closeOptionModal()" style="color:#ff4d4d;font-weight:bold" title="모든 설정과 내용을 초기 상태로 되돌립니다">🚨 기본값 상태로 초기화</button>
-          <button onclick="insertFiveBlankLines();closeOptionModal()" title="현재 위치에 빈 줄 5칸을 삽입합니다">↵×5 빈 줄 5칸 삽입</button>
         </div>
         <div class="opt-card">
           <h4>💾 파일 및 ⚙ 스타일</h4>
@@ -538,14 +537,31 @@ button:disabled{background:#2a2a2a!important;color:#555!important;border-color:#
 <script>
 "use strict";
 
+/*
+ * ■ 수정 가이드 (무엇을 어디서 고치는가)
+ * ─────────────────────────────────────────────────────────────
+ * 숫자패드 버튼 추가/변경 .... Layer1_pad            (Layer 1 버튼 목록)
+ * 수식목록 카드 추가/변경 .... Layer2_Examples       (Layer 2 예제 목록)
+ * 수식목록 분류 아이콘 ....... categoryIcons        (Layer2_renderBoard 안)
+ * 새 계산 함수 추가 .......... funcs  + 함수명 목록 2곳(formatOperatorsAndCommasHtml)
+ * 상수(pi, e 등) 추가 ........ constants
+ * 단위 표기(km, kg 등) ....... normalize()          (숫자+단위 자동 치환)
+ * 기본 설정값 ................ 아래 let 선언부 (쉼표, 합계바, 숫자패드, 계산모드)
+ * 수식 설명 팝업 ............ FormulaPopup_*      (입력된 수식 클릭 시 설명 표시)
+ * 레이어2 높이/글꼴 범위 ..... Layer2_setHeight / Layer2_applyScale
+ * 글꼴 크기 범위 ............. changeFontSize
+ * 색상/배치 .................. 위쪽 <style> (각 블록 앞에 [수정] 표시)
+ * 저장 키(localStorage) ...... "memoCalc..." 로 시작하는 문자열
+ */
+
 const container = document.getElementById("editor-container");
 const fontSizeInput = document.getElementById("fontSizeInput");
 const numpadEl = document.getElementById("virtual-numpad");
 const numpadGrid = document.getElementById("numpad-grid");
-const layer2Board = document.getElementById("layer2-board");
-const layer2Resizer = document.getElementById("layer2-resizer");
-const layer2ScaleInput = document.getElementById("layer2ScaleInput");
-const layer2ScaleRange = document.getElementById("layer2ScaleRange");
+const Layer2_Board = document.getElementById("layer2-board");
+const Layer2_Resizer = document.getElementById("layer2-resizer");
+const Layer2_ScaleInput = document.getElementById("Layer2_ScaleInput");
+const Layer2_ScaleRange = document.getElementById("Layer2_ScaleRange");
 const fontSizeRange = document.getElementById("fontSizeRange");
 const numpadToggleBtn = document.getElementById("numpadToggleBtn");
 const summaryBarEl = document.getElementById("summary-bar");
@@ -557,11 +573,13 @@ const sumTotalEl = document.getElementById("sum-total");
 const sumAvgEl = document.getElementById("sum-avg");
 const calcModeBtn = document.getElementById("calcModeBtn");
 
+// [수정] 기본값: useComma=천단위 쉼표, showSummary=합계바, isNumpadActive=숫자패드, showMenuLabels=메뉴 글자, calcMode="seq"(순차)/"alg"(사칙)
 let activeRow = null, useComma = true, showExample = false, showSummary = true, isNumpadActive = true, showMenuLabels = true, composing = false, calcMode = "seq";
-let currentPadLayer = 1;
-let layer2Filter = "전체보기";
-let layer2Height = parseInt(localStorage.getItem("memoCalcLayer2Height") || "56", 10);
-let layer2Scale = parseInt(localStorage.getItem("memoCalcLayer2Scale") || "100", 10);
+let Layer_Current = 1;
+let Layer2_Filter = "전체보기";
+// [수정] 레이어2 기본 높이(56=화면의 56%)와 글꼴 비율(100=100%)
+let Layer2_Height = parseInt(localStorage.getItem("memoCalcLayer2Height") || "56", 10);
+let Layer2_Scale = parseInt(localStorage.getItem("memoCalcLayer2Scale") || "100", 10);
 
 let undoStack = [];
 let redoStack = [];
@@ -581,6 +599,7 @@ function saveHistoryState() {
   const lastState = undoStack[undoStack.length - 1];
   if (lastState !== currentText) {
     undoStack.push(currentText);
+    // [수정] 실행취소 보관 개수(50)
     if (undoStack.length > 50) undoStack.shift();
     redoStack = [];
     updateUndoRedoUI();
@@ -618,16 +637,14 @@ function redo() {
 function updateUndoRedoUI() {
   const undoBtnTop = document.getElementById("undoBtn");
   const redoBtnTop = document.getElementById("redoBtn");
-  const undoBtnOpt = document.getElementById("undoBtnOpt");
-  const redoBtnOpt = document.getElementById("redoBtnOpt");
   const npUndoBtn = document.getElementById("npUndoBtn");
   const npRedoBtn = document.getElementById("npRedoBtn");
 
   const canUndo = undoStack.length > 1;
   const canRedo = redoStack.length > 0;
 
-  [undoBtnTop, undoBtnOpt, npUndoBtn].forEach(b => { if(b) b.disabled = !canUndo; });
-  [redoBtnTop, redoBtnOpt, npRedoBtn].forEach(b => { if(b) b.disabled = !canRedo; });
+  [undoBtnTop, npUndoBtn].forEach(b => { if(b) b.disabled = !canUndo; });
+  [redoBtnTop, npRedoBtn].forEach(b => { if(b) b.disabled = !canRedo; });
 }
 
 /*
@@ -637,26 +654,30 @@ function updateUndoRedoUI() {
  *
  * ⚠️ Layer 1 / Layer 2의 버튼 구성과 목록의 역할을 분리합니다.
  *   - Layer 1 : 숫자 입력, 기본 연산, 편집, 공통 조작
- *   - Layer 2 : Layer 1에 없는 확장 계산 함수만 제공
- *   - 두 Layer 사이에서는 'Layer 1/2 전환' 버튼만 공통으로 사용
+ *   - Layer 2 : Layer 1에 없는 확장 계산 함수 예제 제공
+ *   - Layer 1 / Layer 2 사이에서는 레이어 전환 버튼만 공통으로 사용
  *   - 0, ., CE, 옵션, 실행취소/재실행 등 Layer 1의 공통 버튼은 Layer 2에 넣지 않음
  *
  * 목록의 모든 항목은 클릭하면 해당 함수의 입력 시작점이 현재 커서에 삽입됩니다.
  */
-// ƒx 수식·함수 목록은 Layer 2 예제 데이터(layer2Examples)로 통합되어 별도 funcCategories를 사용하지 않습니다.
+// ƒx 수식·함수 목록은 Layer 2 예제 데이터(Layer2_Examples)로 통합되어 별도 funcCategories를 사용하지 않습니다.
 
 
 /* Layer 1: 4행 8열 — 숫자/기본연산/편집에 집중한 안정적인 기본 패드 */
-const padLayer1 = [
+// [수정] 버튼 1개 = { text:표시글자, act:동작, val:입력값, cls:색상종류(CSS), title:툴팁 }
+//   act: symbol(val을 입력) / newline / backspace / clear / reset / undo / redo / toggle_layer
+//   순서대로 8열씩 채워지며(4행), 개수를 바꾸면 위쪽 CSS의 행/열 수도 함께 조정
+const Layer1_pad = [
   // Row 1
   { text: "7", act: "symbol", val: "7", cls: "", title: "숫자 7" },
   { text: "8", act: "symbol", val: "8", cls: "", title: "숫자 8" },
   { text: "9", act: "symbol", val: "9", cls: "", title: "숫자 9" },
   { text: "×", act: "symbol", val: "*", cls: "op", title: "곱하기 (*)" },
   { text: "÷", act: "symbol", val: "/", cls: "op", title: "나누기 (/)" },
-  { text: "🌐", act: "toggle_layer", val: "", cls: "layer-btn", title: "레이어 1/2 전환\nLayer 1에는 기본적이 계산 도구/옵션" },
   { text: "(", act: "symbol", val: "(", cls: "plain-symbol", title: "여는 괄호 (" },
   { text: ")", act: "symbol", val: ")", cls: "plain-symbol", title: "닫는 괄호 )" },
+  { text: "√", act: "symbol", val: "sqrt(", cls: "plain-symbol", title: "제곱근 sqrt(" },
+
 
   // Row 2
   { text: "4", act: "symbol", val: "4", cls: "", title: "숫자 4" },
@@ -664,9 +685,9 @@ const padLayer1 = [
   { text: "6", act: "symbol", val: "6", cls: "", title: "숫자 6" },
   { text: "-", act: "symbol", val: "-", cls: "op", title: "빼기 (-)" },
   { text: "%", act: "symbol", val: "%", cls: "op", title: "백분율 연산자 (%)" },
-  { text: "📚", act: "open_layer2_fullscreen", val: "", cls: "func fx-list-btn", title: "📚 수식·함수 예제를 Layer 2 전체 화면으로 열기" },
   { text: ",", act: "symbol", val: ",", cls: "plain-symbol", title: "쉼표 (인자 구분자)" },
   { text: ":", act: "symbol", val: ":", cls: "plain-symbol", title: "콜론 (조건식 구분자)" },
+  { text: "^", act: "symbol", val: "^", cls: "plain-symbol", title: "거듭제곱 (^)" },
 
   // Row 3
   { text: "1", act: "symbol", val: "1", cls: "", title: "숫자 1" },
@@ -676,7 +697,7 @@ const padLayer1 = [
   { text: "=", act: "symbol", val: "=", cls: "op", title: "대입 / 할당 연산자 (=)" },
   { text: "↶", act: "undo", val: "", cls: "undo-redo-btn", id: "npUndoBtn", title: "실행 취소 (Ctrl+Z)" },
   { text: "↷", act: "redo", val: "", cls: "undo-redo-btn", id: "npRedoBtn", title: "재실행 (Ctrl+Y)" },
-  { text: "^", act: "symbol", val: "^", cls: "plain-symbol", title: "거듭제곱 (^)" },
+  { text: "±", act: "symbol", val: "(-1)*(", cls: "plain-symbol", title: "부호 반전 (-1)*(" },
 
   // Row 4
   { text: "0", act: "symbol", val: "0", cls: "", title: "숫자 0" },
@@ -685,8 +706,9 @@ const padLayer1 = [
   { text: "↵ Enter", act: "newline", val: "", cls: "op span-2", title: "다음 줄 생성 (Enter)" },
   { text: "CE", act: "clear", val: "", cls: "danger", title: "현재 줄 내용 삭제" },
   { text: "🧹", act: "reset", val: "", cls: "danger", title: "계산 입력창 내용 모두 지우기" },
-  { text: "🛠️", act: "open_opt_modal", val: "", cls: "opt-btn", title: "옵션 모달 열기" }
+  { text: "📚", act: "toggle_layer", val: "", cls: "layer-btn", title: "레이어 2 · 수식목록" },
 ];
+
 
 /*
  * Layer 2 : 확장 계산 예제 칠판
@@ -701,7 +723,9 @@ const padLayer1 = [
  * 4) 카드를 누르면 설명용 문장이 아니라 실제 계산식이 현재 커서에 삽입됩니다.
  * 5) 각 함수는 ƒx 수식·함수 목록의 항목을 빠짐없이 최소 한 번 사용합니다.
  */
-const layer2Examples = [
+// [수정] 카드 1개 = {cat:분류, name:제목, code:입력될 수식, note:설명}
+//   카드를 추가하려면 같은 형식으로 한 줄을 복사해 값만 바꾸세요. (cat은 기존 분류명과 같게 쓰면 해당 탭에 묶임)
+const Layer2_Examples = [
   {cat:"🏠 생활·부동산",name:"c2f · ℃ → ℉",code:"c2f(25)",note:"섭씨 25도를 화씨로 변환합니다. 온도 센서·날씨 기록처럼 단위가 다른 값을 빠르게 비교할 때 사용할 수 있습니다."},
   {cat:"🏠 생활·부동산",name:"clamp · 범위 제한",code:"clamp(135,0,100)",note:"135라는 값을 0~100 범위에 강제로 맞춥니다. 설정값·점수·밝기처럼 허용 범위를 벗어나면 안 되는 값을 제한할 때 유용합니다."},
   {cat:"🏠 생활·부동산",name:"deprec · 정액법 감가상각",code:"deprec(3000000,300000,5)",note:"취득원가 300만원, 잔존가치 30만원, 내용연수 5년의 연간 감가상각비입니다. 정액법으로 매년 같은 금액을 상각하는 예제입니다."},
@@ -736,7 +760,7 @@ const layer2Examples = [
   {cat:"📊 통계·데이터",name:"trunc · 소수 버림",code:"trunc(12.987)",note:"소수 부분을 제거하고 정수 부분만 남깁니다. 반올림과 달리 12.987은 12가 되므로 두 방식의 차이를 비교하기 좋은 예제입니다."},
   {cat:"📊 통계·데이터",name:"var · 표본 분산",code:"var(12,25,42,58,90)",note:"같은 데이터의 표본 분산을 계산합니다. 표준편차의 제곱에 해당하는 분산으로 데이터의 퍼짐 정도를 수치화합니다."},
   {cat:"📊 통계·데이터",name:"데이터 · 이상값 제한",code:"clamp(median(10,20,30,200,500),0,100)",note:"중앙값을 계산한 후 0~100 범위로 제한합니다. 통계 결과를 표시 범위에 맞춰 안전하게 제한하는 응용 패턴입니다."},
-  {cat:"📊 통계·데이터",name:"통계 · 분산과 표준편차 검산",code:"var(4,8,12,16)=pow(std(4,8,12,16),2)",note:"표본 분산이 표본 표준편차의 제곱과 같은지 비교합니다. true가 나오면 두 통계량의 수학적 관계를 직접 검산한 것입니다."},
+  {cat:"📊 통계·데이터",name:"통계 · 분산과 표준편차 검산",code:"abs(var(4,8,12,16)-pow(std(4,8,12,16),2))<0.000001",note:"표본 분산이 표본 표준편차의 제곱과 같은지 비교합니다. true가 나오면 두 통계량의 수학적 관계를 직접 검산한 것입니다."},
   {cat:"📊 통계·데이터",name:"통계 · 중앙값과 범위",code:"median(5,8,12,40,100)+max(5,8,12,40,100)-min(5,8,12,40,100)",note:"중앙값과 데이터 범위를 한 번에 계산합니다. 극단값이 있는 데이터에서 대표값과 퍼짐 정도를 함께 확인하는 예제입니다."},
   {cat:"📊 통계·데이터",name:"통계 · 평균과 표준편차",code:"avg(10,12,14,16,18)+std(10,12,14,16,18)",note:"평균과 표본 표준편차를 하나의 수식에 조합합니다. 대표적인 중심값과 데이터 퍼짐 정도를 동시에 다루는 예제입니다."},
   {cat:"📐 공학·과학",name:"atan2 · 방향각",code:"deg(atan2(1,1))",note:"좌표 y=1, x=1의 방향각을 구한 뒤 다시 도 단위로 변환합니다. 좌표의 방향을 각도로 바꾸는 실전형 예제입니다."},
@@ -852,20 +876,22 @@ const layer2Examples = [
 
 ];
 
-function getLayer2Categories(){ return [...new Set(layer2Examples.map(x => x.cat))]; }
-function applyLayer2Scale(){ layer2Scale=Math.max(70,Math.min(200,parseInt(layer2Scale,10)||100)); layer2Board.style.setProperty("--l2-scale", layer2Scale / 100); if(layer2ScaleInput) layer2ScaleInput.value=layer2Scale; if(layer2ScaleRange) layer2ScaleRange.value=layer2Scale; localStorage.setItem("memoCalcLayer2Scale",layer2Scale); }
-function renderLayer2Board(){
-  layer2Board.innerHTML="";
+function Layer2_getCategories(){ return [...new Set(Layer2_Examples.map(x => x.cat))]; }
+// [수정] 수식목록 글꼴 비율 범위 70~200(%), 기본 100
+function Layer2_applyScale(){ Layer2_Scale=Math.max(70,Math.min(200,parseInt(Layer2_Scale,10)||100)); Layer2_Board.style.setProperty("--l2-scale", Layer2_Scale / 100); if(Layer2_ScaleInput) Layer2_ScaleInput.value=Layer2_Scale; if(Layer2_ScaleRange) Layer2_ScaleRange.value=Layer2_Scale; localStorage.setItem("memoCalcLayer2Scale",Layer2_Scale); }
+function Layer2_renderBoard(){
+  Layer2_Board.innerHTML="";
 
-  const cats=getLayer2Categories();
-  const visible=layer2Filter==="전체보기" ? layer2Examples : layer2Examples.filter(x=>x.cat===layer2Filter);
+  const cats=Layer2_getCategories();
+  const visible=Layer2_Filter==="전체보기" ? Layer2_Examples : Layer2_Examples.filter(x=>x.cat===Layer2_Filter);
 
   /*
    * Layer 2 첫 줄은 탐색용 탭만 배치합니다.
-   * 레이어1 / 전체보기 / 모든 분류 탭을 같은 흐름으로 이어 붙이고,
+   * 레이어1=숫자패드 / 전체보기 / 모든 분류 탭을 같은 흐름으로 이어 붙이고,
    * 화면 폭이 부족하면 flex-wrap으로 다음 줄로 자연스럽게 넘어갑니다.
    * 별도의 분류 보기 줄은 만들지 않아 세로 공간을 낭비하지 않습니다.
    */
+  // [수정] 분류 탭·카드에 표시할 아이콘 (키 = Layer2_Examples의 cat 값과 동일하게)
   const categoryIcons={
   "🏠 생활·부동산":"🏠",
   "💰 금융·재무":"💰",
@@ -887,49 +913,45 @@ const getCategoryIcon=cat=>categoryIcons[cat] || ((cat.match(/^\S+/)||["📌"])[
 const mainTabs=document.createElement("div");
   mainTabs.className="layer2-tabs";
 
-  const layer1Tab=document.createElement("button");
-  layer1Tab.type="button";
-  layer1Tab.className="layer2-tab layer2-layer1-tab";
-  layer1Tab.textContent="🌐 레이어1";
-  layer1Tab.title="레이어 1로 변경";
-  layer1Tab.onclick=e=>{
+  const Layer1_Tab=document.createElement("button");
+  Layer1_Tab.type="button";
+  Layer1_Tab.className="layer2-tab layer2-layer1-tab";
+  Layer1_Tab.textContent="🔢 레이어1=숫자패드";
+  Layer1_Tab.title="레이어1=숫자패드";
+  Layer1_Tab.onclick=e=>{
     e.preventDefault(); e.stopPropagation();
-    if(layer2FullScreen) exitLayer2FullScreen();
-    currentPadLayer=1;
-    numpadEl.classList.remove("layer2-fullscreen");
-    renderNumpad();
-    updateStatusText("레이어 1로 변경");
+    Layer1_go("레이어1=숫자패드");
   };
-  mainTabs.appendChild(layer1Tab);
+  mainTabs.appendChild(Layer1_Tab);
 
   const allTab=document.createElement("button");
   allTab.type="button";
-  allTab.className="layer2-tab" + (layer2Filter==="전체보기" ? " active" : "");
-  allTab.textContent=`전체보기 (${layer2Examples.length})`;
+  allTab.className="layer2-tab" + (Layer2_Filter==="전체보기" ? " active" : "");
+  allTab.textContent=`전체보기 (${Layer2_Examples.length})`;
   allTab.title="모든 분류의 예제 보기";
   allTab.onclick=e=>{
     e.preventDefault(); e.stopPropagation();
-    layer2Filter="전체보기";
-    renderLayer2Board();
+    Layer2_Filter="전체보기";
+    Layer2_renderBoard();
   };
   mainTabs.appendChild(allTab);
 
   cats.forEach(cat=>{
     const tab=document.createElement("button");
     tab.type="button";
-    tab.className="layer2-tab" + (layer2Filter===cat ? " active" : "");
+    tab.className="layer2-tab" + (Layer2_Filter===cat ? " active" : "");
     tab.textContent=`${getCategoryIcon(cat)} ${cleanCategoryName(cat)}`;
     tab.title=cleanCategoryName(cat)+" 보기";
     tab.onclick=e=>{
       e.preventDefault(); e.stopPropagation();
-      layer2Filter=cat;
-      renderLayer2Board();
+      Layer2_Filter=cat;
+      Layer2_renderBoard();
     };
     mainTabs.appendChild(tab);
   });
 
   // 탭은 Layer 2의 첫 번째 줄에만 배치하고, 예제 출력은 반드시 그 아래에서 시작합니다.
-  layer2Board.appendChild(mainTabs);
+  Layer2_Board.appendChild(mainTabs);
 
   const grid=document.createElement("div");
   grid.className="layer2-board-grid";
@@ -961,22 +983,9 @@ const mainTabs=document.createElement("div");
     card.addEventListener("touchstart",e=>{e.stopPropagation()},{passive:true});
     card.addEventListener("click",e=>{
       e.preventDefault(); e.stopPropagation();
-      if(layer2SavedRow && layer2SavedRow.isConnected){
-        activeRow=layer2SavedRow;
-        setCaretOffset(layer2SavedRow, Math.min(layer2SavedCaret,getRawExprText(layer2SavedRow).length));
-      }
+      Layer1_go();   // 레이어1 복귀 + 커서/숫자패드 상태 복원 후 삽입
       insertSymbol(item.code);
-      updateStatusText(item.name.split(" · ")[0]+" 예제 삽입");
-
-      // Layer 2(일반/전체화면)에서 수식·예제를 클릭하면 항상 Layer 1로 복귀
-      if(layer2FullScreen){
-        exitLayer2FullScreen();
-      }else{
-        currentPadLayer=1;
-        numpadEl.classList.remove("layer2-fullscreen");
-        renderNumpad();
-        updateStatusText(item.name.split(" · ")[0]+" 예제 삽입 · 레이어 1");
-      }
+      updateStatusText(item.name.split(" · ")[0]+" 예제 삽입 · 레이어1");
     });
     card.addEventListener("keydown",e=>{
       if(e.key==="Enter" || e.key===" "){
@@ -994,76 +1003,174 @@ const mainTabs=document.createElement("div");
     grid.appendChild(empty);
   }
 
-  layer2Board.appendChild(grid);
-  applyLayer2Scale();
+  Layer2_Board.appendChild(grid);
+  Layer2_applyScale();
 }
 
-layer2Board.addEventListener("click",e=>{
-  if(currentPadLayer!==2) return;
+Layer2_Board.addEventListener("click",e=>{
+  if(Layer_Current!==2) return;
   const hit=e.target.closest(".layer2-card,.layer2-tab");
   if(hit) return;
-  if(layer2FullScreen) exitLayer2FullScreen();
-  currentPadLayer=1;
-  numpadEl.classList.remove("layer2-fullscreen");
-  renderNumpad();
-  updateStatusText("레이어 1로 변경");
+  Layer1_go("레이어1=숫자패드");
 });
 
-function setLayer2Height(v){layer2Height=Math.max(25,Math.min(90,parseInt(v,10)||56));numpadEl.style.setProperty("--layer2-height",layer2Height+"vh");localStorage.setItem("memoCalcLayer2Height",layer2Height);}
-let resizingLayer2=false,resizeStartY=0,resizeStartHeight=56;
-function beginLayer2Resize(e){if(currentPadLayer!==2)return;e.preventDefault();resizingLayer2=true;resizeStartY=e.clientY??(e.touches&&e.touches[0].clientY);resizeStartHeight=layer2Height;document.body.style.userSelect="none";}
-function moveLayer2Resize(e){if(!resizingLayer2)return;const y=e.clientY??(e.touches&&e.touches[0].clientY);if(typeof y!=="number")return;setLayer2Height(resizeStartHeight+((resizeStartY-y)/Math.max(1,window.innerHeight))*100);applyNumpadState();}
-function endLayer2Resize(){if(!resizingLayer2)return;resizingLayer2=false;document.body.style.userSelect="";}
-layer2Resizer.addEventListener("mousedown",beginLayer2Resize);window.addEventListener("mousemove",moveLayer2Resize);window.addEventListener("mouseup",endLayer2Resize);layer2Resizer.addEventListener("touchstart",beginLayer2Resize,{passive:false});window.addEventListener("touchmove",moveLayer2Resize,{passive:false});window.addEventListener("touchend",endLayer2Resize,{passive:true});
+// [수정] 레이어2 높이 범위 25~90(화면 %), 기본 56
+function Layer2_setHeight(v){Layer2_Height=Math.max(25,Math.min(90,parseInt(v,10)||56));numpadEl.style.setProperty("--layer2-height",Layer2_Height+"vh");localStorage.setItem("memoCalcLayer2Height",Layer2_Height);}
+let Layer2_Resizing=false,Layer2_ResizeStartY=0,Layer2_ResizeStartHeight=56;
+function Layer2_beginResize(e){if(Layer_Current!==2)return;e.preventDefault();Layer2_Resizing=true;Layer2_ResizeStartY=e.clientY??(e.touches&&e.touches[0].clientY);Layer2_ResizeStartHeight=Layer2_Height;document.body.style.userSelect="none";}
+function Layer2_moveResize(e){if(!Layer2_Resizing)return;const y=e.clientY??(e.touches&&e.touches[0].clientY);if(typeof y!=="number")return;Layer2_setHeight(Layer2_ResizeStartHeight+((Layer2_ResizeStartY-y)/Math.max(1,window.innerHeight))*100);applyNumpadState();}
+function Layer2_endResize(){if(!Layer2_Resizing)return;Layer2_Resizing=false;document.body.style.userSelect="";}
+Layer2_Resizer.addEventListener("mousedown",Layer2_beginResize);window.addEventListener("mousemove",Layer2_moveResize);window.addEventListener("mouseup",Layer2_endResize);Layer2_Resizer.addEventListener("touchstart",Layer2_beginResize,{passive:false});window.addEventListener("touchmove",Layer2_moveResize,{passive:false});window.addEventListener("touchend",Layer2_endResize,{passive:true});
 
-let layer2FullScreen=false;
-let layer2RestoreHeight=56;
-let layer2SavedRow=null;
-let layer2SavedCaret=0;
-function showLayer2FullScreen(){
-  layer2RestoreHeight=layer2Height;
-  layer2SavedRow=getCurrentRow();
-  layer2SavedCaret=layer2SavedRow ? getCaretOffset(layer2SavedRow) : 0;
-  layer2FullScreen=true;
-  currentPadLayer=2;
+let Layer2_FullScreen=false, Layer2_SavedRow=null, Layer2_SavedCaret=0;
+function Layer2_showFullScreen(){
+  Layer2_SavedRow=getCurrentRow();
+  Layer2_SavedCaret=Layer2_SavedRow ? getCaretOffset(Layer2_SavedRow) : 0;
+  Layer2_FullScreen=true;
+  Layer_Current=2;
   renderNumpad();
   numpadEl.classList.add("layer2-fullscreen");
-  setTimeout(()=>layer2Board.scrollTop=0,0);
+  applyNumpadState();   // 숫자패드가 꺼져 있어도 전체화면 목록 표시
+  setTimeout(()=>Layer2_Board.scrollTop=0,0);
 }
-function exitLayer2FullScreen(){
-  if(!layer2FullScreen) return;
-  layer2FullScreen=false;
+
+// 레이어1 복귀 공통 처리 (전체화면/일반 레이어2 모두): 숫자패드 켜짐/꺼짐 상태와 커서 위치 복원
+function Layer1_go(msg){
+  Layer2_FullScreen=false;
+  Layer_Current=1;
   numpadEl.classList.remove("layer2-fullscreen");
-  setLayer2Height(layer2RestoreHeight);
   renderNumpad();
-  if(layer2SavedRow && layer2SavedRow.isConnected){
-    activeRow=layer2SavedRow;
-    requestAnimationFrame(()=>setCaretOffset(layer2SavedRow, Math.min(layer2SavedCaret,getRawExprText(layer2SavedRow).length)));
+  applyNumpadState();
+  if(Layer2_SavedRow && Layer2_SavedRow.isConnected){
+    activeRow=Layer2_SavedRow;
+    setCaretOffset(Layer2_SavedRow, Math.min(Layer2_SavedCaret,getRawExprText(Layer2_SavedRow).length));
   }
-  layer2SavedRow=null;
+  Layer2_SavedRow=null;
+  if(msg) updateStatusText(msg);
 }
+
+/*
+ * 수식 설명 팝업
+ * ─────────────────────────────────────────────────────────────
+ * 입력칸에서 수식을 클릭하면 해당 줄 바로 아래에 이름·예제·전체 설명을 팝업으로 보여 줍니다.
+ *  1순위) 입력한 내용이 Layer2_Examples의 수식과 똑같으면, 수식 어디를 눌러도 그 카드 설명
+ *         (예: cos(pi)+1 → "오일러 공식")
+ *  2순위) 내용이 다르면 클릭한 함수 이름(예: f2c(77) 의 "f2c")의 설명.
+ *         괄호 안 숫자는 얼마든지 바꿔도 되고, 중첩 함수는 클릭한 함수의 설명이 나옵니다.
+ * 팝업을 누르거나 다른 곳을 누르면(또는 타이핑하면) 즉시 사라집니다.
+ * [수정] 설명 원본: Layer2_Examples 중 name이 "함수명 · ..." 으로 시작하는 첫 카드
+ *        표시 내용: FormulaPopup_show / 모양: 위쪽 CSS #formula-popup
+ */
+const FormulaPopup_El = document.createElement("div");
+FormulaPopup_El.id = "formula-popup";
+document.body.appendChild(FormulaPopup_El);
+
+function FormulaPopup_hide(){ FormulaPopup_El.style.display = "none"; }
+
+// 함수명 → 설명 카드 (Layer2_Examples에서 name이 "함수명 · ..." 인 첫 카드, 처음 사용할 때 1회 생성)
+let FormulaPopup_Map = null;
+function FormulaPopup_getMap(){
+  if (!FormulaPopup_Map){
+    FormulaPopup_Map = new Map();
+    Layer2_Examples.forEach(it => {
+      const fn = it.name.split(" · ")[0].trim();
+      if (Object.prototype.hasOwnProperty.call(funcs, fn) && !FormulaPopup_Map.has(fn)) FormulaPopup_Map.set(fn, it);
+    });
+  }
+  return FormulaPopup_Map;
+}
+
+// 1순위: 커서가 Layer2 예제 수식과 똑같은 내용(앞뒤가 다른 식에 붙어 있지 않은 독립 수식) 안에 있으면 그 카드
+//        (여러 개면 가장 긴 수식 우선)
+function FormulaPopup_findExact(text, caret){
+  let best = null;
+  for (const it of Layer2_Examples){
+    const len = it.code.length;
+    if (best && len <= best.code.length) continue;
+    let from = 0, idx;
+    while ((idx = text.indexOf(it.code, from)) !== -1){
+      const prev = idx > 0 ? text[idx - 1] : "", next = text[idx + len] || "";
+      if (caret >= idx && caret <= idx + len && (prev === "" || /[\s=(,]/.test(prev)) && (next === "" || /[\s=),#]/.test(next))){
+        best = it; break;
+      }
+      from = idx + 1;
+    }
+  }
+  return best;
+}
+
+// 2순위: 커서가 "함수명(" 의 함수명 위(양 끝 포함)이면 해당 함수 카드
+function FormulaPopup_findByName(text, caret){
+  const map = FormulaPopup_getMap();
+  const re = /[A-Za-z_][A-Za-z0-9_]*(?=\s*\()/g;
+  let m;
+  while ((m = re.exec(text)) !== null){
+    if (caret >= m.index && caret <= m.index + m[0].length && map.has(m[0])) return map.get(m[0]);
+  }
+  return null;
+}
+
+function FormulaPopup_find(row){
+  const text = getRawExprText(row), caret = getCaretOffset(row);
+  return FormulaPopup_findExact(text, caret) || FormulaPopup_findByName(text, caret);
+}
+
+function FormulaPopup_show(row, it){
+  FormulaPopup_El.innerHTML = "";
+  [["fp-name", it.name], ["fp-code", "예) " + it.code], ["fp-note", it.note]].forEach(([cls, txt]) => {
+    const d = document.createElement("div");
+    d.className = cls; d.textContent = txt;
+    FormulaPopup_El.appendChild(d);
+  });
+  FormulaPopup_El.style.display = "block";
+
+  // 입력 줄 바로 아래에 배치, 공간이 부족하면(숫자패드에 가려질 때) 줄 위쪽에 배치
+  const r = row.getBoundingClientRect();
+  const pw = FormulaPopup_El.offsetWidth, ph = FormulaPopup_El.offsetHeight;
+  const bottomLimit = window.innerHeight - (isNumpadActive ? numpadEl.offsetHeight : 0) - 4;
+  let top = r.bottom + 4;
+  if (top + ph > bottomLimit){
+    const above = r.top - ph - 4;
+    top = above >= 4 ? above : Math.max(4, bottomLimit - ph);
+  }
+  FormulaPopup_El.style.top = top + "px";
+  FormulaPopup_El.style.left = Math.max(8, Math.min(r.left, window.innerWidth - pw - 8)) + "px";
+}
+
+// 팝업 자신을 누르면 닫기 (입력창 포커스/선택은 유지)
+FormulaPopup_El.addEventListener("mousedown", e => e.preventDefault());
+FormulaPopup_El.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); FormulaPopup_hide(); });
+// 팝업 밖을 누르면(빈 곳, 숫자패드 등) 즉시 닫기 — 캡처 단계라 아래 입력칸 클릭 처리보다 먼저 실행됨
+document.addEventListener("pointerdown", e => { if (!FormulaPopup_El.contains(e.target)) FormulaPopup_hide(); }, true);
+document.addEventListener("keydown", FormulaPopup_hide, true);
+// 입력칸의 수식 클릭 시 팝업 표시
+container.addEventListener("click", e => {
+  if (e.target.closest && e.target.closest(".result-container")) return;
+  const sel = window.getSelection();
+  if (!sel || !sel.isCollapsed) return;
+  const row = getCurrentRow();
+  if (!row || row.classList.contains("comment")) return;
+  const it = FormulaPopup_find(row);
+  if (it) FormulaPopup_show(row, it);
+});
 
 function renderNumpad() {
   numpadGrid.innerHTML = "";
-  const layer2 = currentPadLayer === 2;
+  const isLayer2 = Layer_Current === 2;
+  numpadGrid.style.display = isLayer2 ? "none" : "grid";
+  Layer2_Resizer.style.display = isLayer2 ? "flex" : "none";
+  Layer2_Board.style.display = isLayer2 ? "flex" : "none";
+  Layer2_Board.style.flexDirection = isLayer2 ? "column" : "";
+  numpadEl.classList.toggle("layer2-active", isLayer2);
+  if(isLayer2) Layer2_setHeight(Layer2_Height);
 
-  numpadGrid.classList.toggle("layer2-grid", layer2);
-  numpadGrid.style.display = layer2 ? "none" : "grid";
-  layer2Resizer.style.display = layer2 ? "flex" : "none";
-  layer2Board.style.display = layer2 ? "flex" : "none";
-  layer2Board.style.flexDirection = layer2 ? "column" : "";
-  numpadEl.classList.toggle("layer2-active", layer2);
-  if(layer2) setLayer2Height(layer2Height);
-
-  if (layer2) {
-    renderLayer2Board();
+  if (isLayer2) {
+    Layer2_renderBoard();
     updateUndoRedoUI();
     return;
   }
 
-  const layerData = padLayer1;
-
-  layerData.forEach(item => {
+  Layer1_pad.forEach(item => {
     const btn = document.createElement("button");
     btn.className = "np-btn " + (item.cls || "");
     if (item.id) btn.id = item.id;
@@ -1080,13 +1187,11 @@ function renderNumpad() {
       else if (act === "backspace") handleBackspace();
       else if (act === "clear") clearCurrentRow();
       else if (act === "reset") clearAllContent();
-      else if (act === "open_layer2_fullscreen") showLayer2FullScreen();
       else if (act === "open_opt_modal") openOptionModal();
       else if (act === "toggle_layer") {
-        currentPadLayer = 2;
+        Layer_Current = 2;
         renderNumpad();
-        updateUndoRedoUI();
-        updateStatusText("숫자 패드 Layer 2 · 예제 칠판");
+        updateStatusText("레이어2=수식목록");
       }
       else if (act === "undo") undo();
       else if (act === "redo") redo();
@@ -1149,6 +1254,7 @@ function toggleCalcMode(){
   updateStatusText(calcMode === "seq" ? "순차연산(SEQ) 모드" : "사칙연산(ALG) 모드");
 }
 
+// [수정] 처음 실행/초기화 시 나타나는 기본 메모 내용 (한 줄 = 수식 한 줄)
 const defaultText = `\n\n\n\n\n
 
 
@@ -1234,6 +1340,10 @@ const requireNonNegativeInteger = (v, name="값") => {
   return v;
 };
 
+// [수정] 새 함수 추가 방법
+//   1) 아래에  이름: (인자) => 계산식,  한 줄 추가  (입력 검증은 requireFinite 등을 재사용)
+//   2) formatOperatorsAndCommasHtml()의 함수명 목록 2곳에 같은 이름 추가 (색상 강조용)
+//   3) 필요하면 Layer2_Examples에 예제 카드 추가
 const funcs = {
   abs:Math.abs, acos:Math.acos, acosh:Math.acosh, asin:Math.asin, asinh:Math.asinh, atan:Math.atan, atanh:Math.atanh, atan2:Math.atan2,
   ceil:Math.ceil, cos:Math.cos, cosh:Math.cosh, exp:Math.exp, floor:Math.floor, log:Math.log, log10:Math.log10, max:Math.max, min:Math.min,
@@ -1363,6 +1473,7 @@ const funcs = {
   }
 };
 
+// [수정] 상수 추가: 이름:값 (예: g:9.80665 → 수식에서 g 로 사용)
 const constants = {pi:Math.PI, e:Math.E, tau:Math.PI*2};
 
 let statusTimer = null;
@@ -1386,6 +1497,7 @@ function updateMenuLabels(){
 }
 const toggleMenuLabels = () => { showMenuLabels = !showMenuLabels; localStorage.setItem("memoCalcMenuLabels", showMenuLabels ? "1" : "0"); updateMenuLabels(); };
 
+// [수정] 아래 두 정규식의 함수명 목록(ans|py2m2|…|payment)에 새 함수명을 추가해야 색상 강조가 적용됩니다 (계산 자체는 funcs만 있으면 동작)
 function formatOperatorsAndCommasHtml(str){
   const tokens = str.split(/([\uac00-\ud7a3]+|\d+(?:\.\d+)?|[+\-*/%=<>:×÷−]|ans|py2m2|m22py|compound|rent2deposit|tax|deprec|sqrt|abs|round|ceil|floor|max|min|pi|e|sin|cos|tan|rad|deg|asin|acos|atan|atan2|acosh|asinh|atanh|cosh|sinh|tanh|std|var|fact|gcd|lcm|perm|comb|c2f|f2c|pow|log|avg|median|sum|pct|changePct|clamp|in2cm|cm2in|ft2m|m2ft|kg2lb|lb2kg|kmh2mps|mps2kmh|simpleInterest|payment|[^\s\uac00-\ud7a3\d+\-*/%=<>:×÷−]+)/gi);
   return tokens.map(t => {
@@ -1614,16 +1726,37 @@ function parseExpressionSafe(expr, vars, mode) {
   return result;
 }
 
+// 천 단위 쉼표(1,000) 제거. 함수 호출 괄호 안의 쉼표는 인자 구분자이므로 보존합니다.
+// 예) clamp(135,0,100) / avg(10,120,30) 의 "0,100" "10,120"을 숫자로 합치지 않음
+function stripThousandsCommas(s){
+  let out = "", i = 0;
+  const stack = [];
+  while (i < s.length){
+    const ch = s[i];
+    if (ch === "("){ stack.push(/[A-Za-z0-9_가-힣]$/.test(out)); out += ch; i++; continue; }
+    if (ch === ")"){ stack.pop(); out += ch; i++; continue; }
+    if (/\d/.test(ch) && !stack.includes(true) && !/[A-Za-z0-9_.가-힣]$/.test(out)){
+      const m = s.slice(i).match(/^\d{1,3}(?:,\d{3})+(?!\d)/);
+      if (m){ out += m[0].replace(/,/g, ""); i += m[0].length; continue; }
+    }
+    out += ch; i++;
+  }
+  return out;
+}
+
 function normalize(s){
   s = s.replace(/\u00a0/g, " ");
-  s = s.replace(/\b\d{1,3}(?:,\d{3})+(?!\d)/g, m => m.replace(/,/g, ""));
+  s = stripThousandsCommas(s);
   s = s.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/\^/g, "^").replace(/\bPI\b/gi, "pi");
-  s = s.replace(/(\d+(?:\.\d+)?)\s*km\b/gi, "($1*1000)")
-    .replace(/(\d+(?:\.\d+)?)\s*m\b(?!\w)/gi, "$1")
-    .replace(/(\d+(?:\.\d+)?)\s*kg\b/gi, "($1*1000)")
-    .replace(/(\d+(?:\.\d+)?)\s*g\b(?!\w)/gi, "$1")
-    .replace(/(\d+(?:\.\d+)?)\s*h\b/gi, "($1*60)")
-    .replace(/(\d+(?:\.\d+)?)\s*min\b/gi, "$1");
+  // [수정] 단위 추가: 아래 .replace(...) 줄을 복사해 단위명(km 등)과 변환식($1*1000 등)만 바꾸면 됨
+  // 숫자+단위 치환: 식별자 일부(ft2m, lb2kg, py2m2 등)의 숫자는 건드리지 않도록 앞 문자가 식별자 문자가 아닐 때만 적용
+  const U = "(^|[^A-Za-z0-9_.가-힣])(\\d+(?:\\.\\d+)?)\\s*";
+  s = s.replace(new RegExp(U + "km\\b", "gi"), "$1($2*1000)")
+    .replace(new RegExp(U + "m\\b(?!\\w)", "gi"), "$1$2")
+    .replace(new RegExp(U + "kg\\b", "gi"), "$1($2*1000)")
+    .replace(new RegExp(U + "g\\b(?!\\w)", "gi"), "$1$2")
+    .replace(new RegExp(U + "h\\b", "gi"), "$1($2*60)")
+    .replace(new RegExp(U + "min\\b", "gi"), "$1$2");
   return s.trim();
 }
 
@@ -1646,6 +1779,7 @@ function format(v){
   return typeof v === "boolean" ? (v ? "true" : "false") : String(v);
 }
 
+// [수정] 글꼴 크기 범위 10~60, 기본 18
 function changeFontSize(v){
   const n = Math.max(10, Math.min(60, parseInt(v, 10) || 18));
   container.style.fontSize = n + "px";
@@ -1663,13 +1797,13 @@ fontSizeInput.addEventListener("wheel", e => {
   fontSizeInput.value = n; changeFontSize(n);
 }, {passive:false});
 
-if(layer2ScaleInput){
-  layer2ScaleInput.addEventListener("input",()=>{layer2Scale=parseInt(layer2ScaleInput.value,10)||100;applyLayer2Scale()});
-  layer2ScaleInput.addEventListener("change",()=>{layer2Scale=parseInt(layer2ScaleInput.value,10)||100;applyLayer2Scale()});
-  layer2ScaleInput.addEventListener("wheel",e=>{e.preventDefault();layer2Scale=Math.max(70,Math.min(200,layer2Scale+(e.deltaY<0?5:-5)));applyLayer2Scale()},{passive:false});
+if(Layer2_ScaleInput){
+  Layer2_ScaleInput.addEventListener("input",()=>{Layer2_Scale=parseInt(Layer2_ScaleInput.value,10)||100;Layer2_applyScale()});
+  Layer2_ScaleInput.addEventListener("change",()=>{Layer2_Scale=parseInt(Layer2_ScaleInput.value,10)||100;Layer2_applyScale()});
+  Layer2_ScaleInput.addEventListener("wheel",e=>{e.preventDefault();Layer2_Scale=Math.max(70,Math.min(200,Layer2_Scale+(e.deltaY<0?5:-5)));Layer2_applyScale()},{passive:false});
 }
-if(layer2ScaleRange){
-  layer2ScaleRange.addEventListener("input",()=>{layer2Scale=parseInt(layer2ScaleRange.value,10)||100;applyLayer2Scale()});
+if(Layer2_ScaleRange){
+  Layer2_ScaleRange.addEventListener("input",()=>{Layer2_Scale=parseInt(Layer2_ScaleRange.value,10)||100;Layer2_applyScale()});
 }
 
 if(fontSizeRange){
@@ -1810,6 +1944,8 @@ function calculate(forceFormatRow = null){
       ansBtn.className = "ans-insert-btn";
       ansBtn.textContent = "ans";
       ansBtn.title = "클릭 시 다음 줄에 ans 입력";
+      // mousedown 기본동작(포커스 이동)을 막아야 focusout→calculate()로 버튼이 교체되지 않아 한 번에 동작
+      ansBtn.addEventListener("mousedown", e => { e.preventDefault(); e.stopPropagation(); });
       ansBtn.onclick = e => { e.preventDefault(); e.stopPropagation(); handleAnsClick(row); };
       resContainer.appendChild(ansBtn);
 
@@ -1930,7 +2066,8 @@ function clearCurrentRow(){
 const updateNumpadButton = () => { numpadToggleBtn.classList.toggle("active", isNumpadActive); numpadToggleBtn.setAttribute("aria-pressed", isNumpadActive ? "true" : "false"); };
 
 function applyNumpadState(){
-  numpadEl.classList.toggle("active", isNumpadActive);
+  // 레이어2 전체화면은 숫자패드 켜짐/꺼짐과 무관하게 항상 표시
+  numpadEl.classList.toggle("active", isNumpadActive || Layer2_FullScreen);
   updateNumpadButton();
   if (isNumpadActive) {
     container.setAttribute("inputmode", "none");
@@ -1939,7 +2076,7 @@ function applyNumpadState(){
     container.removeAttribute("inputmode");
     container.querySelectorAll(".calc-row").forEach(el => el.removeAttribute("inputmode"));
   }
-  document.getElementById("wrap").style.paddingBottom = isNumpadActive ? ((numpadEl.offsetHeight || 140) + 15) + "px" : "40px";
+  document.getElementById("wrap").style.paddingBottom = (isNumpadActive && !Layer2_FullScreen) ? ((numpadEl.offsetHeight || 140) + 15) + "px" : "40px";
 }
 
 const toggleNumpad = () => { isNumpadActive = !isNumpadActive; localStorage.setItem("memoCalcNumpad", isNumpadActive ? "1" : "0"); applyNumpadState(); };
@@ -2113,10 +2250,13 @@ function insertFiveBlankLines(){
 
 function clearAllContent(){
   initDOM("");
-  const first = container.querySelector(".calc-row"); 
+  const first = container.querySelector(".calc-row");
   if (first){ setCaretOffset(first, 0); activeRow = first; }
+  // [수정] 지운 직후 빈 줄 5칸을 1회 넣어 아래 공간 확보 (불필요하면 아래 한 줄 삭제)
+  insertFiveBlankLines();
+  if (first){ setCaretOffset(first, 0); activeRow = first; }   // 커서는 첫 줄에 유지
   saveHistoryState();
-  updateStatusText("입력창 내용 지움");
+  updateStatusText("입력창 내용 지움 · 빈 줄 5칸 추가");
 }
 
 function resetToDefault(){
@@ -2151,7 +2291,7 @@ function resetToDefault(){
   updateUndoRedoUI();
 
   initDOM(defaultText);
-  layer2FullScreen=false; layer2SavedRow=null; numpadEl.classList.remove("layer2-fullscreen"); currentPadLayer=1; layer2Filter="전체보기"; setLayer2Height(56); layer2Scale=100; applyLayer2Scale(); renderNumpad();
+  Layer2_SavedRow=null; Layer2_Filter="전체보기"; Layer2_setHeight(56); Layer2_Scale=100; Layer2_applyScale(); Layer1_go();
   showExample = false; 
   updateExampleButton(); 
   calculate();
@@ -2168,7 +2308,10 @@ container.addEventListener("focusin", () => {
   if (isNumpadActive) container.setAttribute("inputmode", "none");
 });
 
-container.addEventListener("focusout", () => calculate());
+container.addEventListener("focusout", e => {
+  if (e.relatedTarget && container.contains(e.relatedTarget)) return;   // 내부 버튼(ans 등)으로 이동 시 재계산 생략
+  calculate();
+});
 container.addEventListener("compositionstart", () => { composing = true; });
 container.addEventListener("compositionend", () => {
   composing = false;
@@ -2245,7 +2388,7 @@ const useWebFont = (localStorage.getItem("memoCalcUseWebFont") ?? "0") === "1";
 document.getElementById("webFontToggle").checked = useWebFont;
 toggleWebFont(useWebFont);
 
-setLayer2Height(layer2Height); applyLayer2Scale(); renderNumpad();
+Layer2_setHeight(Layer2_Height); Layer2_applyScale(); renderNumpad();
 initDOM(localStorage.getItem("memoCalcText") ?? defaultText);
 showExample = false;
 
