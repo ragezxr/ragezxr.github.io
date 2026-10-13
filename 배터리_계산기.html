@@ -64,38 +64,49 @@
   
   /* 잔량 슬라이더 패널 (수치 가독성 및 균형 조절) */
   .slider-panel{max-width:760px;margin:16px auto 0;padding:16px 14px;background:#181a1d;border:1px solid #3d4047;border-radius:10px;width:100%;box-sizing:border-box}
-  .slider-heading{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#bbb}
-  .slider-heading strong{color:#a3ff52;font-size:22px;white-space:nowrap;letter-spacing:-0.5px}
+  .slider-heading{display:flex;justify-content:center;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:#bbb;text-align:center}
+  .slider-heading strong{color:#a3ff52;font-size:25px;white-space:nowrap;letter-spacing:-0.5px;text-align:center;text-shadow:0 0 8px #a3ff5233}
   
   .slider-wrapper{position:relative;width:100%;margin:10px 0 0}
-  .battery-slider{appearance:none;-webkit-appearance:none;width:100%;height:8px;border-radius:99px;outline:none;margin:0;background:#50545c;padding:0;border:1px solid #666;cursor:pointer;box-sizing:border-box}
-  .battery-slider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#a3ff52;border:3px solid #202328;box-shadow:0 0 0 2px #a3ff52}
-  .battery-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#a3ff52;border:3px solid #202328;box-shadow:0 0 0 2px #a3ff52}
+  /* 잔량 구간별 색상: 눈금의 유효 폭과 동일하게 좌우 8px 안쪽에 배치해 끝점 오차 방지 */
+  .battery-slider{appearance:none;-webkit-appearance:none;width:100%;height:10px;border-radius:99px;outline:none;margin:0;background-color:transparent;background-image:linear-gradient(to right,#50545c 0%,#50545c 10%,#ff4d4d 10%,#ff4d4d 30%,#ffd43b 30%,#ffd43b 40%,#39c879 40%,#39c879 90%,#ffd43b 90%,#ffd43b 100%);background-size:calc(100% - 16px) 100%;background-position:center center;background-repeat:no-repeat;padding:0;border:0;cursor:pointer;box-sizing:border-box;display:block}
+  .battery-slider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#a3ff52;border:2px solid #202328;box-shadow:0 0 0 1px #a3ff52}
+  .battery-slider::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#a3ff52;border:2px solid #202328;box-shadow:0 0 0 1px #a3ff52}
   
-  /* 절대 좌표 기반 정밀 눈금 컨테이너 */
-  .slider-scale-abs{position:relative;height:30px;margin:6px 11px 0 11px;box-sizing:border-box}
-  .slider-mark-abs{position:absolute;top:0;transform:translateX(-50%);text-align:center;color:#aeb3bc;font-size:11px;line-height:1.35;white-space:nowrap}
+  /* 눈금 라벨은 지그재그 2단 배치, 빗금은 슬라이더 트랙 바로 위에 고정 */
+  .slider-scale-abs{position:relative;height:68px;margin:0 8px 0;box-sizing:border-box}
+  .slider-mark-abs{position:absolute;top:0;height:100%;transform:translateX(-50%);text-align:center;color:#aeb3bc;font-size:13px;line-height:1.1;white-space:nowrap}
   .slider-mark-abs:first-child{transform:translateX(0);text-align:left}
   .slider-mark-abs:last-child{transform:translateX(-100%);text-align:right}
-  
-  .slider-mark-abs:before{content:"";display:block;width:1px;height:7px;background:#888;margin:0 auto 4px}
-  .slider-mark-abs:first-child:before{margin-left:0;margin-right:auto}
-  .slider-mark-abs:last-child:before{margin-left:auto;margin-right:0}
+  .slider-mark-abs .mark-label{position:absolute;top:0;left:50%;transform:translateX(-50%);display:block;text-align:center;line-height:1.1;font-weight:bold}
+  .slider-mark-abs.mark-row-low .mark-label{top:21px}
+  .slider-mark-abs:first-child .mark-label{left:0;transform:none;text-align:left}
+  .slider-mark-abs:last-child .mark-label{left:auto;right:0;transform:none;text-align:right}
+  .slider-mark-abs:before{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);display:block;width:2px;height:10px;background:#888}
+  .slider-mark-abs.mark-tick-long:before{height:24px}
+  .slider-mark-abs:first-child:before{left:0;transform:none}
+  .slider-mark-abs:last-child:before{left:auto;right:0;transform:none}
+  .slider-mark-abs.mark-red{color:#ff7777;font-weight:bold}
+  .slider-mark-abs.mark-red:before{background:#ff5252}
+  .slider-mark-abs.mark-yellow{color:#ffdf66;font-weight:bold}
+  .slider-mark-abs.mark-yellow:before{background:#ffd43b}
+  .slider-mark-abs.mark-green{color:#70e5a4;font-weight:bold}
+  .slider-mark-abs.mark-green:before{background:#39c879}
+  .slider-mark-abs .mark-voltage{display:block;margin-top:2px;font-size:12px;color:#e0e4eb;white-space:nowrap;font-weight:normal}
+  .slider-mark-abs.mark-30:before{width:3px;background:#ffd843}
+  .slider-mark-abs.mark-90:before{width:3px;background:#70e5a4}
 
-  .slider-mark-abs .mark-voltage{display:block;font-size:10px;color:#d5d8de;white-space:nowrap}
-  .slider-mark-abs.mark-30{color:#ffd843;font-weight:bold}
-  .slider-mark-abs.mark-30:before{width:2px;background:#ffd843}
-  .slider-mark-abs.mark-90{color:#70e5a4;font-weight:bold}
-  .slider-mark-abs.mark-90:before{width:2px;background:#70e5a4}
-
-  /* 모바일 좁은 화면 눈금 최적화 */
+  /* 모바일에서도 두 줄 라벨과 빗금이 겹치지 않도록 조정 */
   @media(max-width:480px){
     .slider-panel{padding:12px 10px}
-    .slider-scale-abs{font-size:9px}
-    .slider-mark-abs{font-size:9px}
-    .slider-mark-abs .mark-voltage{font-size:8px;transform:scale(0.9);letter-spacing:-.4px}
+    .slider-scale-abs{height:62px;margin-left:8px;margin-right:8px;margin-bottom:0}
+    .slider-mark-abs{font-size:11px}
+    .slider-mark-abs.mark-row-low .mark-label{top:20px}
+    .slider-mark-abs .mark-voltage{font-size:10px;letter-spacing:-.2px}
+    .slider-mark-abs:before{height:11px}
+    .slider-mark-abs.mark-tick-long:before{height:18px}
     .slider-heading{font-size:12px}
-    .slider-heading strong{font-size:20px}
+    .slider-heading strong{font-size:23px}
   }
 
   .settings-btn{max-width:520px;margin:14px auto 0;display:block;background:#4a4d54;font-size:15px;padding:11px}
@@ -120,11 +131,37 @@
   .bright-yellow{color:#ffd843}
   .bright-red{color:#ff5252}
 
-  table{width:100%;border-collapse:collapse;margin-top:12px;word-break:keep-all}
-  th,td{border-bottom:1px solid #444;padding:9px 6px;text-align:center;word-break:keep-all}
-  th{color:#bbb;font-size:12px}
-  td{font-size:13.5px}
+  table{width:100%;border-collapse:collapse;margin-top:5px;table-layout:fixed;word-break:keep-all}
+  th,td{border-bottom:1px solid #444;padding:3px 1px;text-align:center;word-break:keep-all;overflow-wrap:anywhere}
+  th{color:#bbb;font-size:11px;line-height:1.2}
+  td{font-size:12px;line-height:1.2}
+  .ref-table th:nth-child(1),.ref-table td:nth-child(1){width:8%}
+  .ref-table th:nth-child(2),.ref-table td:nth-child(2){width:9%}
+  .ref-table th:nth-child(3),.ref-table td:nth-child(3){width:14%}
+  .ref-table th:nth-child(4),.ref-table td:nth-child(4){width:14%}
+  .ref-table th:nth-child(5),.ref-table td:nth-child(5){width:14%}
+  .ref-table th:nth-child(6),.ref-table td:nth-child(6){width:41%}
   .note{color:#aaa;font-size:12.5px;line-height:1.5;margin-top:12px;word-break:keep-all}
+  /* 모바일: 기준표를 읽기 쉬운 2열 카드로 변환해 잘림/압축 방지 */
+  @media(max-width:600px){
+    .ref-table{display:block;width:100%;margin-top:5px;border-collapse:separate;border-spacing:0}
+    .ref-table thead{display:none}
+    .ref-table tbody{display:block;width:100%;min-width:0}
+    .ref-table tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;margin:0 0 8px;border:1px solid #41444b;border-radius:8px;overflow:hidden;background:#24262b}
+    .ref-table th,.ref-table td{width:auto!important;min-width:0;max-width:100%;box-sizing:border-box}
+    .ref-table td{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:42px;padding:6px 5px;font-size:12px;line-height:1.25;border:0;border-right:1px solid #363940;border-bottom:1px solid #363940;text-align:center;white-space:normal;overflow-wrap:anywhere;word-break:normal}
+    .ref-table td:nth-child(odd){border-right:1px solid #363940}
+    .ref-table td::before{content:attr(data-label);display:block;width:100%;color:#aeb4bf;font-size:10px;font-weight:normal;line-height:1.2;margin-bottom:3px;white-space:normal;overflow-wrap:anywhere}
+    .ref-table td:nth-child(6){grid-column:1/-1;display:block;min-height:0;text-align:left;padding:7px 9px;background:#202226;border:0;border-top:1px solid #3d4047;font-size:11.5px;line-height:1.4;overflow-wrap:anywhere}
+    .ref-table td:nth-child(6)::before{display:inline-block;width:auto;margin:0 6px 0 0;color:#ffd843;font-weight:bold;font-size:10px}
+    .ref-table tr.row-start td,.ref-table tr.row-end td{border-top:0;border-bottom:1px solid #363940}
+    .ref-table tr.row-start td{background:#383428}
+    .ref-table tr.row-end td{background:#2a362f}
+    .ref-table tr.row-now-detail{border:2px solid #0284c7;background:#0f2942}
+    .ref-table tr.row-now-detail td{padding:7px 5px!important;background:#0f2942!important;color:#a3ff52!important;border:0!important;border-right:1px solid #24506c!important;border-bottom:1px solid #24506c!important;font-size:12px}
+    .ref-table tr.row-now-detail td::before{color:#c5d7e7}
+    .ref-table tr.row-now-detail td:nth-child(6){padding:7px 9px!important;border-top:1px solid #24506c!important;border-right:0!important}
+  }
   
   .ref-table tr.row-start td{background:#383428;font-weight:bold;border-top:1px solid #82734d;border-bottom:1px solid #82734d}
   .ref-table tr.row-end td{background:#2a362f;font-weight:bold;border-top:1px solid #4d735b;border-bottom:1px solid #4d735b}
@@ -164,10 +201,10 @@
 
     <!-- 잔량 슬라이더 패널 (하단 상태표시줄 포함) -->
     <div class="slider-panel">
-      <div class="slider-heading"><span>🎚️ 잔량 슬라이드 입력</span><strong id="sliderReadout">50% · 64.0V</strong></div>
+      <div class="slider-heading"><strong id="sliderReadout">50% = 64.0V</strong></div>
       <div class="slider-wrapper">
-        <input id="socSlider" class="battery-slider" type="range" min="0" max="100" step="1" value="50" aria-label="배터리 잔량 슬라이더" onfocus="this.blur();">
         <div id="sliderScale" class="slider-scale-abs" aria-hidden="true"></div>
+        <input id="socSlider" class="battery-slider" type="range" min="0" max="100" step="1" value="50" aria-label="배터리 잔량 슬라이더" onfocus="this.blur();">
       </div>
       <!-- 상태표시줄 (충전 시간과 비고 사이 빈칸 공백 확보) -->
       <div id="message" class="warn"></div>
@@ -331,6 +368,20 @@ function toggleSettings(){
   el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
 }
 
+function getSocTone(soc){
+  if (soc <= 30) return "#ff6464";
+  if (soc <= 40) return "#ffad5c";
+  if (soc <= 60) return "#ffe16a";
+  return "#a3ff52";
+}
+
+function getVoltageTone(soc){
+  if (soc <= 30) return "#ff6464";
+  if (soc <= 40) return "#ffad5c";
+  if (soc <= 60) return "#ffe16a";
+  return "#60caff";
+}
+
 function buildRef(currentV, currentSoc, h80, h90, h100, ah, amp){
   const ref = document.getElementById('ref');
   ref.innerHTML = "";
@@ -345,12 +396,12 @@ function buildRef(currentV, currentSoc, h80, h90, h100, ah, amp){
     let rowClass = (s === 30 ? "row-start" : (s === 90 ? "row-end" : ""));
 
     ref.innerHTML += `<tr class="${rowClass}">
-      <td>${s}%</td>
-      <td>${v.toFixed(1)}V</td>
-      <td>${cc}</td>
-      <td>${cv1}</td>
-      <td>${cv2}</td>
-      <td>${note}</td>
+      <td data-label="잔량" style="color:${getSocTone(s)}!important;font-weight:700">${s}%</td>
+      <td data-label="전압" style="color:${getVoltageTone(s)}!important;font-weight:700">${v.toFixed(1)}V</td>
+      <td data-label="CC 80%">${cc}</td>
+      <td data-label="CV1 90%">${cv1}</td>
+      <td data-label="CV2 100%">${cv2}</td>
+      <td data-label="비고">${note}</td>
     </tr>`;
   });
 
@@ -366,12 +417,12 @@ function renderNowRow(currentV, currentSoc, h80, h90, h100) {
   let cv2Txt = currentSoc >= 100 ? "완료" : fmtTime(h100);
 
   return `<tr class="row-now-detail">
-    <td>약 ${roundedSoc}%</td>
-    <td>${currentV.toFixed(1)}V</td>
-    <td>${ccTxt}</td>
-    <td>${cv1Txt}</td>
-    <td>${cv2Txt}</td>
-    <td>📍 현재 실시간 측정 위치</td>
+    <td data-label="잔량" style="color:${getSocTone(roundedSoc)}!important;font-weight:800">약 ${roundedSoc}%</td>
+    <td data-label="전압" style="color:${getVoltageTone(roundedSoc)}!important;font-weight:800">${currentV.toFixed(1)}V</td>
+    <td data-label="CC 80%">${ccTxt}</td>
+    <td data-label="CV1 90%">${cv1Txt}</td>
+    <td data-label="CV2 100%">${cv2Txt}</td>
+    <td data-label="비고">📍 현재 실시간 측정 위치</td>
   </tr>`;
 }
 
@@ -388,15 +439,21 @@ function voltageFromSoc(soc){
 function buildSliderScale(){
   const scale = document.getElementById('sliderScale');
   scale.innerHTML = points.map(([soc, voltage]) => {
-    const cls = soc === 30 ? 'slider-mark-abs mark-30' : (soc === 90 ? 'slider-mark-abs mark-90' : 'slider-mark-abs');
-    return `<div class="${cls}" style="left: ${soc}%;"><span>${soc}%</span><span class="mark-voltage">${voltage.toFixed(1)}V</span></div>`;
+    let zone = '';
+    if (soc >= 10 && soc < 30) zone = ' mark-red';
+    else if (soc >= 30 && soc < 40 || soc === 100) zone = ' mark-yellow';
+    else if (soc >= 40 && soc <= 90) zone = ' mark-green';
+    const cls = 'slider-mark-abs' + zone + (soc === 30 ? ' mark-30' : '') + (soc === 90 ? ' mark-90' : '');
+    const row = (Math.round(soc / 10) % 2 === 1) ? ' mark-row-low' : '';
+    const tick = (Math.round(soc / 10) % 2 === 0) ? ' mark-tick-long' : '';
+    return `<div class="${cls}${row}${tick}" style="left:${soc}%;"><span class="mark-label">${soc}%<span class="mark-voltage">${voltage.toFixed(1)}V</span></span></div>`;
   }).join('');
 }
 
 function syncSliderFromVoltage(v){
   const soc = Math.max(0,Math.min(100,socFromV(v)));
   document.getElementById('socSlider').value = String(Math.round(soc));
-  document.getElementById('sliderReadout').textContent = `${Math.round(soc)}% · ${v.toFixed(1)}V`;
+  document.getElementById('sliderReadout').textContent = `${Math.round(soc)}% = ${v.toFixed(1)}V`;
 }
 
 function calculate(){
@@ -471,7 +528,7 @@ document.getElementById('socSlider').addEventListener('input', e => {
   const soc = Number(e.target.value);
   const v = voltageFromSoc(soc);
   document.getElementById('voltage').value = v.toFixed(1);
-  document.getElementById('sliderReadout').textContent = `${soc}% · ${v.toFixed(1)}V`;
+  document.getElementById('sliderReadout').textContent = `${soc}% = ${v.toFixed(1)}V`;
   calculate();
 });
 
