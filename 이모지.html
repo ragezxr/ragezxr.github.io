@@ -37005,21 +37005,35 @@ function enableCategoryRailDrag(container) {
 }
 filterContainers.forEach(enableCategoryRailDrag);
 const LAST_CATEGORY_STORAGE_KEY = 'emojiExplorerLastCategory_v3';
-let activeCategory = '전체';
-// 매번 최근 복사 항목에서 시작합니다. 카테고리 탐색은 사용자가 분류 버튼이나 검색을 누를 때 시작합니다.
-let recentOnlyView = true;
+const LAST_SUBCATEGORY_STORAGE_KEY = 'emojiExplorerLastSubcategory_v1';
+const validCategoryNames = new Set(['전체', ...sections.map((section) => section.dataset.section)]);
+let savedCategory = null;
+let savedSubcategory = '전체';
+try {
+  const storedCategory = localStorage.getItem(LAST_CATEGORY_STORAGE_KEY);
+  if (storedCategory && validCategoryNames.has(storedCategory)) savedCategory = storedCategory;
+  savedSubcategory = localStorage.getItem(LAST_SUBCATEGORY_STORAGE_KEY) || '전체';
+} catch (error) {}
+// 이전 실행에서 분류 선택값이 저장되어 있으면 해당 분류로 복귀합니다.
+// 저장된 분류가 한 번도 없을 때만 최근 복사 항목을 첫 화면으로 표시합니다.
+let activeCategory = savedCategory || '전체';
+let recentOnlyView = savedCategory === null;
+if (!recentOnlyView) document.documentElement.classList.remove('recent-startup');
 function showCategoryResults() {
   if (!recentOnlyView) return;
   recentOnlyView = false;
   document.documentElement.classList.remove('recent-startup');
 }
 function saveActiveCategory() {
-  try { localStorage.setItem(LAST_CATEGORY_STORAGE_KEY, activeCategory); } catch (error) {}
+  try {
+    localStorage.setItem(LAST_CATEGORY_STORAGE_KEY, activeCategory);
+    localStorage.setItem(LAST_SUBCATEGORY_STORAGE_KEY, activeSubcategory);
+  } catch (error) {}
 }
 
 const subcategoryArea = document.getElementById('subcategoryArea');
 const subcategoryChips = document.getElementById('subcategoryChips');
-let activeSubcategory = '전체';
+let activeSubcategory = savedSubcategory;
 
 // 각 상위 분류에 맞춘 세부 분류 규칙. 영문 이모지 이름으로 분류해 변형 이름도 함께 탐색합니다.
 const SUBCATEGORY_RULES = {
@@ -37391,6 +37405,7 @@ document.addEventListener('click', (event) => {
   const chip = event.target.closest('.subcategory-chip');
   if (!chip) return;
   activeSubcategory = chip.dataset.subcategoryFilter || '전체';
+  saveActiveCategory();
   document.querySelectorAll('.subcategory-chip').forEach((item) => {
     const active = item.dataset.subcategoryFilter === activeSubcategory;
     item.classList.toggle('active', active);
@@ -38383,6 +38398,13 @@ function warmSearchIndexInBackground() {
 }
 renderRecent();
 renderSubcategoryFilters(activeCategory);
+// 복원된 세부 분류가 현재 상위 분류에 없으면 '전체'로 안전하게 되돌립니다.
+if (activeSubcategory !== '전체' && !Array.from(subcategoryChips.querySelectorAll('.subcategory-chip')).some((chip) => chip.dataset.subcategoryFilter === activeSubcategory)) activeSubcategory = '전체';
+subcategoryChips.querySelectorAll('.subcategory-chip').forEach((chip) => {
+  const active = chip.dataset.subcategoryFilter === activeSubcategory;
+  chip.classList.toggle('active', active);
+  chip.setAttribute('aria-pressed', String(active));
+});
 applyFilters();
 // 초기 최근 복사 화면을 먼저 표시한 뒤, 분류 카드와 검색 인덱스를 백그라운드에서 미리 준비합니다.
 scheduleBackgroundPreload();
