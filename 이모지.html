@@ -783,6 +783,24 @@ body { background-image:radial-gradient(ellipse at top, #101722 0%, #07090d 48re
 .close-popup { background:#1a2533 !important; }
 .toast { background:#111d2b !important; border-color:#344b66 !important; }
 footer { color:#737f90 !important; }
+
+/* Unicode 18.0 세부 분류 제목: 전체 보기에서 각 하위 그룹을 구분 */
+.subcategory-divider { grid-column:1 / -1; display:flex; align-items:center; gap:10px; min-width:0; margin:10px 0 1px; padding:9px 11px; border:1px solid #303a49; border-left:3px solid #6685ad; border-radius:9px; background:linear-gradient(90deg,#121821,#0b0f15); color:#e4edf9; font-size:.83rem; font-weight:800; line-height:1.25; }
+.subcategory-divider::after { content:""; flex:1; height:1px; min-width:8px; background:#293342; }
+.subcategory-divider[hidden] { display:none !important; }
+.subcategory-divider-title { white-space:normal; overflow-wrap:anywhere; }
+.subcategory-divider-count { color:#8d9eb4; font-size:.7rem; font-weight:650; white-space:nowrap; }
+@media(max-width:560px) { .subcategory-divider { margin:7px 0 0; padding:7px 8px; border-radius:8px; font-size:.77rem; gap:7px; } .subcategory-divider-count { font-size:.65rem; } }
+
+/* 선택한 세부 분류: 칩 글자색 초록 + 첫 줄로 이동한 그룹 제목 초록(가는 초록 외곽선) */
+.subcategory-area .subcategory-chip.active,
+.subcategory-area .subcategory-chip.active .subcategory-icon { color:#5fe08f !important; }
+.subcategory-area .subcategory-chip.active span:not(.subcategory-icon) { color:#8ceeb0 !important; }
+.subcategory-area .subcategory-chip.active { border-color:#3fae68 !important; }
+.subcategory-divider.is-selected { border:1px solid #3fcf74 !important; border-radius:9px; color:#5fe08f !important; }
+.subcategory-divider.is-selected .subcategory-divider-title { color:#5fe08f !important; }
+.subcategory-divider.is-selected .subcategory-divider-count { color:#8ceeb0 !important; }
+.subcategory-divider.is-selected::after { background:#2c6b46; }
 </style>
 
 </head>
@@ -36924,15 +36942,13 @@ function runBackgroundPreload(deadline) {
       backgroundPreloadQueue.shift();
       continue;
     }
-    const fragment = document.createDocumentFragment();
-    while (job.template.content.firstElementChild) {
-      fragment.appendChild(job.template.content.firstElementChild);
-    }
+    const fragment = buildCategoryGridFragment(job.section, job.template);
     if (fragment.childNodes.length) job.grid.appendChild(fragment);
     job.template.remove();
     emojiTemplates.delete(job.section);
     backgroundPreloadQueue.shift();
     sectionsLoaded += 1;
+    if (!recentOnlyView) applyFilters();
     if (deadline && !deadline.didTimeout && deadline.timeRemaining() < 1) break;
   }
   if (backgroundPreloadQueue.length) {
@@ -37005,7 +37021,7 @@ function enableCategoryRailDrag(container) {
 }
 filterContainers.forEach(enableCategoryRailDrag);
 const LAST_CATEGORY_STORAGE_KEY = 'emojiExplorerLastCategory_v3';
-const LAST_SUBCATEGORY_STORAGE_KEY = 'emojiExplorerLastSubcategory_v1';
+const LAST_SUBCATEGORY_STORAGE_KEY = 'emojiExplorerLastSubcategory_v3';
 const validCategoryNames = new Set(['전체', ...sections.map((section) => section.dataset.section)]);
 let savedCategory = null;
 let savedSubcategory = '전체';
@@ -37035,150 +37051,224 @@ const subcategoryArea = document.getElementById('subcategoryArea');
 const subcategoryChips = document.getElementById('subcategoryChips');
 let activeSubcategory = savedSubcategory;
 
-// 각 상위 분류에 맞춘 세부 분류 규칙. 영문 이모지 이름으로 분류해 변형 이름도 함께 탐색합니다.
+// Unicode Emoji 18.0 공식 그룹·서브그룹의 순서와 명칭을 기준으로 세부 분류합니다.
+// 사용자 친화적인 한글 상위 분류는 유지하되, 세부 항목의 구분·순서는 표준 그룹 체계를 따릅니다.
 const SUBCATEGORY_RULES = {
   '스마일·감정': [
-    { label:'기쁨·웃음', icon:'😁', re:/grin|smil|laugh|joy|blush|wink|relieved|smirk|beam|satisfied|upside down|star.?struck|sunglasses|nerd face|grinning|squinting|tears of joy/i },
-    { label:'슬픔·눈물', icon:'🥹', re:/sad|cry|sob|tear|disappoint|pensive|frown|broken heart|pleading|weary|anguish/i },
-    { label:'화남·불만', icon:'🤬', re:/anger|angry|rage|mad|pout|cursing|steam from nose|middle finger/i },
-    { label:'놀람·두려움', icon:'😨', re:/astonish|surpris|fear|scared|scream|shock|cold sweat|flushed|open mouth|dizzy|exploding head|shaking face/i },
-    { label:'사랑·하트·커플', icon:'💑', re:/heart|love|kiss|couple|romance|affection|in love/i },
-    { label:'말풍선·대화', icon:'🗨️', re:/speech bubble|thought bubble|anger right|anger left|left speech|right anger|balloon|dialog/i },
-    { label:'아픔·피곤·몸 상태', icon:'🤧', re:/sick|nausea|vomit|sneeze|hot face|cold face|sleep|tired|drooling|mask|thermometer|yawning|dizzy face/i },
-    { label:'기타 표정', icon:'🎭', re:/face|expression|ghost|skull|pile of poo|robot|alien/i }
+    {label:'웃는 얼굴',icon:'😁',re:/grinning|smil|laugh|joy|blush|wink|relieved|relaxed|smirk|beam|satisfied|upside down|star.struck|squinting|tears of joy|grin|rofl|lol|rolling on the floor|triumph/i},
+    {label:'애정·사랑 표현',icon:'🥰',re:/heart eyes|smiling face with hearts|love|kiss|couple|romantic|in love|heart with|two hearts|revolving hearts|broken heart|beating heart|growing heart|sparkling heart|hugging|cupid|innocent/i},
+    {label:'혀 내밀기·장난',icon:'😛',re:/tongue|savoring food|money mouth|zany|squinting face with tongue|yum/i},
+    {label:'손짓·생각하는 얼굴',icon:'🤔',re:/thinking|facepalm|face palm|shushing|hand over mouth|saluting face/i},
+    {label:'무표정·의심',icon:'😐',re:/neutral|expressionless|without mouth|no mouth|grimacing|lying|rolling eyes|unamused|raised eyebrow|dotted line face|straight face|zipper mouth/i},
+    {label:'졸림·수면',icon:'😴',re:/sleep|sleepy|yawn|tired|zzz/i},
+    {label:'아픔·몸 상태',icon:'🤒',re:/sick|nausea|vomit|sneeze|hot face|cold face|mask|thermometer|dizzy face|woozy|head bandage|medical mask|fever|face exhaling|drooling face|sneezing face|cracking face/i},
+    {label:'모자·파티 얼굴',icon:'🤠',re:/cowboy|partying face|party face|face with party|disguise|hat face/i},
+    {label:'안경 쓴 얼굴',icon:'🤓',re:/nerd face|sunglasses|smiling face with sunglasses|face with monocle|^nerd$|^hushed$|^no mouth$|^face with spiral eyes$|^face in clouds$|^face exhaling$|^drooling face$|^sneezing face$|^face with symbols over mouth$|^cracking face$/i},
+    {label:'걱정·놀람·두려움',icon:'😨',re:/astonish|surpris|fear|scared|scream|shock|cold sweat|flushed|open mouth|exploding head|shaking face|concern|worried|anxious|pleading|sweat|grimace|dizzy|hushed|face with spiral eyes|face in clouds/i},
+    {label:'슬픔·화남·부정적 감정',icon:'😢',re:/sad|cry|sob|tear|disappoint|pensive|frown|weary|anguish|anger|angry|rage|pout|cursing|steam from nose|persevere|confounded|confused|frowning|face with symbols over mouth/i},
+    {label:'괴물·분장 얼굴',icon:'👻',re:/ghost|skull|pile of poo|robot|alien|ogre|goblin|monster|vampire|zombie|jack.o.lantern|imp|devil|japanese ogre|japanese goblin|clown|poop|space invader|distorted face/i},
+    {label:'고양이 얼굴',icon:'😺',re:/cat face|grinning cat|smiley cat|cat with|kissing cat|weary cat|crying cat|pouting cat|heart eyes cat/i},
+    {label:'원숭이 얼굴',icon:'🙈',re:/monkey face|see no evil|hear no evil|speak no evil|monkey/i},
+    {label:'감정·말풍선 기호',icon:'💢',re:/heart|anger symbol|collision|sweat droplets|dashing away|speech bubble|thought bubble|speech balloon|thought balloon|speaking head|anger right|anger left|left speech|speech left|right anger|fight cloud|bomb|boom|dash|hole|^100$|^innocent$/i}
   ],
   '사람·신체': [
-    { label:'피부색 조합', icon:'🖐️', re:/\(skin tone \d+\)/i },
-    { label:'신체·장기', icon:'🧠', re:/anatomical heart|brain|bone|lung|tooth|eye|ear|nose|mouth|tongue|foot|leg|arm|lips|bust|body|muscle|mechanical arm|mechanical leg|lungs|biting lip/i },
-    { label:'손·손가락·몸짓', icon:'🤌', re:/hand|finger|fist|wave|clap|thumb|palm|nail|raised hand|handshake|crossed fingers|pinched|call me|vulcan|ok hand|backhand|writing hand|sign of the horns|middle finger|index pointing|selfie/i },
-    { label:'직업·역할', icon:'🧑‍💼', re:/doctor|health worker|judge|teacher|student|artist|astronaut|firefighter|pilot|farmer|mechanic|scientist|technologist|office worker|construction worker|police|detective|cook|chef|singer|factory worker|safety vest|superhero|supervillain|mage|wizard|fairy|vampire|merperson|elf|genie|zombie|guard|prince|princess|king|queen|clown|person in suit|person with veil|person wearing turban|person with skullcap|person with crown|person with white cane|person with probing cane/i },
-    { label:'가족·연인·관계', icon:'🫂', re:/family|couple|kiss|holding hands|pregnant|breast.feed|baby|child|boy|girl|man and woman|two men|two women|people holding hands|people with bunny ears|people wrestling|people holding hands/i },
-    { label:'동작·운동·자세', icon:'🧘', re:/walking|running|dancing|swimming|climbing|kneeling|standing|lifting|cartwheel|juggling|surfing|skiing|biking|rowing|meditation|yoga|person playing|playing|bowing|shrugging|facepalming|gesturing|tipping hand|saluting|getting massage|getting haircut|person in lotus|person bouncing|person doing|person golfing|person fencing|person lifting|person mountain biking|person running|person walking/i },
-    { label:'보조기기·접근성', icon:'🦽', re:/wheelchair|prosthetic|hearing aid|white cane|mobility scooter|accessibility|motorized wheelchair|manual wheelchair/i },
-    { label:'머리·외모', icon:'🦱', re:/hair|bald|person with|wearing turban|headscarf|veil|red hair|curly hair|white hair/i },
-    { label:'인물·얼굴', icon:'🧑‍🤝‍🧑', re:/person|people|adult|man|woman|child|boy|girl|baby|older|youth|bust|bouncing ball|face/i }
+    {label:'손가락을 편 손',icon:'🖐️',re:/open hand|raised hand|waving hand|^wave$|hand with fingers splayed|hand splayed|splayed hand|raised back of hand|vulcan salute|back of hand/i},
+    {label:'손가락 부분 동작',icon:'🤌',re:/pinch|pinched|crossed fingers|love.you gesture|sign of the horns|call me hand|hand with index finger and thumb crossed|finger.*(cross|splayed)|^v$|ok hand|metal|vulcan|^call me$|leftwards thumb sign|rightwards thumb sign/i},
+    {label:'한 손가락·방향 지시',icon:'👆',re:/index pointing|point(?:ing)? (up|down|left|right)|point up 2|middle finger|backhand index|index finger|pointed finger/i},
+    {label:'주먹·엄지 손짓',icon:'✊',re:/fist|punch|thumbsup|thumbsdown|thumbs up|thumbs down|thumb up|thumb down|oncoming fist|left.facing fist|right.facing fist|raised fist/i},
+    {label:'양손·손짓',icon:'👏',re:/clap|clapping hands|folded hands|open hands|raising hands|handshake|palms up together|palms together|heart hands|hands.*(raised|open|clap|fold|pray)|holding hands|^pray$/i},
+    {label:'손 도구 사용',icon:'✍️',re:/writing hand|hand with.*(pencil|pen|brush)|nail polish|^nail care$/i},
+    {label:'신체 부위',icon:'🧠',re:/anatomical heart|brain|bone|lung|tooth|eyes?$|ears?(?: with hearing aid)?$|nose$|mouth$|tongue$|foot|leg|arm|lips|body|muscle|mechanical arm|mechanical leg|lungs|biting lip|heart anatomy|drop of blood|joint|kidney|footprints|ear with hearing aid/i},
+    {label:'인물·외모·머리',icon:'🧑',re:/^(?:adult|person|man|woman|child|boy|girl|baby|older person|older man|older woman|pregnant person|person with blond hair|person with red hair|person with curly hair|person with white hair|person with afro|person: bald|person bald|man: bald|woman: bald|bald person|woman with red hair|man with red hair|man red haired|woman red haired|man curly haired|woman curly haired|man white haired|woman white haired|man bald|woman bald|blond-haired person|blond haired person|blond-haired woman|blond-haired man|blond haired woman|blond haired man|person red hair|person curly hair|person white hair|older adult|older person|older man|older woman|bearded person|woman beard|man beard|woman with headscarf|deaf person|deaf woman|deaf man|boy|girl|man|woman|baby|person|person in manual wheelchair|person in motorized wheelchair)$/i},
+    {label:'사람 동작·몸짓',icon:'🙋',re:/^(?:dancer|levitate|person raising hand|woman raising hand|man raising hand|person frowning|woman frowning|man frowning|person pouting|woman pouting|man pouting|person facepalming|woman facepalming|man facepalming|person shrugging|woman shrugging|man shrugging)$|bowing|shrugging|facepalming|gesturing|tipping hand|saluting|handshake|call me hand|person gesturing|person bowing|person raising hand|person frowning|person pouting|person facepalming|person shrugging|person tipping hand/i},
+    {label:'직업·역할',icon:'🧑‍💼',re:/doctor|health worker|judge|teacher|student|artist|astronaut|firefighter|pilot|farmer|mechanic|scientist|technologist|office worker|construction worker|police|detective|cook|chef|singer|factory worker|safety vest|guard|prince|princess|king|queen|clown|person in suit|person with veil|woman with veil|man with veil|women with veil|man with chinese cap|woman wearing turban|man wearing turban|person wearing turban|person with skullcap|person with crown|person in tuxedo|woman in tuxedo|man in tuxedo|person with white cane|person with probing cane|person wearing|person with headscarf|ear with hearing aid|deaf person|deaf woman|deaf man|woman with headscarf/i},
+    {label:'판타지·상상 속 인물',icon:'🧚',re:/superhero|supervillain|mage|wizard|fairy|vampire|merperson|elf|genie|zombie|ogre|goblin|troll|ghost|angel|devil|santa claus|mx claus|mrs claus|^santa$|santa|ninja|mermaid|merman|merperson|hairy creature|person with crown|fantasy/i},
+    {label:'사람 활동·이동',icon:'🚶',re:/person.*(walking|running|dancing|swimming|climbing|kneeling|standing|meditating|in lotus|doing cartwheel|juggling|steaming room|in bed|taking bath|getting massage|getting haircut|with white cane|with probing cane|in motorized wheelchair|in manual wheelchair|using wheelchair|using cane|with mobility scooter)|walking|running|dancing|swimming|climbing|meditation|yoga|cartwheel|juggling|steaming room|bath|getting haircut|wheelchair|white cane|probing cane|mobility scooter|accessibility|person in bed|person taking bath|women with bunny ears partying|men with bunny ears partying|standing|kneeling|lotus position|steamy room|get.*massage|face massage/i},
+    {label:'스포츠·운동하는 사람',icon:'🏃',re:/person playing|person golfing|person fencing|person lifting|person mountain biking|person bouncing ball|person surfing|person swimming|person rowing|person cycling|person biking|person skiing|person snowboarding|skier|snowboarder|weightlifter|golfer|surfer|swimmer|rower|cyclist|bicyclist|juggler|gymnast|handball|water polo|basketball|soccer|volleyball|badminton|tennis|cricket|horse racing|fencing|wrestling|woman bouncing ball|man bouncing ball|woman surfing|man surfing|woman golfing|man golfing|woman playing|man playing|person playing|person with ball|person with racket|lifting weights|weight lifting|rowing boat|rowing|^weightlifter$|^weight lifter$/i},
+    {label:'쉬기·휴식',icon:'🧘',re:/person in bed|person taking bath|person in lotus position|person meditating|sleeping accommodation|person resting/i},
+    {label:'가족·관계',icon:'👨‍👩‍👧',re:/family|couple|people holding hands|people with bunny ears|people wrestling|holding hands|man and woman|two men|two women|breast.feed|pregnant|kiss|people with|person feeding baby|man feeding baby|woman feeding baby|feeding baby|kiss man man|kiss woman man|kiss woman woman|people hugging/i},
+    {label:'사람 기호·실루엣',icon:'🗣️',re:/bust in silhouette|busts in silhouette|speaking head|footprints|person silhouette|people silhouette/i}
   ],
   '동물·자연': [
-    { label:'곤충·작은 생물', icon:'🐞', re:/ant|bee|beetle|bug|butterfly|caterpillar|cockroach|cricket|fly|mosquito|spider|scorpion|worm|snail|moth|lady beetle|dragonfly|centipede|mite|locust/i },
-    { label:'새·날개 동물', icon:'🦜', re:/bird|chicken|duck|eagle|owl|parrot|penguin|flamingo|swan|turkey|crow|dove|goose|hatching chick|nest|feather|peacock|bat|phoenix/i },
-    { label:'물속·바다 생물', icon:'🪼', re:/fish|whale|dolphin|seal|shark|octopus|squid|crab|lobster|shrimp|shell|coral|jellyfish|blowfish|spouting whale|oyster|tropical fish|water buffalo/i },
-    { label:'반려·가축 동물', icon:'🐕', re:/cat|dog|hamster|rabbit|mouse|rat|guinea pig|parrot|paw|poodle|guide dog|service dog|pig|cow|horse|sheep|goat|donkey|rooster|ox|buffalo/i },
-    { label:'야생·육지 동물', icon:'🐘', re:/bear|bison|boar|camel|deer|elephant|fox|giraffe|gorilla|hippopotamus|kangaroo|koala|leopard|lion|llama|monkey|moose|orangutan|otter|panda|raccoon|rhinoceros|sloth|tiger|wolf|zebra|badger|beaver|bunny|hedgehog|skunk|raccoon|dinosaur|t.rex|dragon|lizard|snake|turtle|crocodile|frog|newt|unicorn/i },
-    { label:'꽃·나무·식물', icon:'🌱', re:/flower|blossom|bouquet|cherry|rose|tulip|sunflower|hibiscus|wilted|tree|leaf|herb|seedling|potted|cactus|mushroom|four leaf|maple leaf|fallen leaf|evergreen|deciduous|sheaf|rice plant|plant|lotus|rosette/i },
-    { label:'날씨·하늘', icon:'🌈', re:/sun|cloud|rain|snow|storm|tornado|wind|moon|star|rainbow|lightning|fog|thermometer|fire|droplet|comet|shooting star|sunrise|sunset|weather|cyclone/i },
-    { label:'풍경·자연물', icon:'🏔️', re:/mountain|volcano|island|desert|rock|wood|forest|landscape|water wave|ocean|earth|beach|park|globe|wave|river|lake/i }
+    {label:'포유류',icon:'🐘',re:/bear|bison|boar|camel|cat|dog|hamster|rabbit|mouse|rat|guinea pig|poodle|paw|pig|cow|horse|sheep|goat|donkey|rooster|ox|buffalo|deer|elephant|fox|giraffe|gorilla|hippopotamus|kangaroo|koala|leopard|lion|llama|monkey|moose|orangutan|otter|panda|raccoon|rhinoceros|rhino|sloth|tiger|wolf|zebra|badger|beaver|bunny|hedgehog|skunk|ram|feet|bat|beaver|mammoth|badger|llama|guide dog|service dog|donkey|chipmunk|squirrel|raccoon|polar bear|hippo|kangaroo|camel|bactrian camel|gorilla|orangutan|otter|skunk|bison/i},
+    {label:'새',icon:'🦜',re:/bird|chicken|duck|eagle|owl|parrot|penguin|flamingo|swan|turkey|crow|dove|goose|hatching chick|baby chick|hatched chick|dodo|nest|feather|peacock|rooster|black bird|phoenix|wing|flying bird/i},
+    {label:'양서류',icon:'🐸',re:/frog|newt|salamander|amphibian/i},
+    {label:'파충류·공룡',icon:'🦎',re:/lizard|snake|turtle|crocodile|dinosaur|t.rex|dragon face|dragon|dinosaur|sauropod|t.rex|unicorn|tortoise|reptile/i},
+    {label:'해양 생물',icon:'🪼',re:/fish|whale|dolphin|seal|porpoise|shark|octopus|squid|crab|lobster|shrimp|shell|coral|jellyfish|blowfish|spouting whale|oyster|tropical fish|squid|spiral shell|orca/i},
+    {label:'곤충·절지동물',icon:'🦋',re:/ant|bee|beetle|bug|butterfly|caterpillar|cockroach|cricket|fly|mosquito|spider|scorpion|worm|snail|moth|lady beetle|dragonfly|centipede|mite|locust|larva|ladybug|ant|honeybee|web|snail/i},
+    {label:'꽃',icon:'🌷',re:/flower|blossom|bouquet|cherry blossom|rose|tulip|sunflower|hibiscus|wilted rose|rosette|lotus|blossom/i},
+    {label:'식물·나무·버섯',icon:'🌱',re:/tree|leaf|herb|seedling|potted|cactus|mushroom|four leaf|maple leaf|fallen leaf|evergreen|deciduous|sheaf|rice plant|plant|chestnut|root vegetable|sprout|leaves|shamrock|empty nest|coconut|pine|branch|wood/i},
+    {label:'자연·날씨·하늘',icon:'🌈',re:/sun|cloud|rain|snow|storm|tornado|wind|moon|star|rainbow|lightning|fog|thermometer|fire|droplet|comet|shooting star|sunrise|sunset|weather|cyclone|mountain|volcano|island|desert|rock|forest|landscape|water wave|ocean|earth|beach|park|globe|wave|river|lake|microbe|milky way|night with stars|water|ice|meteor/i}
   ],
   '음식·음료': [
-    { label:'과일·채소', icon:'🥑', re:/apple|avocado|banana|blueberr|cherr|coconut|corn|cucumber|eggplant|garlic|grape|kiwi|lemon|lime|mango|melon|olive|onion|orange|peach|pear|pepper|pineapple|potato|strawberry|tomato|watermelon|carrot|broccoli|pea pod|leafy green|mushroom|cucumber|ginger|bell pepper|tangerine|icecream/i },
-    { label:'고기·해산물', icon:'🦐', re:/bacon|cut of meat|meat|poultry leg|shrimp|crab|lobster|oyster|prawn|squid|clam|fish cake|shellfish|sausage|hamburger meat/i },
-    { label:'식사·요리', icon:'🥘', re:/bento|bread|burger|burrito|curry|cooked|dumpling|egg|fondue|fries|hot dog|kebab|lasagna|noodles|paella|pancake|pizza|pot of food|rice|salad|sandwich|soup|spaghetti|stew|taco|tamale|tortilla|waffle|wrap|sushi|oden|ramen|flatbread|stuffed flatbread|casserole|food|bowl with spoon/i },
-    { label:'디저트·간식', icon:'🍩', re:/cake|candy|chocolate|cookie|cupcake|custard|doughnut|honey pot|ice cream|lollipop|pie|popcorn|pretzel|shaved ice|shortcake|sweet|dessert|fortune cookie|moon cake|biscuit|gingerbread|donut|cooking/i },
-    { label:'음료·커피·차', icon:'🧋', re:/beer|beers|beverage|bottle|bubble tea|champagne|coffee|cocktail|cup|drink|mate|milk|sake|tea|wine|tropical drink|whisky|juice|hot chocolate|teapot|glass of milk|ice cube|tumbler glass|izakaya lantern/i },
-    { label:'식기·주방도구', icon:'🥄', re:/fork|knife|spoon|chopsticks|kitchen|cooking|frying pan|shallow pan|jar|pot|plate|bowl|utensil/i }
+    {label:'과일',icon:'🍎',re:/apple|avocado|banana|blueberr|cherr|coconut|grape|kiwi|lemon|lime|mango|melon|olive|orange|peach|pear|pineapple|strawberry|tomato|watermelon|tangerine|plum|mango|papaya|fruit|berries|jackfruit|lychee|lime|lemon|pear|peach|grapes|pickle|salt/i},
+    {label:'채소·식재료',icon:'🥑',re:/corn|cucumber|eggplant|garlic|onion|pepper|potato|carrot|broccoli|pea pod|leafy green|mushroom|ginger|bell pepper|beans|olive|root vegetable|chestnut|sweet potato|hot pepper|cabbage|vegetable|cucumber|pea|bean|lotus root/i},
+    {label:'조리 음식·식사',icon:'🍕',re:/bread|burger|burrito|cooked|egg|fondue|fries|hot.?dog|kebab|lasagna|paella|pancake|pizza|pot of food|salad|sandwich|soup|spaghetti|stew|taco|tamale|tortilla|waffle|wrap|flatbread|stuffed flatbread|casserole|bowl with spoon|potato|meal|food|pie|poultry|hamburger|meat on bone|croissant|bagel|cheese|falafel|butter/i},
+    {label:'아시아 음식·밥·면',icon:'🍜',re:/bento|curry rice|rice ball|rice cracker|rice cake|sushi|ramen|oden|fortune cookie|moon cake|dumpling|takeout box|chopsticks|noodles|fried shrimp|fish cake|steaming bowl|sake|dango|onigiri|cooked rice|soup bowl|rice|curry/i},
+    {label:'해산물·고기',icon:'🍤',re:/bacon|cut of meat|meat|poultry leg|shrimp|crab|lobster|oyster|prawn|squid|clam|shellfish|sausage|hamburger meat|fish|cooking|steak|chicken leg/i},
+    {label:'디저트·간식',icon:'🍩',re:/cake|candy|chocolate|cookie|cupcake|custard|doughnut|honey pot|ice cream|lollipop|pie|popcorn|pretzel|shaved ice|shortcake|sweet|dessert|biscuit|gingerbread|donut|chocolate bar|candy|fortune cookie|moon cake|soft ice cream|ice cream|icecream|birthday|cooking/i},
+    {label:'음료·커피·차',icon:'🧋',re:/beer|beers|beverage|bottle|bubble tea|champagne|coffee|cocktail|cup|drink|mate|milk|sake|tea|wine|tropical drink|whisky|juice|hot chocolate|teapot|glass of milk|ice cube|tumbler glass|water glass|boba|latte/i},
+    {label:'식기·주방 도구',icon:'🥄',re:/fork|knife|spoon|chopsticks|kitchen|frying pan|shallow pan|jar|pot|plate|bowl|utensil|cookware|dish|saucer|fork and knife|amphora/i}
   ],
   '여행·장소·교통': [
-    { label:'자동차·도로', icon:'🚙', re:/car|taxi|bus|truck|motorcycle|bicycle|bike|scooter|ambulance|fire engine|police car|tractor|traffic|stop sign|gas station|fuel|parking|motorway|road|racing car|pickup truck|wheel|skateboard|tire|construction sign/i },
-    { label:'기차·철도', icon:'🚄', re:/train|tram|railway|bullettrain|monorail|metro|light rail|station|locomotive/i },
-    { label:'비행기·우주 이동', icon:'🛫', re:/airplane|helicopter|parachute|rocket|satellite|flying saucer|airport|space shuttle/i },
-    { label:'배·수상 교통', icon:'⛴️', re:/boat|ship|ferry|sailboat|canoe|anchor|harbor|cruise|life preserver|speedboat|rowing boat/i },
-    { label:'건물·명소', icon:'🏛️', re:/building|house|castle|church|mosque|synagogue|temple|hotel|hospital|school|stadium|factory|bank|fountain|bridge|tower|city|department store|convenience store|post office|hut|park|national park|camping|tent|statue|construction|lighthouse|kaaba|shinto shrine|carousel horse/i },
-    { label:'지도·여행용품', icon:'🧳', re:/map|compass|globe|world|earth|ticket|luggage|passport|location|pin|baggage|suitcase|guidebook|beach|sunrise|sunset|desert|island|mountain/i }
+    {label:'지도·지리',icon:'🗺️',re:/map|compass|globe|world|earth|ticket|luggage|passport|location|pin|baggage|suitcase|guidebook|check-in|round pushpin|triangular flag on post|world map/i},
+    {label:'자연 지형·장소',icon:'🏝️',re:/mountain|volcano|island|desert|beach|park|forest|landscape|ocean|river|lake|hot springs|national park|camping|tent|mount fuji|waterfall|landslide|rock|wood|meteor|ringed planet|star2|stars|star|zap|umbrella2|umbrella|closed umbrella|homes|office|wedding|seat|japan|oncoming automobile|rotating light|bellhop|octagonal sign|oil|bricks|hotsprings/i},
+    {label:'건물·도시·명소',icon:'🏙️',re:/building|house|castle|hospital|school|stadium|factory|bank|fountain|bridge|tower|city|department store|convenience store|post office|hut|construction|lighthouse|statue|office building|skyscraper|house building|bank|store|shop|ferris wheel|roller coaster|stadium|circus tent|carousel|windmill/i},
+    {label:'종교 시설·장소',icon:'🛕',re:/church|mosque|synagogue|temple|kaaba|shinto shrine|place of worship|hindu temple/i},
+    {label:'기타 장소·시설',icon:'🎡',re:/fountain|castle|hospital|school|toilet|bath|shower|elevator|escalator|barber|haircut|cinema|post office|customs|passport control|baggage claim|left luggage|ferris wheel|roller coaster|playground|japan post|statue/i},
+    {label:'자동차·도로·철도',icon:'🚗',re:/car|taxi|bus|truck|motorcycle|bicycle|bike|scooter|ambulance|fire engine|police car|tractor|traffic|stop sign|gas station|fuel|parking|motorway|road|racing car|pickup truck|wheel|skateboard|tire|construction sign|train|tram|railway|bullettrain|monorail|metro|light rail|station|locomotive|trolleybus|auto rickshaw|articulated lorry|aerial tramway|bus stop|kick scooter|roller skate/i},
+    {label:'배·수상 교통',icon:'⛴️',re:/boat|ship|ferry|sailboat|canoe|anchor|harbor|cruise|life preserver|speedboat|rowing boat|motor boat|passenger ship|ship/i},
+    {label:'비행기·항공·우주 이동',icon:'✈️',re:/airplane|helicopter|parachute|rocket|satellite|flying saucer|airport|space shuttle|aircraft|small airplane|airplane departure|airplane arrival/i},
+    {label:'숙박·호텔',icon:'🏨',re:/hotel|love hotel|hotel building|love motel/i},
+    {label:'시간·시계',icon:'🕒',re:/clock|watch|hourglass|calendar|alarm|timer|stopwatch|mantelpiece clock|watch/i},
+    {label:'하늘·날씨',icon:'🌤️',re:/sun|cloud|rain|snow|storm|tornado|wind|moon|rainbow|lightning|fog|thermometer|fire|droplet|comet|shooting star|sunrise|sunset|cyclone|milky way|night with stars|weather/i}
   ],
   '활동·스포츠·예술': [
-    { label:'스포츠·운동', icon:'🏅', re:/ball|baseball|basketball|football|soccer|volleyball|tennis|badminton|golf|cricket|hockey|rugby|ski|sled|skate|surf|swim|boxing|martial|medal|racing|goal|ping pong|pool|bowling|curling|lacrosse|fencing|wrestling|gymnastics|weightlifting|horse racing|trophy|sport|shuttlecock|jersey|skier|snowboarder|racehorse|dart|mahjong|bow and arrow/i },
-    { label:'음악·악기', icon:'🎸', re:/accordion|banjo|drum|guitar|keyboard|musical|notes|saxophone|violin|trumpet|flute|microphone|headphone|music|maracas|tambourine|harp|long drum|bell/i },
-    { label:'미술·공예', icon:'🖌️', re:/art|paint|brush|crayon|craft|knit|sewing|needle|thread|scissors|yarn|palette|pencil|picture|canvas|framed picture|paintbrush|dye/i },
-    { label:'게임·놀이', icon:'🕹️', re:/game|joker|jigsaw|dice|chess|spade|club suit|playing card|magic wand|slot machine|puzzle|game die|yo.yo|kite|pinata|balloon/i },
-    { label:'공연·축제', icon:'🎤', re:/circus|confetti|party|clown|balloon|fireworks|mask|theater|performing|dance|ballet|jack.o.lantern|sparkler|ticket|festival|accordion/i }
+    {label:'행사·축제',icon:'🎉',re:/birthday|clapper|dolls|firecracker|congratulations|fireworks|confetti|jack.o.lantern|christmas|party popper|balloon|gift|ribbon|sparkler|celebration|izakaya lantern|ticket|circus|festival|red envelope|wrapped gift|tada|tanabata tree|bamboo|flags|wind chime|rice scene|sparkles/i},
+    {label:'메달·시상',icon:'🏅',re:/medal|trophy|first place|second place|third place|sports medal|military medal|award/i},
+    {label:'스포츠·운동',icon:'⚽',re:/ball|baseball|basketball|football|soccer|volleyball|tennis|badminton|golf|cricket|hockey|rugby|ski|sled|skate|surf|swim|boxing|martial|racing|goal|ping pong|pool|bowling|curling|lacrosse|fencing|wrestling|gymnastics|weightlifting|horse racing|sport|shuttlecock|jersey|skier|snowboarder|racehorse|dart|bow and arrow|flying disc|running shirt|sports equipment|hockey stick|fishing pole|ballet shoes/i},
+    {label:'게임·놀이',icon:'🎮',re:/game|joker|jigsaw|dice|chess|spade|club suit|playing card|magic wand|slot machine|puzzle|game die|yo.yo|kite|piñata|pinata|mahjong|video game|controller|paddle|game piece|domino|teddy bear|yo-yo|nesting dolls|^clubs$|^diamonds$|^joystick$|^diving mask$|nazar amulet|knot|frame photo/i},
+    {label:'미술·공예',icon:'🎨',re:/art|paint|brush|crayon|craft|knit|sewing|needle|thread|scissors|yarn|palette|pencil|picture|canvas|framed picture|paintbrush|dye|thread|sewing needle|pottery|crafts/i},
+    {label:'음악·공연·악기',icon:'🎸',re:/accordion|banjo|drum|guitar|keyboard|musical|notes|saxophone|violin|trumpet|flute|microphone|headphone|music|maracas|tambourine|harp|long drum|bell|performing|dance|ballet|theater|theatre|headphones|studio microphone|musical score|musical notes|singer|stage|trombone|notes/i}
   ],
   '사물·도구·생활': [
-    { label:'전자·컴퓨터', icon:'🖥️', re:/computer|keyboard|mouse|phone|mobile|laptop|monitor|printer|camera|video camera|battery|electric|plug|wifi|wireless|satellite|radio|remote|tv|television|telephone|fax|disk|floppy|cd|dvd|headphone|microphone|smartphone|tablet|game controller|joystick|calling|desktop|film frames|high brightness|low brightness|loud sound|loudspeaker|projector|minidisc|trackball|track next|track previous|sound/i },
-    { label:'도구·수리', icon:'🔧', re:/hammer|wrench|screwdriver|tool|gear|nut and bolt|clamp|saw|pick|ladder|chains|hook|magnet|safety pin|scissors|compass|balance scale|anvil|axe|drill|fire extinguisher|screw|bolt|brick|nail|carpentry/i },
-    { label:'의류·패션', icon:'🧥', re:/shirt|t.shirt|jeans|coat|dress|shoe|sandal|boot|socks|hat|cap|glasses|sunglasses|bag|purse|backpack|wallet|ring|necklace|jewelry|crown|lipstick|nail polish|high.heel|kimono|sari|scarf|glove|ribbon|handbag|clutch bag|bikini|briefs|goggles|military helmet|mortar board|necktie|shorts|underwear|womens|pouch/i },
-    { label:'집·가구·생활', icon:'🛋️', re:/bed|chair|couch|door|window|house|lamp|light bulb|candle|bath|toilet|shower|mirror|refrigerator|bucket|broom|basket|closet|wardrobe|bed|key|bell|window|soap|sponge|towel|wastebasket|plunger|mop|bedroom/i },
-    { label:'건강·의료', icon:'🩹', re:/syringe|pill|medicine|thermometer|crutch|wheelchair|stethoscope|bandage|adhesive bandage|dna|microscope|test tube|petri|medical|drop of blood|tooth|x.ray|cane|heart anatomy|lungs|heartbeat|heartpulse|microbe|o2/i },
-    { label:'책·문서·사무', icon:'🗃️', re:/book|notebook|paper|page|folder|file|pen|pencil|clipboard|calendar|chart|bookmark|mail|envelope|letter|newspaper|receipt|label|document|printer|scroll|memo|card index|spiral note|ledger|eraser|black nib|name badge|notepad spiral|straight ruler|triangular ruler|pushpin|round pushpin|sewing needle|thread|net with handle|placard/i },
-    { label:'돈·업무·금융', icon:'🪙', re:/money|coin|banknote|credit card|atm|briefcase|dollar|yen|euro|pound|cash|receipt|gem|money bag|wallet|balance scale|chart increasing|chart decreasing/i },
-    { label:'교통·건물·장소', icon:'🛣️', re:/aerial tramway|articulated lorry|auto rickshaw|busstop|cinema|city dusk|convenience store|department store|elevator|customs|children crossing|motorway|railway|tram|station|trolleybus|fuel pump|ferris wheel|roller coaster/i },
-    { label:'동물·자연', icon:'🦊', re:/blowfish|cockroach|cat2|cow2|dog2|dodo|frog|feather|foggy|cyclone|cloud with|tropical fish|bird|bug|animal|paw prints|fish|plant|flower|tree|leaf|sun|moon/i },
-    { label:'음식·음료', icon:'🥗', re:/beers|bowl with spoon|cupcake|dango|egg|falafel|flatbread|fondue|fork and knife|fork knife plate|hotdog|ramen|sushi|rice|spaghetti|taco|burrito|popcorn|pretzel|beverage|bubble tea|wine|coffee|tea|sake|cocktail|banana|apple|carrot|corn|cucumber|pizza|burger|bread|candy|cookie|ice cream/i },
-    { label:'인물·몸짓·캐릭터', icon:'🕺', re:/alien|angel|bust in silhouette|busts in silhouette|call me|clap|clown|couple|couplekiss|cowboy|curly haired|disappointed|confounded|confused|exploding head|fingers crossed|frowning|ghost|grinning|anguished|facepalm|people|person|woman|man|baby|child|vampire|zombie|fairy|genie|robot/i },
-    { label:'스포츠·게임', icon:'🥇', re:/8ball|bow and arrow|bowling|dart|darts|flying disc|goal|mahjong|first place|beginner|medal|trophy|chess|game|playing card|crossed swords|pool 8 ball|cricket|soccer|football|basketball|ping pong|video game/i },
-    { label:'과학·실험·계산', icon:'⚗️', re:/abacus|alembic|atom|calculator|compression|control knobs|microscope|test tube|petri dish|dna|telescope|satellite|laboratory|magnet|bulb|flashlight|battery|gear|light bulb|ab|abc|abcd/i },
-    { label:'축제·기념일', icon:'🪅', re:/birthday|clapper|dolls|firecracker|congratulations|fireworks|confetti|jack.o.lantern|christmas|party popper|wrapped gift|balloon|gift|ribbon|sparkler|celebration|calendar|izakaya lantern/i },
-    { label:'별자리·전통·문화', icon:'🧿', re:/aquarius|aries|cancer|libra|ophiuchus|pisces|sagittarius|scorpius|taurus|virgo|cupid|japan|japanese goblin|japanese ogre|menorah|prayer beads|place of worship|wheel of dharma|statue of liberty|mount fuji|moyai|nazar amulet|shamrock|rosette|fleur.de.lis/i },
-    { label:'스포츠·게임', icon:'🥇', re:/8ball|bow and arrow|bowling|dart|darts|flying disc|goal|mahjong|first place|beginner|medal|trophy|chess|game|playing card|crossed swords|pool 8 ball|cricket|soccer|football|basketball|ping pong|video game|skier|snowboarder|racehorse|space invader/i },
-    { label:'자연·동물·날씨', icon:'🍃', re:/aquatic|leopard|pig2|poodle|rhino|t rex|tiger2|whale2|hibiscus|leaves|microbe|snowflake|milky way|night with stars|tangerine|tulip|wilted rose|wind chime|mount fuji|ice cube|shell|umbrella2|umbrella|moyai/i },
-    { label:'문자·숫자·기호', icon:'🆎', re:/^\d+$|^[a-z]{1,4}$|accept|asterisk|bangbang|copyright|registered|trademark|fleur.de.lis|curly loop|ideograph|cl$|cool|free|new|back|soon|end|on|off|eight spoked asterisk|black nib|pound symbol|symbols|dividers|dash|clubs|hearts|spades|interrobang|high brightness|low brightness|sparkle|sparkles|star2|stars|revolving hearts|two hearts|twisted rightwards arrows/i },
-    { label:'보안·안전·도구', icon:'🪖', re:/bomb|boom|boomerang|coffin|dagger|gun|sword|shield|weapon|crossed swords|fire extinguisher|safety|closed umbrella|flashlight|warning|headstone|razor|axe|knife/i },
-    { label:'상자·소품·기타', icon:'📦', re:/gift|wrapped|package|box|shopping|balloon|toy|teddy|crystal|gem|mirror ball|confetti|bell|key|lock|bookmark|label/i }
+    {label:'의류·패션',icon:'🧥',re:/shirt|t.shirt|jeans|coat|dress|shoe|sandal|boot|socks|hat|cap|glasses|sunglasses|bag|purse|backpack|wallet|ring|necklace|jewelry|crown|lipstick|nail polish|high.heel|kimono|sari|scarf|glove|ribbon|handbag|clutch bag|bikini|briefs|goggles|military helmet|mortar board|necktie|shorts|underwear|womens|pouch|safety vest|helmet|thong sandal|flat shoe|school satchel|womans clothes|one piece swimsuit/i},
+    {label:'소리·음향',icon:'🔊',re:/speaker|mute|loud sound|sound|volume|bell|megaphone|horn|siren|ringing|speaker high|speaker low|headphone/i},
+    {label:'음악 재생·악기',icon:'🎼',re:/musical|music|guitar|drum|saxophone|violin|trumpet|flute|accordion|banjo|harp|maracas|tambourine|long drum|headphone|microphone|trombone|^notes$|musical notes/i},
+    {label:'전화·통신 기기',icon:'📱',re:/phone|telephone|mobile|smartphone|fax|pager|telephone receiver|calling|telephone|cellular/i},
+    {label:'컴퓨터·전자 기기',icon:'💻',re:/computer|keyboard|mouse|laptop|monitor|printer|camera|video camera|battery|electric|plug|wifi|wireless|radio|remote|tv|television|disk|floppy|cd|dvd|tablet|game controller|joystick|desktop|film frames|projector|minidisc|trackball|computer disk|optical disc|video game/i},
+    {label:'빛·영상·사진',icon:'💡',re:/light bulb|flashlight|candle|lantern|camera|video camera|film|movie|projector|television|mirror ball|light|low brightness|high brightness|red light|green light|blue light|magnifying glass|^mag$|^mag right$|magnifying glass tilted/i},
+    {label:'책·종이·문서',icon:'📚',re:/book|notebook|paper|page|folder|file|clipboard|calendar|chart|bookmark|newspaper|receipt|label|document|scroll|memo|card index|spiral note|ledger|notepad|card file box|books|closed book|open book|green book|blue book|orange book|notebook with decorative cover|page facing up|page with curl/i},
+    {label:'돈·금융',icon:'💰',re:/money|coin|banknote|credit card|atm|dollar|yen|euro|pound|cash|money bag|receipt|gem|balance scale|chart increasing|chart decreasing|currency/i},
+    {label:'우편·편지',icon:'📬',re:/mail|envelope|letter|postbox|mailbox|inbox tray|outbox tray|love letter|package|post|postal/i},
+    {label:'글쓰기·필기구',icon:'✏️',re:/pen|pencil|crayon|black nib|writing|paintbrush|straight ruler|triangular ruler|eraser|fountain pen|memo|clipboard|pushpin|round pushpin|paperclip|linked paperclips|scissors/i},
+    {label:'사무·업무용품',icon:'🗂️',re:/briefcase|file cabinet|card index|calendar|chart|clipboard|pushpin|round pushpin|paperclip|straight ruler|triangular ruler|office|file folder|card file box|wastebasket|label|name badge|date|dividers|card box|ballot box|placard|level slider|school satchel|school bag|squeeze bottle|shopping cart|treasure chest|coffin|urn|headstone|moyai|smoking|boomerang|razor|net with handle|gun|bow and arrow|link|mega|vhs|clapper|scales/i},
+    {label:'잠금·열쇠·보안',icon:'🔐',re:/lock|key|locked|unlocked|keyhole|padlock|closed lock|open lock|lock with pen|locked with key/i},
+    {label:'도구·수리·작업',icon:'🔧',re:/hammer|wrench|screwdriver|tool|gear|nut and bolt|clamp|saw|pick|ladder|chains|hook|magnet|safety pin|compass|balance scale|anvil|axe|drill|fire extinguisher|screw|bolt|brick|nail|carpentry|plunger|scissors|knife|dagger|shield|sword|weapon/i},
+    {label:'과학·실험',icon:'⚗️',re:/abacus|alembic|atom|calculator|microscope|test tube|petri|dna|telescope|satellite|laboratory|magnet|gear|bulb|flashlight|battery|control knobs|compression|science|chemistry|telescope/i},
+    {label:'건강·의료',icon:'🩹',re:/syringe|pill|medicine|thermometer|crutch|wheelchair|stethoscope|bandage|adhesive bandage|dna|microscope|test tube|petri|medical|drop of blood|tooth|x.ray|cane|heart anatomy|lungs|heartbeat|heartpulse|microbe|o2|first aid|plaster/i},
+    {label:'집·가구·생활용품',icon:'🛋️',re:/bed|chair|couch|door|window|house|lamp|bath|toilet|shower|mirror|refrigerator|bucket|broom|basket|closet|wardrobe|soap|sponge|towel|wastebasket|mop|bedroom|potted plant|cooking|bowl|cup|fork|spoon|plate|pot|jar|safety pin|broom|nesting/i},
+    {label:'기타 사물·생활',icon:'🧰',re:/.*/}
   ],
   '기호·표시': [
-    { label:'화살표·방향', icon:'🧭', re:/arrow|up button|down button|left button|right button|backward|forward|clockwise|counterclockwise|turn|return|end arrow|soon arrow/i },
-    { label:'확인·경고·금지', icon:'⚠️', re:/check|cross mark|warning|alert|no entry|prohibited|stop sign|exclamation|question mark|information|sos|radioactive|biohazard|cancel|forbidden|no one under|do not|privacy|congratulations|secret/i },
-    { label:'하트·별·반짝임', icon:'💖', re:/heart|star|sparkle|sparkles|glowing star|milky way|dizzy|collision|comet/i },
-    { label:'숫자·문자·키캡', icon:'🔠', re:/digit|button|letters|abc|1234|number|keycap|input|symbols|a button|b button|o button|p button|cl button|ab button|information source/i },
-    { label:'수학·비교 기호', icon:'🧮', re:/plus|minus|divide|multiply|equal|infinity|heavy|recycle|trademark|copyright|registered|currency|percent|hash|asterisk|wavy dash|interrobang/i },
-    { label:'시간·달력', icon:'🗓️', re:/clock|watch|hourglass|calendar|alarm|timer|stopwatch|mantelpiece clock/i },
-    { label:'도형·색상', icon:'🔵', re:/circle|square|diamond|triangle|rectangle|hexagon|black|white|red|blue|green|orange|purple|brown|yellow|small orange diamond|large blue diamond/i },
-    { label:'별자리·종교', icon:'🛐', re:/aries|taurus|gemini|cancer|leo|virgo|libra|scorpius|sagittarius|capricorn|aquarius|pisces|om|yin yang|cross|menorah|star and crescent|dharma|place of worship|orthodox cross|latin cross|religion/i },
-    { label:'기기 조작·재생', icon:'🎛️', re:/eject|play pause|repeat|rewind|mute|speaker|signal strength|battery|mobile phone off|no bell|fast forward|stop button|pause button/i },
-    { label:'통신·우편', icon:'📬', re:/inbox tray|outbox tray|mailbox|love letter|envelope|postbox|mail/i },
-    { label:'사회·몸짓 기호', icon:'🫶', re:/female sign|male sign|transgender symbol|peace|hear no evil|see no evil|speak no evil|palms up together/i },
-    { label:'안내·금지 표지', icon:'🛑', re:/atm|no bicycles|no mobile phones|no pedestrians|no smoking|octagonal sign|wc|medical symbol|part alternation mark|ideograph advantage|grey question|question|prohibited/i }
+    {label:'교통·이동 표지',icon:'🚸',re:/atm|baggage claim|customs|left luggage|passport control|children crossing|no bicycles|no entry|no motor vehicles|no pedestrians|no smoking|no mobile phones|traffic|bus stop|fuel pump|parking|wheelchair symbol/i},
+    {label:'경고·안전·금지',icon:'⚠️',re:/warning|alert|prohibited|stop sign|radioactive|biohazard|no entry|forbidden|no one under|do not|privacy|sos|cross mark|check mark|exclamation mark|question mark|skull and crossbones/i},
+    {label:'화살표·방향',icon:'➡️',re:/arrow|up button|down button|left button|right button|backward|forward|clockwise|counterclockwise|turn|return|end arrow|soon arrow|curving|rightwards|leftwards|upwards|downwards/i},
+    {label:'종교 기호',icon:'☯️',re:/om|yin yang|cross|menorah|star and crescent|dharma|place of worship|orthodox cross|latin cross|religion|khanda|peace symbol|wheel of dharma/i},
+    {label:'별자리',icon:'♈',re:/aries|taurus|gemini|cancer|leo|virgo|libra|scorpius|sagittarius|capricorn|aquarius|pisces|ophiuchus|zodiac/i},
+    {label:'오디오·영상 기호',icon:'🔀',re:/eject|play pause|repeat|rewind|mute|speaker|signal strength|battery|mobile phone off|no bell|fast forward|stop button|pause button|record button|shuffle tracks|play button|radio button|antenna bars/i},
+    {label:'성별·사회 기호',icon:'⚧️',re:/female sign|male sign|transgender symbol|peace|hear no evil|see no evil|speak no evil|palms up together|social|recycling symbol/i},
+    {label:'수학·비교 기호',icon:'➗',re:/plus|minus|divide|multiply|equal|infinity|heavy|recycle|percent|hash|asterisk|wavy dash|interrobang|not equal|less than|greater than|division|multiplication|heavy plus|heavy minus|heavy equals|heavy division/i},
+    {label:'문장·특수 기호',icon:'⁉️',re:/exclamation|question|punctuation|copyright|registered|trademark|asterisk|interrobang|curly loop|double curly loop|wavy dash|part alternation|reference mark|eight spoked asterisk|eight pointed star|sparkle|sparkles|cross mark|check mark|red question mark|white question mark|grey question mark|zero|one|two|three|four|five|six|seven|eight|nine|^bangbang$|^tm$|^m$|^x$|^o$|^a$|^b$|^ab$|^cl$|^o2$|^cool$|^free$|^id$|^new$|^ng$|^ok$|^up$|^vs$|^koko$|^sa$|u7121|u6307|u7981|u7a7a|u5408|u6e80|u6709|u6708|u7533|u5272|u55b6|accept|secret|congratulations|beginner|trident|put litter|potable water|non.potable water|underage|mens|baby symbol|wheelchair|medical symbol|fleur.de.lis|star of david|vibration mode|low brightness|high brightness|back|end|on|soon|top/i},
+    {label:'통화 기호',icon:'💱',re:/currency|dollar|yen|euro|pound|rupee|won|coin|banknote|heavy dollar sign|currency exchange/i},
+    {label:'기타 기호',icon:'🔣',re:/$a/},
+    {label:'키캡·숫자·문자',icon:'🔢',re:/keycap|digit|button|letters|abc|1234|number|input|symbols|a button|b button|o button|p button|cl button|ab button|information source|regional indicator|letter|ideograph|squared|track next|track previous|ballot box with check|loop|cinema|name badge|wc/i},
+    {label:'도형·색상',icon:'🔵',re:/circle|square|diamond|triangle|rectangle|hexagon|black|white|red|blue|green|orange|purple|brown|yellow|small orange diamond|large blue diamond|geometric|large red circle|large blue circle/i}
   ],
   '국기': [
-    { label:'아시아·오세아니아', icon:'🗺️', re:/^flag (af|ae|am|az|bd|bh|bn|bt|cn|ge|id|il|in|iq|ir|jo|jp|kg|kh|kp|kr|kw|kz|la|lb|lk|mm|mn|mv|my|np|om|ph|pk|ps|qa|sa|sg|sy|th|tj|tl|tm|tr|tw|uz|vn|ye|hk|mo|au|ck|fj|fm|gu|ki|mh|mp|nc|nf|nr|nu|nz|pf|pg|pn|pw|sb|tk|to|tv|vu|wf|ws)$/i },
-    { label:'유럽', icon:'🏰', re:/^flag (ad|al|at|ax|ba|be|bg|by|ch|cz|de|dk|ee|es|fi|fo|fr|gb|gg|gi|gr|hr|hu|ie|im|is|it|je|li|lt|lu|lv|mc|md|me|mk|mt|nl|no|pl|pt|ro|rs|ru|se|si|sk|sm|ua|va|ac|bl|cy|fk|gs|gi)$/i },
-    { label:'아프리카', icon:'🦒', re:/^flag (ao|bf|bi|bj|bw|cd|cf|cg|ci|cm|cv|dj|dz|eg|eh|er|et|ga|gh|gm|gn|gq|gw|ke|km|lr|ls|ly|ma|mg|ml|mr|mu|mw|mz|na|ne|ng|rw|sc|sd|sl|sn|so|ss|st|sz|td|tg|tn|tz|ug|za|zm|zw)$/i },
-    { label:'아메리카·카리브', icon:'🗽', re:/^flag (ag|ai|ar|aw|bb|bl|bm|bo|bq|br|bs|bz|ca|cl|co|cr|cu|cw|dm|do|ec|fk|gd|gf|gl|gp|gs|gt|gy|hn|ht|jm|kn|ky|lc|mf|mq|ms|mx|ni|pa|pe|pm|pr|py|sr|sv|sx|tc|tt|us|uy|vc|ve|vg|vi)$/i },
-    { label:'지역·특수 깃발', icon:'🏁', re:/england|scotland|wales|flag|crossed flags|checkered flag|triangular flag|black flag|white flag|pirate flag|rainbow flag|transgender flag|flag: /i }
+    {label:'국기·지역기',icon:'🏳️',re:/.*/}
   ],
   '이모지 구성요소': [
-    { label:'피부색 요소', icon:'🖐🏽', re:/skin tone/i },
-    { label:'머리카락 요소', icon:'🦳', re:/hair|bald/i },
-    { label:'기타 구성요소', icon:'🧬', re:/component|tone|modifier/i }
+    {label:'피부색 요소',icon:'🖐🏽',re:/skin tone|tone modifier|^tone[1-5]$/i},
+    {label:'머리카락 요소',icon:'🦱',re:/hair|bald/i},
+    {label:'기타 구성요소',icon:'🧩',re:/.*/}
   ]
 };
-function getSubcategoryForCard(card) {
+const SUBCATEGORY_FALLBACKS = {
+  '스마일·감정':{label:'기타 얼굴·감정',icon:'🙂'},
+  '사람·신체':{label:'기타 인물·몸짓',icon:'🧑'},
+  '동물·자연':{label:'기타 자연·생물',icon:'🌿'},
+  '음식·음료':{label:'기타 음식·음료',icon:'🍽️'},
+  '여행·장소·교통':{label:'기타 장소·교통',icon:'🧭'},
+  '활동·스포츠·예술':{label:'기타 활동·예술',icon:'🎭'},
+  '사물·도구·생활':{label:'기타 사물·생활',icon:'🧰'},
+  '기호·표시':{label:'기타 기호',icon:'🔣'},
+  '국기':{label:'국기·지역기',icon:'🏳️'},
+  '이모지 구성요소':{label:'기타 구성요소',icon:'🧩'}
+};
+function getSubcategoryInfoForCard(card) {
   const category = card.dataset.category || '';
-  const name = card.querySelector('.emoji-name')?.textContent.trim() || '';
-  // 피부색 변형 이모지는 주제와 별도로 한 곳에서 빠르게 모아볼 수 있게 합니다.
-  if (category === '사람·신체' && /\(skin tone \d+\)/i.test(name)) return { label:'피부색 조합', icon:'🖐️' };
+  const name = (card.querySelector('.emoji-name')?.textContent || '').trim().replace(/[_-]+/g,' ').replace(/(?: \(skin tone \d+\))+/gi,'').toLocaleLowerCase('en');
   const rules = SUBCATEGORY_RULES[category] || [];
-  for (const rule of rules) if (rule.re.test(name)) return { label:rule.label, icon:rule.icon };
-  return { label:'기타', icon:'🧩' };
+  for (const rule of rules) { if (rule.re.source === '.*' || rule.re.source === '$a') continue; if (rule.re.test(name)) return {label:rule.label,icon:rule.icon}; }
+  return SUBCATEGORY_FALLBACKS[category] || {label:'기타',icon:'🧩'};
 }
+function getSubcategoryForCard(card) { return getSubcategoryInfoForCard(card); }
 function ensureCardSubcategory(card) {
-  if (!card.dataset.subcategory) card.dataset.subcategory = getSubcategoryForCard(card).label;
-  return card.dataset.subcategory || '기타';
+  const name = card.querySelector('.emoji-name')?.textContent || '';
+  if (card.dataset.subcategorySource === name && card.dataset.subcategory) return card.dataset.subcategory;
+  const info = getSubcategoryInfoForCard(card);
+  card.dataset.subcategorySource = name;
+  card.dataset.subcategory = info.label;
+  card.dataset.subcategoryIcon = info.icon;
+  return info.label;
 }
+function codepointSequenceForCard(card) {
+  const value = card.querySelector('.codepoints')?.textContent || '';
+  return Array.from(value.matchAll(/U\+([0-9A-F]{2,6})/gi), match => parseInt(match[1],16));
+}
+function compareCardsByCodepoint(a,b) {
+  const x = codepointSequenceForCard(a), y = codepointSequenceForCard(b);
+  const size = Math.min(x.length,y.length);
+  for (let i=0;i<size;i++) if (x[i] !== y[i]) return x[i]-y[i];
+  return x.length-y.length;
+}
+function buildCategoryGridFragment(section, template) {
+  const fragment = document.createDocumentFragment();
+  const category = section.dataset.section || '';
+  const categoryCards = cardsByCategory.get(category) || Array.from(template.content.querySelectorAll('.emoji-card'));
+  const groups = new Map();
+  for (const card of categoryCards) {
+    const label = ensureCardSubcategory(card);
+    if (!groups.has(label)) groups.set(label,[]);
+    groups.get(label).push(card);
+  }
+  const rules = SUBCATEGORY_RULES[category] || [];
+  const order = new Map(rules.map((rule,index)=>[rule.label,index]));
+  const groupOrder = Array.from(groups.keys()).sort((a,b)=>(order.get(a) ?? 999)-(order.get(b) ?? 999) || a.localeCompare(b,'ko'));
+  for (const label of groupOrder) {
+    const members = groups.get(label).sort(compareCardsByCodepoint);
+    if (category !== '이모지 구성요소') {
+      const heading = document.createElement('div');
+      heading.className = 'subcategory-divider';
+      heading.dataset.subcategoryHeading = label;
+      heading.hidden = true;
+      const icon = members[0]?.dataset.subcategoryIcon || (rules.find(rule=>rule.label===label)?.icon) || '🧩';
+      const title = document.createElement('span'); title.className = 'subcategory-divider-title'; title.textContent = `${icon} ${label}`;
+      const count = document.createElement('span'); count.className = 'subcategory-divider-count';
+      count.textContent = `${members.filter(card=>!card.classList.contains('variant-hidden')).length.toLocaleString('ko-KR')}개`;
+      heading.append(title,count);
+      fragment.appendChild(heading);
+    }
+    for (const card of members) fragment.appendChild(card);
+  }
+  return fragment;
+}
+
 function populateSubcategoryChips(container, category, items, counts, rules) {
   container.replaceChildren();
   const addChip = (label, icon, count) => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `subcategory-chip${label === '전체' ? ' active' : ''}`;
+    button.className = `subcategory-chip${label === activeSubcategory ? ' active' : ''}`;
     button.dataset.subcategoryFilter = label;
-    button.setAttribute('aria-pressed', String(label === '전체'));
+    button.setAttribute('aria-pressed', String(label === activeSubcategory));
     const iconSpan = document.createElement('span'); iconSpan.className = 'subcategory-icon'; iconSpan.setAttribute('aria-hidden', 'true'); iconSpan.textContent = icon; button.append(iconSpan, document.createTextNode(` ${label} `));
     const countSpan = document.createElement('span');
     countSpan.textContent = count.toLocaleString('ko-KR');
     button.appendChild(countSpan);
     container.appendChild(button);
   };
-  addChip('전체', '📋', items.length);
   const ordered = [];
-  if (category === '사람·신체' && counts.has('피부색 조합')) ordered.push(['피부색 조합','🖐️']);
   for (const rule of rules) if (counts.has(rule.label)) ordered.push([rule.label, rule.icon]);
   if (counts.has('기타')) ordered.push(['기타','🧩']);
-  for (const label of counts.keys()) if (!ordered.some(item => item[0] === label)) ordered.push([label,'📌']);
+  for (const label of counts.keys()) if (!ordered.some(item => item[0] === label)) { const sample = items.find(card => ensureCardSubcategory(card) === label); ordered.push([label, sample?.dataset.subcategoryIcon || '📌']); }
   for (const [label, icon] of ordered) addChip(label, icon, counts.get(label) || 0);
 }
 function renderSubcategoryFilters(category) {
   if (!subcategoryArea || !subcategoryChips) return;
   subcategoryChips.replaceChildren();
-  activeSubcategory = '전체';
+  // 세부 분류 선택값은 상위 분류 변경 시 호출부에서 초기화하고, 시작 시에는 저장된 값 복원을 허용합니다.
   // 피부색·머리카락 구성요소는 별도 세부 분류 필터가 아니라,
   // 구성요소 이모지 카드 옆의 이모지 아이콘으로 직접 표시/숨김을 제어합니다.
   if (category === '이모지 구성요소') { subcategoryArea.hidden = true; return; }
@@ -37286,13 +37376,29 @@ return;
   sections.forEach((section) => { if (!activeSectionSet.has(section)) section.hidden = true; });
   activeSections.forEach((section) => {
     let sectionVisible = 0;
+    const visibleBySubcategory = new Map();
     const sectionCards = cardsByCategory.get(section.dataset.section) || [];
     sectionCards.forEach((card) => {
-      const subgroupMatches = globalSearchActive || activeSubcategory === '전체' || ensureCardSubcategory(card) === activeSubcategory;
+      const subcategory = ensureCardSubcategory(card);
+      // 세부 분류는 필터가 아니라 해당 그룹 위치로 이동하는 탐색 명령입니다.
+      const subgroupMatches = true;
       const isBaseEmoji = !card.classList.contains('variant-hidden') && card.dataset.category !== '이모지 구성요소';
       const show = isBaseEmoji && subgroupMatches && (!query || matchesSearch(getSearchIndex(card), query));
       card.hidden = !show;
-      if (show) { visible += 1; sectionVisible += 1; }
+      if (show) {
+        visible += 1;
+        sectionVisible += 1;
+        visibleBySubcategory.set(subcategory, (visibleBySubcategory.get(subcategory) || 0) + 1);
+      }
+    });
+    const showGroupTitles = !globalSearchActive && section.dataset.section !== '이모지 구성요소';
+    section.querySelectorAll('.subcategory-divider').forEach((heading) => {
+      const label = heading.dataset.subcategoryHeading || '';
+      const groupCount = visibleBySubcategory.get(label) || 0;
+      heading.hidden = !showGroupTitles || groupCount === 0;
+      heading.classList.toggle('is-selected', activeSubcategory !== '전체' && label === activeSubcategory);
+      const count = heading.querySelector('.subcategory-divider-count');
+      if (count) count.textContent = `${groupCount.toLocaleString('ko-KR')}개`;
     });
     section.hidden = sectionVisible === 0 || section.dataset.section === '이모지 구성요소';
   });
@@ -37404,7 +37510,7 @@ filters.forEach((filter) => filter.addEventListener('click', () => {
 document.addEventListener('click', (event) => {
   const chip = event.target.closest('.subcategory-chip');
   if (!chip) return;
-  activeSubcategory = chip.dataset.subcategoryFilter || '전체';
+  activeSubcategory = chip.dataset.subcategoryFilter || '';
   saveActiveCategory();
   document.querySelectorAll('.subcategory-chip').forEach((item) => {
     const active = item.dataset.subcategoryFilter === activeSubcategory;
@@ -37412,7 +37518,11 @@ document.addEventListener('click', (event) => {
     item.setAttribute('aria-pressed', String(active));
   });
   hideEmojiPopup();
+  showCategoryResults();
   applyFilters();
+  // 해당 세부 분류의 첫 그룹 제목을 목록 첫 줄 위치로 이동합니다.
+  const heading = Array.from(document.querySelectorAll('.subcategory-divider')).find((item) => item.dataset.subcategoryHeading === activeSubcategory && !item.hidden);
+  if (heading) window.setTimeout(() => window.scrollTo({ top: Math.max(0, heading.getBoundingClientRect().top + window.scrollY - 12), behavior: 'smooth' }), 40);
 });
 const RECENT_STORAGE_KEY = 'emojiExplorerRecentCopies_v1';
 const MAX_RECENT = 60;
