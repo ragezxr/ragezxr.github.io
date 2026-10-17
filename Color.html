@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChromaCraft Pro - CSS 색상명·팔레트·비교 스튜디오</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #090d16;
+            color: #f8fafc;
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(21, 30, 49, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%) translateX(-50%); opacity: 0; }
+            to { transform: translateY(0) translateX(-50%); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        #imageSamplerCanvas { display:block; width:100%; height:auto; cursor:crosshair; touch-action:pan-y; }
+        #imageMagnifier { width:150px; height:150px; image-rendering:pixelated; }
+        .expert-output { min-height:220px; max-height:460px; overflow:auto; white-space:pre; tab-size:2; }
+        input[type="range"] { cursor: pointer; }
+        #comparisonTableBody td { vertical-align: middle; }
+        button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #818cf8; outline-offset: 2px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 flex flex-wrap gap-2 items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i data-lucide="palette" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+                        ChromaCraft Pro
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">CSS 색상명 · 정밀 조정 · 팔레트 비교</p>
+                </div>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex flex-wrap max-w-full bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium">
+                <button id="tabPaletteBtn" onclick="switchTab('palette')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-md">
+                    <i data-lucide="swatch-book" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">색상 & 조화</span>
+                </button>
+                <button id="tabColorsBtn" onclick="switchTab('colors')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="swatch-book" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">CSS 색상표·비교</span>
+                </button>
+                <button id="tabExpertBtn" onclick="switchTab('expert')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="pipette" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">전문가 도구</span>
+                </button>
+                <button id="tabGradientBtn" onclick="switchTab('gradient')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="blend" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">CSS 그래디언트</span>
+                </button>
+                <button id="tabAccessibilityBtn" onclick="switchTab('accessibility')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="eye" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">대비 & 시각 모의</span>
+                </button>
+                <button id="tabLibraryBtn" onclick="switchTab('library')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span class="hidden md:inline">보관함 (<span id="savedCount">0</span>)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- TAB 1: COLOR PICKER, HARMONIES, TINTS & SHADES -->
+        <div id="paletteSection" class="space-y-8">
+            
+            <!-- Base Inspector & Eyedropper Card -->
+            <div class="glass-panel rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+                    
+                    <div class="flex items-center gap-4 w-full lg:w-auto">
+                        <div class="relative group">
+                            <input type="color" id="baseColorPicker" value="#6366F1" class="w-20 h-20 rounded-2xl shadow-xl border-2 border-slate-700 bg-transparent cursor-pointer transition-transform group-hover:scale-105" oninput="updateBaseColor(this.value)">
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">기준 색상</span>
+                                <button onclick="randomizeBaseColor()" class="p-1 text-slate-400 hover:text-white transition-colors" title="랜덤 색상 (스페이스바)">
+                                    <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button id="eyedropperBtn" onclick="openEyeDropper()" class="p-1 text-slate-400 hover:text-indigo-400 transition-colors hidden" title="화면 색상 추출 (Eyedropper)">
+                                    <i data-lucide="pipette" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <h2 id="baseHexDisplay" class="text-3xl font-bold font-mono text-white tracking-wide">#6366F1</h2>
+                            <p id="baseColorName" class="mt-1 text-xs font-semibold text-amber-300" aria-live="polite">가장 가까운 CSS 색상명 확인 중…</p>
+                        </div>
+                    </div>
+
+                    <!-- Color Codes Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full lg:w-auto flex-1">
+                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 font-semibold block">HEX</span>
+                            <div class="flex items-center justify-between mt-1">
+                                <span id="codeHex" class="font-mono text-xs font-semibold truncate">#6366F1</span>
+                                <button onclick="copyToClipboard(document.getElementById('codeHex').innerText, 'HEX')" class="text-slate-400 hover:text-white">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 font-semibold block">RGB</span>
+                            <div class="flex items-center justify-between mt-1">
+                                <span id="codeRgb" class="font-mono text-xs font-semibold truncate">99, 102, 241</span>
+                                <button onclick="copyToClipboard('rgb(' + document.getElementById('codeRgb').innerText + ')', 'RGB')" class="text-slate-400 hover:text-white">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 font-semibold block">HSL</span>
+                            <div class="flex items-center justify-between mt-1">
+                                <span id="codeHsl" class="font-mono text-xs font-semibold truncate">239, 84%, 67%</span>
+                                <button onclick="copyToClipboard('hsl(' + document.getElementById('codeHsl').innerText + ')', 'HSL')" class="text-slate-400 hover:text-white">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 font-semibold block">HSV</span>
+                            <div class="flex items-center justify-between mt-1">
+                                <span id="codeHsv" class="font-mono text-xs font-semibold truncate">239, 59%, 95%</span>
+                                <button onclick="copyToClipboard('hsv(' + document.getElementById('codeHsv').innerText + ')', 'HSV')" class="text-slate-400 hover:text-white">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 font-semibold block">CMYK</span>
+                            <div class="flex items-center justify-between mt-1">
+                                <span id="codeCmyk" class="font-mono text-xs font-semibold truncate">59, 58, 0, 5</span>
+                                <button onclick="copyToClipboard('cmyk(' + document.getElementById('codeCmyk').innerText + ')', 'CMYK')" class="text-slate-400 hover:text-white">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
+                            <span class="text-[10px] text-slate-400 font-semibold block">OKLCH</span>
+                            <div class="flex items-center justify-between mt-1">
+                                <span id="codeOklch" class="font-mono text-xs font-semibold truncate">0.58 0.22 264</span>
+                                <button onclick="copyToClipboard('oklch(' + document.getElementById('codeOklch').innerText + ')', 'OKLCH')" class="text-slate-400 hover:text-white">
+                                    <i data-lucide="copy" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Fine-grained HSL controls -->
+            <div class="glass-panel rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 class="font-bold text-white">정밀 색상 조정 <span class="text-xs text-slate-400 font-normal">HSL</span></h3>
+                        <p class="text-xs text-slate-400 mt-1">색상·채도·명도를 1단위로 조절합니다. HEX 입력과 색상 선택기도 서로 연동됩니다.</p>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <input id="manualHexInput" type="text" value="#6366F1" maxlength="7" spellcheck="false" aria-label="HEX 색상 코드" class="w-28 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs font-mono uppercase text-white focus:outline-none focus:border-indigo-500">
+                        <button onclick="applyManualHex()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">HEX 적용</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs"><label for="hueSlider" class="text-slate-300">색상 Hue</label><span id="hueValue" class="font-mono text-indigo-300">239°</span></div>
+                        <input id="hueSlider" type="range" min="0" max="360" step="1" value="239" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500">
+                        <div class="h-2 rounded-full" style="background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)"></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs"><label for="saturationSlider" class="text-slate-300">채도 Saturation</label><span id="saturationValue" class="font-mono text-indigo-300">84%</span></div>
+                        <input id="saturationSlider" type="range" min="0" max="100" step="1" value="84" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500">
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs"><label for="lightnessSlider" class="text-slate-300">명도 Lightness</label><span id="lightnessValue" class="font-mono text-indigo-300">67%</span></div>
+                        <input id="lightnessSlider" type="range" min="0" max="100" step="1" value="67" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tints & Shades Section -->
+            <div class="glass-panel p-6 rounded-2xl space-y-4 shadow-xl">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i data-lucide="sun-moon" class="w-5 h-5 text-indigo-400"></i>
+                    <span>명도 스펙트럼 (Tints & Shades)</span>
+                </h3>
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Tints (밝은 톤)</span>
+                        <div id="tintsContainer" class="grid grid-cols-10 h-12 rounded-xl overflow-hidden border border-slate-700/50"></div>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Shades (어두운 톤)</span>
+                        <div id="shadesContainer" class="grid grid-cols-10 h-12 rounded-xl overflow-hidden border border-slate-700/50"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Harmonies Grid -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">색상 조화 팔레트 (Harmonies)</h3>
+                        <p class="text-sm text-slate-400">22가지 배색 방식과 160개 이상의 색상 샘플을 한눈에 비교합니다. 색상 칸을 누르면 HEX를 복사할 수 있습니다.</p>
+                        <p id="harmonyStats" class="text-xs text-indigo-300 mt-1">배색 방식 22개 · 색상 샘플 계산 중</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="saveCurrentPalette()" class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium text-xs transition-all">
+                            <i data-lucide="bookmark-plus" class="w-4 h-4 text-indigo-400"></i>
+                            <span>팔레트 저장</span>
+                        </button>
+                        <button onclick="randomizeBaseColor()" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-medium text-xs shadow-lg shadow-indigo-500/25 transition-all transform active:scale-95">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                            <span>랜덤 전체 생성</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="harmonyContainer">
+                    <!-- Dynamically generated palette cards -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB: CSS NAMED COLORS & DETAILED COMPARISON -->
+        <div id="colorsSection" class="hidden space-y-6">
+            <div class="glass-panel rounded-2xl p-5 md:p-6 space-y-4">
+                <div class="flex flex-wrap justify-between items-start gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">CSS 표준 색상명 탐색기</h2>
+                        <p class="text-sm text-slate-400 mt-1">CSS 표준 색상 148개를 검색하고, <b class="text-slate-200">이름 복사</b>로 DarkGray 같은 색상명만 간편하게 복사합니다.</p>
+                    </div>
+                    <span id="colorLibraryCount" class="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">148 colors</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_190px] gap-3">
+                    <input id="colorSearchInput" type="search" placeholder="색상명 또는 HEX 검색 (예: DarkGray, Black, #A9A9A9)" oninput="renderNamedColors()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500">
+                    <select id="colorFamilyFilter" onchange="renderNamedColors()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <option value="all">모든 색상 계열</option>
+                        <option value="neutral">무채색·흰색·검정</option>
+                        <option value="red">빨강</option><option value="orange">주황</option><option value="yellow">노랑</option>
+                        <option value="green">초록</option><option value="cyan">청록</option><option value="blue">파랑</option>
+                        <option value="purple">보라</option><option value="pink">분홍</option><option value="brown">갈색</option>
+                    </select>
+                </div>
+                <p class="text-xs text-slate-500">이름 복사는 CSS 색상명만 복사하며, 기준색 적용과 비교 추가는 각각 현재 색상 변경 및 비교표 추가 기능입니다.</p>
+                <div id="namedColorsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"></div>
+                <p id="namedColorsEmpty" class="hidden py-8 text-center text-sm text-slate-500">검색 조건에 맞는 색상이 없습니다.</p>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-5 md:p-6 space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">상세 색상 비교표</h2>
+                        <p class="text-sm text-slate-400 mt-1">색상명, HEX, RGB, HSL, HSV, CMYK, OKLCH, 명도와 흰색·검정 대비를 한눈에 비교합니다.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="addBaseToComparison()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">현재 기준색 추가</button>
+                        <button onclick="resetComparison()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs">비교 초기화</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-slate-800">
+                    <table class="min-w-[1120px] w-full text-left text-xs">
+                        <thead class="bg-slate-900 text-slate-300"><tr>
+                            <th class="px-3 py-3 font-semibold">색상 / CSS 이름</th><th class="px-3 py-3 font-semibold">HEX</th><th class="px-3 py-3 font-semibold">RGB</th><th class="px-3 py-3 font-semibold">HSL</th><th class="px-3 py-3 font-semibold">HSV</th><th class="px-3 py-3 font-semibold">CMYK</th><th class="px-3 py-3 font-semibold">OKLCH</th><th class="px-3 py-3 font-semibold">명도</th><th class="px-3 py-3 font-semibold">흰색 대비</th><th class="px-3 py-3 font-semibold">검정 대비</th><th class="px-3 py-3 font-semibold">관리</th>
+                        </tr></thead>
+                        <tbody id="comparisonTableBody" class="divide-y divide-slate-800 bg-slate-950/50"></tbody>
+                    </table>
+                </div>
+                <p class="text-[11px] text-slate-500">명도는 WCAG 상대 휘도(0~1)입니다. 대비 비율은 해당 색상과 순백(#FFFFFF)·순흑(#000000) 사이의 비율입니다. CMYK는 RGB에서 변환한 근삿값으로 실제 인쇄 결과는 프로파일·용지에 따라 달라질 수 있습니다.</p>
+            </div>
+        </div>
+
+        <!-- EXPERT TOOLS: SCREEN / IMAGE COLOR SAMPLER, DELTA E, EXPORT -->
+        <div id="expertSection" class="hidden space-y-8">
+            <div class="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">전문가 색상 도구</h2>
+                    <p class="text-sm text-slate-400 mt-1">화면·이미지 픽셀 캡처, 지각 색차(ΔE00), 디자인 토큰 내보내기를 한곳에서 사용합니다.</p>
+                </div>
+                <span class="text-xs px-3 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-200">LOCAL · 브라우저 내부 처리</span>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-5">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="pipette" class="w-5 h-5 text-indigo-400"></i>컬러 캡처 피커</h3>
+                        <p class="text-xs text-slate-400 mt-1">화면에서 바로 추출하거나 이미지 파일을 열고 픽셀을 클릭해 정확한 HEX를 선택합니다.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button type="button" onclick="captureScreenColor()" class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold"><i data-lucide="monitor" class="w-4 h-4"></i>화면에서 색상 캡처</button>
+                        <label class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-sm font-semibold cursor-pointer"><i data-lucide="image-plus" class="w-4 h-4"></i>이미지 열기<input id="samplerImageInput" type="file" accept="image/*" class="hidden"></label>
+                    </div>
+                    <p id="screenPickerHelp" class="text-[11px] text-slate-500">화면 캡처는 EyeDropper를 지원하는 최신 Chrome/Edge에서 사용합니다. 지원되지 않는 환경에서는 이미지 열기를 이용하세요.</p>
+
+                    <div id="imageSamplerWrap" class="hidden space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span id="samplerImageInfo" class="text-xs text-slate-400">이미지를 불러왔습니다.</span>
+                            <button type="button" onclick="clearSamplerImage()" class="text-xs text-slate-400 hover:text-rose-300">이미지 닫기</button>
+                        </div>
+                        <div class="rounded-xl overflow-auto max-h-[520px] border border-slate-700 bg-slate-950 p-1">
+                            <canvas id="imageSamplerCanvas" width="1" height="1" aria-label="이미지 픽셀 컬러 캡처 영역"></canvas>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-[150px_minmax(0,1fr)] gap-4 items-center">
+                            <div class="rounded-xl border border-slate-700 bg-slate-950 p-2 flex justify-center"><canvas id="imageMagnifier" width="150" height="150" aria-label="픽셀 확대 미리보기"></canvas></div>
+                            <div class="space-y-2 min-w-0">
+                                <div class="flex items-center gap-2"><span id="imageHoverSwatch" class="w-8 h-8 rounded-lg border border-white/20 shrink-0" style="background:#6366F1"></span><code id="imageHoverHex" class="text-sm font-mono text-white">#6366F1</code></div>
+                                <p id="imageHoverRgb" class="text-xs text-slate-400 font-mono">RGB 99, 102, 241</p>
+                                <p id="imageSamplerStatus" class="text-xs text-slate-500">이미지 위에 포인터를 올려 미리 보고 클릭하여 픽셀을 선택하세요.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-slate-700 bg-slate-950/70 p-4 space-y-3">
+                        <div class="flex items-center gap-3">
+                            <span id="capturedColorSwatch" class="w-14 h-14 rounded-xl border border-white/15 shadow-inner shrink-0" style="background:#6366F1"></span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-2"><code id="capturedColorHex" class="text-xl font-bold font-mono text-white">#6366F1</code><button type="button" onclick="copyCapturedColor()" class="text-xs text-indigo-300 hover:text-white">HEX 복사</button></div>
+                                <p id="capturedColorName" class="text-xs text-amber-300 mt-1">MediumSlateBlue에 가까운 색상</p>
+                                <p id="capturedColorMeta" class="text-[11px] text-slate-500 mt-1">선택된 캡처 색상 · 대기 중</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <button type="button" onclick="applyCapturedColorAsBase()" class="py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">기준색 적용</button>
+                            <button type="button" onclick="addCapturedColorToComparison()" class="py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs">비교표 추가</button>
+                            <button type="button" onclick="saveCapturedColor()" class="py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs">보관함 저장</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-5">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="git-compare" class="w-5 h-5 text-indigo-400"></i>지각 색차 분석 · CIEDE2000</h3>
+                        <p class="text-xs text-slate-400 mt-1">두 sRGB 색상을 CIE Lab로 변환하고 CIEDE2000(ΔE00) 공식으로 지각 차이를 비교합니다.</p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-slate-700 bg-slate-950 p-3 space-y-2">
+                            <label class="block text-[11px] font-semibold text-slate-400">색상 A · 현재 기준색</label>
+                            <div class="flex items-center gap-2"><span id="deltaBaseSwatch" class="w-9 h-9 rounded-lg border border-white/10" style="background:#6366F1"></span><code id="deltaBaseHex" class="font-mono text-sm text-white">#6366F1</code></div>
+                        </div>
+                        <div class="rounded-xl border border-slate-700 bg-slate-950 p-3 space-y-2">
+                            <label for="expertCompareHex" class="block text-[11px] font-semibold text-slate-400">색상 B · 비교 색상 HEX</label>
+                            <input id="expertCompareHex" type="text" value="#A855F7" maxlength="7" spellcheck="false" oninput="updateExpertDifference()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-sm uppercase text-white focus:outline-none focus:border-indigo-500">
+                            <div class="flex items-center gap-2"><span id="deltaCompareSwatch" class="w-6 h-6 rounded-md border border-white/10" style="background:#A855F7"></span><span id="deltaCompareRgb" class="text-[11px] text-slate-400 font-mono">RGB 168, 85, 247</span></div>
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4">
+                        <div class="flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs text-indigo-200">CIEDE2000 색차</p><div class="flex items-baseline gap-2 mt-1"><strong id="deltaEValue" class="text-4xl font-bold font-mono text-white">—</strong><span class="text-xs text-indigo-200">ΔE00</span></div></div><span id="deltaECategory" class="text-sm font-semibold text-white">HEX 색상을 확인하세요.</span></div>
+                        <div class="h-2 rounded-full bg-slate-900 mt-4 overflow-hidden"><div id="deltaEBar" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500" style="width:0%"></div></div>
+                        <p id="deltaEExplanation" class="text-xs text-slate-300 mt-3">일반적인 근사 해석이며, 관찰 환경·디스플레이·주변색에 따라 지각은 달라질 수 있습니다.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-slate-700 p-3"><p class="text-[11px] text-slate-400">색상 A → 흰색 대비</p><p id="deltaBaseContrast" class="text-lg font-mono text-white mt-1">—</p></div>
+                        <div class="rounded-xl border border-slate-700 p-3"><p class="text-[11px] text-slate-400">색상 B → 흰색 대비</p><p id="deltaCompareContrast" class="text-lg font-mono text-white mt-1">—</p></div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-4">
+                <div class="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="file-code-2" class="w-5 h-5 text-indigo-400"></i>전문가용 팔레트 내보내기</h3>
+                        <p class="text-xs text-slate-400 mt-1">현재 기준색과 22가지 배색 팔레트를 CSS 변수·JSON·CSV·Tailwind 설정으로 내보냅니다.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="expertExportFormat" onchange="renderExpertExport()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"><option value="css">CSS 변수</option><option value="json">JSON 데이터</option><option value="csv">CSV 비교표</option><option value="tailwind">Tailwind 설정</option></select>
+                        <button type="button" onclick="renderExpertExport()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white">미리보기 갱신</button>
+                        <button type="button" onclick="copyExpertExport()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white">코드 복사</button>
+                        <button type="button" onclick="downloadExpertExport()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white">파일 저장</button>
+                    </div>
+                </div>
+                <pre id="expertExportPreview" class="expert-output rounded-xl border border-slate-800 bg-slate-950 p-4 text-[11px] leading-relaxed font-mono text-emerald-200">내보내기 형식을 선택한 후 미리보기를 갱신하세요.</pre>
+                <p class="text-[11px] text-slate-500">내보내기 팔레트는 현재 기준색에 따라 실시간 생성됩니다. CSV에는 CSS 이름 근사값, HEX, RGB, HSL, OKLCH, WCAG 상대 휘도와 흰색·검정 대비가 포함됩니다.</p>
+            </section>
+        </div>
+
+        <!-- TAB 2: ADVANCED CSS GRADIENT STUDIO -->
+        <div id="gradientSection" class="hidden space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- Left: Control Panel -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 rounded-2xl space-y-6">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
+                            <span>그래디언트 설정</span>
+                        </h3>
+
+                        <!-- Type Selector (Linear, Radial, Conic) -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">유형 (Gradient Type)</label>
+                            <div class="grid grid-cols-3 gap-1 p-1 bg-slate-900 rounded-xl border border-slate-800">
+                                <button id="gradTypeLinear" onclick="setGradientType('linear')" class="py-2 text-xs font-medium rounded-lg bg-indigo-600 text-white transition-all">선형 (Linear)</button>
+                                <button id="gradTypeRadial" onclick="setGradientType('radial')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">원형 (Radial)</button>
+                                <button id="gradTypeConic" onclick="setGradientType('conic')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">원뿔형 (Conic)</button>
+                            </div>
+                        </div>
+
+                        <!-- Angle Slider (Linear / Conic) -->
+                        <div id="angleControlGroup" class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">각도 / 시작점</label>
+                                <span id="angleValueDisplay" class="text-xs font-mono text-indigo-400 font-semibold">90°</span>
+                            </div>
+                            <input type="range" id="gradientAngle" min="0" max="360" value="90" oninput="updateGradient()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                            <div class="grid grid-cols-4 gap-1.5 pt-1">
+                                <button onclick="setAngle(0)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">0° (→)</button>
+                                <button onclick="setAngle(90)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">90° (↓)</button>
+                                <button onclick="setAngle(180)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">180° (←)</button>
+                                <button onclick="setAngle(270)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">270° (↑)</button>
+                            </div>
+                        </div>
+
+                        <!-- Color Stops List -->
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">색상 지점 (Color Stops)</label>
+                                <button onclick="addGradientStop()" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
+                                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                                    <span>색상 추가</span>
+                                </button>
+                            </div>
+                            <div id="stopsContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <!-- Preset Library Dropdown -->
+                        <div class="space-y-2">
+                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">추천 프리셋 (Presets)</label>
+                            <div class="grid grid-cols-2 gap-2" id="gradientPresets">
+                                <!-- Preset Buttons rendered dynamically -->
+                            </div>
+                        </div>
+
+                        <button onclick="generateRandomGradient()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors">
+                            <i data-lucide="dices" class="w-4 h-4 text-purple-400"></i>
+                            <span>랜덤 그래디언트 생성</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right: Preview & Code Outputs -->
+                <div class="lg:col-span-7 space-y-6 flex flex-col">
+                    
+                    <div class="glass-panel p-4 rounded-2xl flex-1 flex flex-col">
+                        <div class="flex items-center justify-between mb-3 px-1">
+                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">실시간 프리뷰</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="saveCurrentGradient()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+                                    <i data-lucide="bookmark" class="w-3.5 h-3.5 text-indigo-400"></i>
+                                    <span>저장</span>
+                                </button>
+                                <button onclick="toggleFullscreenPreview()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+                                    <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                                    <span>전체화면</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="gradientPreview" class="w-full h-72 sm:h-80 md:h-96 rounded-xl shadow-2xl transition-all duration-200 border border-slate-700/50 flex items-center justify-center relative overflow-hidden group">
+                            <span class="text-xs font-medium bg-slate-950/70 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Interactive Live Preview
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- CSS & Tailwind Code Output Cards -->
+                    <div class="glass-panel p-5 rounded-2xl space-y-4">
+                        <!-- Standard CSS -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">CSS Background Code</span>
+                                <button onclick="copyToClipboard(document.getElementById('cssOutput').innerText, 'CSS')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사
+                                </button>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300 overflow-x-auto">
+                                <code id="cssOutput">background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);</code>
+                            </div>
+                        </div>
+
+                        <!-- Tailwind CSS -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tailwind CSS Classes</span>
+                                <button onclick="copyToClipboard(document.getElementById('tailwindOutput').innerText, 'Tailwind')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사
+                                </button>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto">
+                                <code id="tailwindOutput">bg-gradient-to-r from-[#6366f1] to-[#a855f7]</code>
+                            </div>
+                        </div>
+
+                        <!-- SVG Gradient -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">SVG Gradient Code</span>
+                                <button onclick="copyToClipboard(document.getElementById('svgOutput').innerText, 'SVG')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300">
+                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사
+                                </button>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-amber-300 max-h-24 overflow-y-auto">
+                                <code id="svgOutput">&lt;svg&gt;...&lt;/svg&gt;</code>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CONTRAST CHECKER & COLOR BLINDNESS SIMULATOR -->
+        <div id="accessibilitySection" class="hidden space-y-8">
+            
+            <!-- WCAG Contrast Checker -->
+            <div class="glass-panel p-6 rounded-2xl space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-white">WCAG 웹 접근성 텍스트 대비 분석</h3>
+                    <p class="text-sm text-slate-400">선택한 기준 색상 상에서 흰색/어두운색 텍스트의 가독성 및 가이드라인 충족 여부입니다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="wcagContainer">
+                    <!-- Contrast Analysis Cards rendered dynamically -->
+                </div>
+            </div>
+
+            <!-- Color Blindness Simulator -->
+            <div class="glass-panel p-6 rounded-2xl space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-white">색각 이상 시각 모의 (Color Blindness Simulation)</h3>
+                    <p class="text-sm text-slate-400">다양한 유형의 색각 이상 사용자의 시선에서 기준 색상이 어떻게 인지되는지 시뮬레이션합니다.</p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="blindnessContainer">
+                    <!-- Blindness cards dynamically populated -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB 4: SAVED LIBRARY & EXPORT -->
+        <div id="librarySection" class="hidden space-y-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold text-white">마이 보관함 (Saved Items)</h3>
+                    <p class="text-sm text-slate-400">로컬 스토리지에 저장된 나만의 색상 팔레트 및 그래디언트입니다.</p>
+                </div>
+                <button onclick="clearAllSaved()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 border border-rose-500/30 px-3 py-1.5 rounded-xl bg-rose-500/10">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 전체 삭제
+                </button>
+            </div>
+
+            <!-- Saved Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="savedItemsContainer">
+                <!-- Dynamically rendered saved cards -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
+        <div class="bg-slate-900 text-white border border-slate-700 shadow-2xl px-5 py-3 rounded-xl flex items-center gap-3 toast-animate">
+            <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <i data-lucide="check" class="w-4 h-4"></i>
+            </div>
+            <span id="toastMessage" class="text-sm font-medium">복사되었습니다!</span>
+        </div>
+    </div>
+
+    <!-- Fullscreen Overlay -->
+    <div id="fullscreenOverlay" class="fixed inset-0 z-50 hidden flex flex-col justify-end p-6 bg-black">
+        <div id="fullscreenPreviewBg" class="absolute inset-0"></div>
+        <button onclick="toggleFullscreenPreview()" class="relative z-10 self-end px-5 py-2.5 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-md text-white rounded-xl border border-white/20 font-medium text-sm flex items-center gap-2 shadow-2xl transition-all">
+            <i data-lucide="minimize-2" class="w-4 h-4"></i>
+            <span>닫기 (ESC)</span>
+        </button>
+    </div>
+
+    <!-- Hidden Canvas for PNG Export -->
+    <canvas id="exportCanvas" class="hidden"></canvas>
+
+    <!-- JavaScript Application Core Logic -->
+    <script>
+        // --- GLOBAL STATE ---
+        let currentBaseColor = "#6366F1";
+        let gradientState = {
+            type: 'linear',
+            angle: 90,
+            stops: [
+                { color: '#6366F1', position: 0 },
+                { color: '#A855F7', position: 100 }
+            ]
+        };
+        const CSS_NAMED_COLORS = {"aliceblue":"#F0F8FF","antiquewhite":"#FAEBD7","aqua":"#00FFFF","aquamarine":"#7FFFD4","azure":"#F0FFFF","beige":"#F5F5DC","bisque":"#FFE4C4","black":"#000000","blanchedalmond":"#FFEBCD","blue":"#0000FF","blueviolet":"#8A2BE2","brown":"#A52A2A","burlywood":"#DEB887","cadetblue":"#5F9EA0","chartreuse":"#7FFF00","chocolate":"#D2691E","coral":"#FF7F50","cornflowerblue":"#6495ED","cornsilk":"#FFF8DC","crimson":"#DC143C","cyan":"#00FFFF","darkblue":"#00008B","darkcyan":"#008B8B","darkgoldenrod":"#B8860B","darkgray":"#A9A9A9","darkgreen":"#006400","darkgrey":"#A9A9A9","darkkhaki":"#BDB76B","darkmagenta":"#8B008B","darkolivegreen":"#556B2F","darkorange":"#FF8C00","darkorchid":"#9932CC","darkred":"#8B0000","darksalmon":"#E9967A","darkseagreen":"#8FBC8F","darkslateblue":"#483D8B","darkslategray":"#2F4F4F","darkslategrey":"#2F4F4F","darkturquoise":"#00CED1","darkviolet":"#9400D3","deeppink":"#FF1493","deepskyblue":"#00BFFF","dimgray":"#696969","dimgrey":"#696969","dodgerblue":"#1E90FF","firebrick":"#B22222","floralwhite":"#FFFAF0","forestgreen":"#228B22","fuchsia":"#FF00FF","gainsboro":"#DCDCDC","ghostwhite":"#F8F8FF","gold":"#FFD700","goldenrod":"#DAA520","gray":"#808080","green":"#008000","greenyellow":"#ADFF2F","grey":"#808080","honeydew":"#F0FFF0","hotpink":"#FF69B4","indianred":"#CD5C5C","indigo":"#4B0082","ivory":"#FFFFF0","khaki":"#F0E68C","lavender":"#E6E6FA","lavenderblush":"#FFF0F5","lawngreen":"#7CFC00","lemonchiffon":"#FFFACD","lightblue":"#ADD8E6","lightcoral":"#F08080","lightcyan":"#E0FFFF","lightgoldenrodyellow":"#FAFAD2","lightgray":"#D3D3D3","lightgreen":"#90EE90","lightgrey":"#D3D3D3","lightpink":"#FFB6C1","lightsalmon":"#FFA07A","lightseagreen":"#20B2AA","lightskyblue":"#87CEFA","lightslategray":"#778899","lightslategrey":"#778899","lightsteelblue":"#B0C4DE","lightyellow":"#FFFFE0","lime":"#00FF00","limegreen":"#32CD32","linen":"#FAF0E6","magenta":"#FF00FF","maroon":"#800000","mediumaquamarine":"#66CDAA","mediumblue":"#0000CD","mediumorchid":"#BA55D3","mediumpurple":"#9370DB","mediumseagreen":"#3CB371","mediumslateblue":"#7B68EE","mediumspringgreen":"#00FA9A","mediumturquoise":"#48D1CC","mediumvioletred":"#C71585","midnightblue":"#191970","mintcream":"#F5FFFA","mistyrose":"#FFE4E1","moccasin":"#FFE4B5","navajowhite":"#FFDEAD","navy":"#000080","oldlace":"#FDF5E6","olive":"#808000","olivedrab":"#6B8E23","orange":"#FFA500","orangered":"#FF4500","orchid":"#DA70D6","palegoldenrod":"#EEE8AA","palegreen":"#98FB98","paleturquoise":"#AFEEEE","palevioletred":"#DB7093","papayawhip":"#FFEFD5","peachpuff":"#FFDAB9","peru":"#CD853F","pink":"#FFC0CB","plum":"#DDA0DD","powderblue":"#B0E0E6","purple":"#800080","rebeccapurple":"#663399","red":"#FF0000","rosybrown":"#BC8F8F","royalblue":"#4169E1","saddlebrown":"#8B4513","salmon":"#FA8072","sandybrown":"#F4A460","seagreen":"#2E8B57","seashell":"#FFF5EE","sienna":"#A0522D","silver":"#C0C0C0","skyblue":"#87CEEB","slateblue":"#6A5ACD","slategray":"#708090","slategrey":"#708090","snow":"#FFFAFA","springgreen":"#00FF7F","steelblue":"#4682B4","tan":"#D2B48C","teal":"#008080","thistle":"#D8BFD8","tomato":"#FF6347","turquoise":"#40E0D0","violet":"#EE82EE","wheat":"#F5DEB3","white":"#FFFFFF","whitesmoke":"#F5F5F5","yellow":"#FFFF00","yellowgreen":"#9ACD32"};
+        let comparisonColors = [
+            { hex: '#6366F1', source: 'base' },
+            { hex: '#A9A9A9' },
+            { hex: '#000000' },
+            { hex: '#FFFFFF' }
+        ];
+        let savedItems = (() => { try { const v = JSON.parse(localStorage.getItem('chromacraft_saved') || '[]'); return Array.isArray(v) ? v : []; } catch (_) { return []; } })();
+
+        const PRESET_GRADIENTS = [
+            { name: "Sunset Beach", stops: [{color:"#ff7e5f", position:0}, {color:"#feb47b", position:100}] },
+            { name: "Neon Cyber", stops: [{color:"#00f2fe", position:0}, {color:"#4facfe", position:100}] },
+            { name: "Pastel Dream", stops: [{color:"#a1c4fd", position:0}, {color:"#c2e9fb", position:100}] },
+            { name: "Aurora Night", stops: [{color:"#43e97b", position:0}, {color:"#38f9d7", position:100}] },
+            { name: "Deep Space", stops: [{color:"#0f172a", position:0}, {color:"#334155", position:50}, {color:"#6366f1", position:100}] },
+            { name: "Flame Burst", stops: [{color:"#f83600", position:0}, {color:"#fe8c00", position:100}] }
+        ];
+
+        // --- INIT ON LOAD ---
+        window.onload = function() {
+            lucide.createIcons();
+            if ('EyeDropper' in window) {
+                document.getElementById('eyedropperBtn').classList.remove('hidden');
+            } else {
+                const helper = document.getElementById('screenPickerHelp');
+                if (helper) helper.textContent = '현재 브라우저는 화면 직접 캡처를 지원하지 않습니다. 이미지 열기를 사용하면 이미지 픽셀을 선택할 수 있습니다.';
+            }
+            updateBaseColor(currentBaseColor);
+            renderGradientStops();
+            renderPresetButtons();
+            updateGradient();
+            updateSavedCount();
+            renderNamedColors();
+            renderComparisonTable();
+            initImageColorPicker();
+            setCapturedColor(currentBaseColor, '초기 기준색', '');
+            updateExpertDifference();
+            renderExpertExport();
+
+            // Keyboard shortcut (Spacebar for random color)
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                    e.preventDefault();
+                    randomizeBaseColor();
+                } else if (e.key === 'Escape') {
+                    const overlay = document.getElementById('fullscreenOverlay');
+                    if (!overlay.classList.contains('hidden')) toggleFullscreenPreview();
+                }
+            });
+        };
+
+        // --- TAB SWITCHING LOGIC ---
+        function switchTab(tab) {
+            const tabs = ['palette', 'colors', 'expert', 'gradient', 'accessibility', 'library'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`${t}Section`);
+                const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
+                if (t === tab) {
+                    sec.classList.remove('hidden');
+                    btn.className = "flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-md";
+                } else {
+                    sec.classList.add('hidden');
+                    btn.className = "flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white";
+                }
+            });
+
+            if (tab === 'colors') { renderNamedColors(); renderComparisonTable(); }
+            if (tab === 'expert') { updateExpertDifference(); renderExpertExport(); }
+            if (tab === 'accessibility') renderAccessibility();
+            if (tab === 'library') renderSavedLibrary();
+        }
+
+        // --- COLOR CONVERSION UTILITIES ---
+        function hexToRgb(hex) {
+            let c = hex.replace('#', '');
+            if (c.length === 3) c = c.split('').map(x => x + x).join('');
+            const num = parseInt(c, 16);
+            return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+        }
+
+        function rgbToHex(r, g, b) {
+            const toHex = x => {
+                const h = Math.round(Math.max(0, Math.min(255, x))).toString(16);
+                return h.length === 1 ? '0' + h : h;
+            };
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`.toUpperCase();
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+
+        function rgbToHsv(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            const v = max;
+            const d = max - min;
+            const s = max === 0 ? 0 : d / max;
+            let h = 0;
+            if (max !== min) {
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100) };
+        }
+
+        function rgbToCmyk(r, g, b) {
+            let c = 1 - (r / 255);
+            let m = 1 - (g / 255);
+            let y = 1 - (b / 255);
+            let k = Math.min(c, Math.min(m, y));
+            if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
+            c = Math.round(((c - k) / (1 - k)) * 100);
+            m = Math.round(((m - k) / (1 - k)) * 100);
+            y = Math.round(((y - k) / (1 - k)) * 100);
+            k = Math.round(k * 100);
+            return { c, m, y, k };
+        }
+
+        // Accurate sRGB -> OKLab -> OKLCH conversion.
+        function rgbToOklch(r, g, b) {
+            const linear = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+            const R = linear(r), G = linear(g), B = linear(b);
+            const l = Math.cbrt(0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B);
+            const m = Math.cbrt(0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B);
+            const ss = Math.cbrt(0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B);
+            const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * ss;
+            const a = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * ss;
+            const bb = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * ss;
+            const C = Math.sqrt(a * a + bb * bb);
+            const h = C < 1e-7 ? 0 : (Math.atan2(bb, a) * 180 / Math.PI + 360) % 360;
+            return { l: L.toFixed(3), c: C.toFixed(3), h: Math.round(h) };
+        }
+
+        // --- WCAG CONTRAST & ACCESSIBILITY ---
+        function getLuminance(r, g, b) {
+            const a = [r, g, b].map(v => {
+                v /= 255;
+                return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            });
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+        }
+
+        function getContrastRatio(hex1, hex2) {
+            const rgb1 = hexToRgb(hex1);
+            const rgb2 = hexToRgb(hex2);
+            const L1 = getLuminance(rgb1.r, rgb1.g, rgb1.b);
+            const L2 = getLuminance(rgb2.r, rgb2.g, rgb2.b);
+            const maxL = Math.max(L1, L2);
+            const minL = Math.min(L1, L2);
+            return parseFloat(((maxL + 0.05) / (minL + 0.05)).toFixed(2));
+        }
+
+        // --- COLOR BLINDNESS SIMULATION ALGORITHM ---
+        function simulateColorBlindness(hex, type) {
+            let { r, g, b } = hexToRgb(hex);
+            r /= 255; g /= 255; b /= 255;
+
+            let sr, sg, sb;
+            if (type === 'protanopia') {
+                sr = 0.56667 * r + 0.43333 * g + 0.00000 * b;
+                sg = 0.55833 * r + 0.44167 * g + 0.00000 * b;
+                sb = 0.00000 * r + 0.24167 * g + 0.75833 * b;
+            } else if (type === 'deuteranopia') {
+                sr = 0.62500 * r + 0.37500 * g + 0.00000 * b;
+                sg = 0.70000 * r + 0.30000 * g + 0.00000 * b;
+                sb = 0.00000 * r + 0.30000 * g + 0.70000 * b;
+            } else if (type === 'tritanopia') {
+                sr = 0.95000 * r + 0.05000 * g + 0.00000 * b;
+                sg = 0.00000 * r + 0.43333 * g + 0.56667 * b;
+                sb = 0.00000 * r + 0.47500 * g + 0.52500 * b;
+            } else if (type === 'achromatopsia') {
+                const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+                sr = sg = sb = gray;
+            } else {
+                return hex;
+            }
+
+            return rgbToHex(
+                Math.min(255, Math.max(0, sr * 255)),
+                Math.min(255, Math.max(0, sg * 255)),
+                Math.min(255, Math.max(0, sb * 255))
+            );
+        }
+
+        // --- CSS NAMED COLOR SEARCH, PRECISION CONTROLS & COMPARISON ---
+        const CSS_COLOR_PARTS = ["aquamarine","cornflower","chartreuse","goldenrod","honeydew","rebecca","blanched","almond","antique","alice","azure","beige","bisque","black","blue","brown","burly","wood","cadet","chocolate","coral","cornsilk","crimson","cyan","dark","deep","dim","dodger","fire","brick","floral","white","forest","green","fuchsia","gainsboro","ghost","gold","gray","grey","hot","pink","indian","red","indigo","ivory","khaki","lavender","blush","lawn","lime","lemon","chiffon","magenta","maroon","medium","midnight","mint","cream","misty","rose","moccasin","navajo","navy","old","lace","olive","drab","orange","orchid","pale","papaya","whip","peach","puff","peru","plum","powder","purple","rosy","royal","saddle","sandy","salmon","sienna","silver","sea","sky","slate","smoke","snow","spring","steel","tan","teal","thistle","tomato","turquoise","violet","wheat","yellow","aqua","sienna","light"];
+        const CSS_COLOR_PARTS_SORTED = [...new Set(CSS_COLOR_PARTS.filter(Boolean))].sort((a, b) => b.length - a.length);
+        function titleCssName(name) {
+            const parts = CSS_COLOR_PARTS_SORTED;
+            const memo = {};
+            function splitAt(i) {
+                if (i === name.length) return [];
+                if (memo[i] !== undefined) return memo[i];
+                for (const part of parts) {
+                    if (name.startsWith(part, i)) {
+                        const rest = splitAt(i + part.length);
+                        if (rest) return (memo[i] = [part, ...rest]);
+                    }
+                }
+                return (memo[i] = null);
+            }
+            const words = splitAt(0);
+            return words ? words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') : name.charAt(0).toUpperCase() + name.slice(1);
+        }
+        const CSS_NAMED_COLOR_LIST = Object.entries(CSS_NAMED_COLORS).map(([name, hex]) => ({ name, displayName: titleCssName(name), hex, family: colorFamily(hex, name) }));
+
+        function colorDistance(hexA, hexB) {
+            const a = hexToRgb(hexA), b = hexToRgb(hexB);
+            const rmean = (a.r + b.r) / 2, dr = a.r - b.r, dg = a.g - b.g, db = a.b - b.b;
+            return Math.sqrt((2 + rmean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rmean) / 256) * db * db);
+        }
+
+        function findCssColorInfo(hex) {
+            const normalized = rgbToHex(hexToRgb(hex).r, hexToRgb(hex).g, hexToRgb(hex).b);
+            const exact = CSS_NAMED_COLOR_LIST.filter(entry => entry.hex === normalized);
+            if (exact.length) return { exact: true, names: exact.map(entry => entry.displayName), name: exact[0].displayName, hex: normalized, distance: 0 };
+            let bestName = 'Black', bestHex = '#000000', bestDistance = Infinity;
+            for (const entry of CSS_NAMED_COLOR_LIST) {
+                const distance = colorDistance(normalized, entry.hex);
+                if (distance < bestDistance) { bestDistance = distance; bestName = entry.displayName; bestHex = entry.hex; }
+            }
+            return { exact: false, names: [bestName], name: bestName, hex: bestHex, distance: bestDistance };
+        }
+
+        function colorFamily(hex, rawName = '') {
+            const { r, g, b } = hexToRgb(hex);
+            const { h, s, l } = rgbToHsl(r, g, b);
+            const name = String(rawName).toLowerCase();
+            if (/(brown|sienna|peru|chocolate|tan|burlywood|wheat|bisque|moccasin|papaya|peachpuff)/.test(name)) return 'brown';
+            if (s < 13) return 'neutral';
+            if (h < 15 || h >= 345) return 'red';
+            if (h < 45) return l < 45 ? 'brown' : 'orange';
+            if (h < 70) return 'yellow';
+            if (h < 165) return 'green';
+            if (h < 200) return 'cyan';
+            if (h < 255) return 'blue';
+            if (h < 300) return 'purple';
+            return 'pink';
+        }
+
+        function applyManualHex() {
+            const value = document.getElementById('manualHexInput').value.trim();
+            if (!/^#?(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) { toast('HEX는 #RGB 또는 #RRGGBB 형식으로 입력하세요.'); return; }
+            let hex = value.startsWith('#') ? value : `#${value}`;
+            if (hex.length === 4) hex = '#' + [...hex.slice(1)].map(c => c + c).join('');
+            updateBaseColor(hex);
+            toast('HEX 색상을 적용했습니다.');
+        }
+
+        function updateBaseFromHsl() {
+            const h = Number(document.getElementById('hueSlider').value);
+            const saturation = Number(document.getElementById('saturationSlider').value);
+            const lightness = Number(document.getElementById('lightnessSlider').value);
+            const rgb = hslToRgb(h, saturation, lightness);
+            document.getElementById('hueValue').textContent = `${h}°`;
+            document.getElementById('saturationValue').textContent = `${saturation}%`;
+            document.getElementById('lightnessValue').textContent = `${lightness}%`;
+            updateBaseColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+        }
+
+        function copyNamedColorName(name) {
+            copyToClipboard(name, 'CSS 색상명');
+        }
+
+        function setNamedColorAsBase(hex, name) {
+            updateBaseColor(hex);
+            toast(`${name} 색상을 기준 색상으로 적용했습니다.`);
+        }
+
+        function addColorToComparison(hex) {
+            const normalized = rgbToHex(hexToRgb(hex).r, hexToRgb(hex).g, hexToRgb(hex).b);
+            if (comparisonColors.some(c => c.hex.toUpperCase() === normalized)) { toast('이미 비교표에 있는 색상입니다.'); return; }
+            if (comparisonColors.length >= 6) { toast('비교표에는 최대 6개 색상까지 추가할 수 있습니다.'); return; }
+            comparisonColors.push({ hex: normalized });
+            renderComparisonTable();
+            toast(`${findCssColorInfo(normalized).name}을(를) 비교표에 추가했습니다.`);
+        }
+
+        function addBaseToComparison() { addColorToComparison(currentBaseColor); }
+
+        function removeComparisonColor(index) {
+            if (comparisonColors[index]?.source === 'base') { toast('현재 기준 색상은 비교표에서 제거할 수 없습니다.'); return; }
+            comparisonColors.splice(index, 1);
+            renderComparisonTable();
+        }
+
+        function resetComparison() {
+            comparisonColors = [{ hex: currentBaseColor, source: 'base' }, { hex: '#A9A9A9' }, { hex: '#000000' }, { hex: '#FFFFFF' }];
+            renderComparisonTable();
+            toast('비교표를 기준색·DarkGray·Black·White로 초기화했습니다.');
+        }
+
+        function renderNamedColors() {
+            const grid = document.getElementById('namedColorsGrid');
+            if (!grid) return;
+            const query = (document.getElementById('colorSearchInput')?.value || '').trim().toLowerCase().replace(/^#/, '');
+            const family = document.getElementById('colorFamilyFilter')?.value || 'all';
+            const filtered = CSS_NAMED_COLOR_LIST.filter(({ name, displayName, hex, family: colorGroup }) => {
+                const matchesQuery = !query || name.includes(query) || hex.toLowerCase().includes(query) || displayName.toLowerCase().includes(query);
+                return matchesQuery && (family === 'all' || colorGroup === family);
+            });
+            document.getElementById('colorLibraryCount').textContent = `${filtered.length} / ${CSS_NAMED_COLOR_LIST.length} colors`;
+            document.getElementById('namedColorsEmpty').classList.toggle('hidden', filtered.length !== 0);
+            grid.innerHTML = filtered.map(({ displayName: name, hex }) => {
+                const { r, g, b } = hexToRgb(hex);
+                const contrast = getContrastRatio(hex, '#FFFFFF');
+                const textColor = contrast > 3 ? '#FFFFFF' : '#111827';
+                return `<article class="overflow-hidden rounded-xl border border-slate-700/70 bg-slate-900/60 hover:border-indigo-500/70 transition-colors">
+                    <button type="button" onclick="setNamedColorAsBase('${hex}','${name}')" title="${name} ${hex} · 기준 색상으로 적용" class="block w-full text-left">
+                        <span class="block h-12 sm:h-14" style="background:${hex}"></span>
+                        <span class="block px-2.5 pt-2 text-xs font-bold text-white truncate">${name}</span>
+                        <span class="block px-2.5 pb-2 text-[10px] font-mono text-slate-400">${hex}</span>
+                    </button>
+                    <div class="grid grid-cols-3 border-t border-slate-800">
+                        <button type="button" onclick="copyNamedColorName('${name}')" title="${name} 이름만 복사" class="py-2 px-0.5 text-[10px] text-emerald-300 hover:bg-emerald-500/10">이름 복사</button>
+                        <button type="button" onclick="setNamedColorAsBase('${hex}','${name}')" class="py-2 px-0.5 text-[10px] text-slate-300 hover:bg-slate-800 border-l border-slate-800">기준색 적용</button>
+                        <button type="button" onclick="addColorToComparison('${hex}')" class="py-2 px-0.5 text-[10px] text-indigo-300 hover:bg-indigo-500/10 border-l border-slate-800">비교 추가 +</button>
+                    </div>
+                </article>`;
+            }).join('');
+        }
+
+        function renderComparisonTable() {
+            const body = document.getElementById('comparisonTableBody');
+            if (!body) return;
+            body.innerHTML = comparisonColors.map((item, index) => {
+                const hex = item.hex.toUpperCase();
+                const { r, g, b } = hexToRgb(hex);
+                const hsl = rgbToHsl(r, g, b), hsv = rgbToHsv(r, g, b), cmyk = rgbToCmyk(r, g, b), oklch = rgbToOklch(r, g, b);
+                const info = findCssColorInfo(hex);
+                const name = info.exact ? info.names.join(' / ') : `≈ ${info.name}`;
+                const luminance = getLuminance(r, g, b).toFixed(4);
+                const whiteContrast = getContrastRatio(hex, '#FFFFFF'), blackContrast = getContrastRatio(hex, '#000000');
+                return `<tr class="hover:bg-slate-900/70">
+                    <td class="px-3 py-3 min-w-44"><div class="flex items-center gap-2"><span class="w-9 h-9 rounded-lg border border-white/10 shrink-0" style="background:${hex}"></span><span><b class="block text-slate-100">${name}</b><span class="block text-[10px] text-slate-500">${item.source === 'base' ? '현재 기준색' : (info.exact ? 'CSS 표준 색상' : '가장 가까운 CSS 색상')}</span></span></div></td>
+                    <td class="px-3 py-3 font-mono text-slate-200 whitespace-nowrap">${hex}</td>
+                    <td class="px-3 py-3 font-mono text-slate-300 whitespace-nowrap">${r}, ${g}, ${b}</td>
+                    <td class="px-3 py-3 font-mono text-slate-300 whitespace-nowrap">${hsl.h}, ${hsl.s}%, ${hsl.l}%</td>
+                    <td class="px-3 py-3 font-mono text-slate-300 whitespace-nowrap">${hsv.h}, ${hsv.s}%, ${hsv.v}%</td>
+                    <td class="px-3 py-3 font-mono text-slate-300 whitespace-nowrap">${cmyk.c}, ${cmyk.m}, ${cmyk.y}, ${cmyk.k}</td>
+                    <td class="px-3 py-3 font-mono text-slate-300 whitespace-nowrap">${oklch.l} ${oklch.c} ${oklch.h}</td>
+                    <td class="px-3 py-3 font-mono text-slate-300">${luminance}</td>
+                    <td class="px-3 py-3 font-mono ${whiteContrast >= 4.5 ? 'text-emerald-300' : 'text-amber-300'}">${whiteContrast}:1</td>
+                    <td class="px-3 py-3 font-mono ${blackContrast >= 4.5 ? 'text-emerald-300' : 'text-amber-300'}">${blackContrast}:1</td>
+                    <td class="px-3 py-3">${item.source === 'base' ? '<span class="text-slate-600">기준색</span>' : `<button onclick="removeComparisonColor(${index})" class="text-rose-300 hover:text-rose-200">삭제</button>`}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // --- BASE COLOR UPDATE ---
+        function updateBaseColor(hex) {
+            currentBaseColor = hex.toUpperCase();
+            document.getElementById('baseColorPicker').value = currentBaseColor;
+            document.getElementById('baseHexDisplay').innerText = currentBaseColor;
+
+            const { r, g, b } = hexToRgb(currentBaseColor);
+            const { h, s, l } = rgbToHsl(r, g, b);
+            const hsv = rgbToHsv(r, g, b);
+            const { c, m, y, k } = rgbToCmyk(r, g, b);
+            const oklch = rgbToOklch(r, g, b);
+
+            document.getElementById('codeHex').innerText = currentBaseColor;
+            document.getElementById('codeRgb').innerText = `${r}, ${g}, ${b}`;
+            document.getElementById('codeHsl').innerText = `${h}, ${s}%, ${l}%`;
+            document.getElementById('codeHsv').innerText = `${hsv.h}, ${hsv.s}%, ${hsv.v}%`;
+            document.getElementById('codeCmyk').innerText = `${c}, ${m}, ${y}, ${k}`;
+            document.getElementById('codeOklch').innerText = `${oklch.l} ${oklch.c} ${oklch.h}`;
+            const nameInfo = findCssColorInfo(currentBaseColor);
+            document.getElementById('baseColorName').textContent = nameInfo.exact
+                ? `CSS 색상명: ${nameInfo.names.join(' / ')}`
+                : `가장 가까운 CSS 색상명: ${nameInfo.name} · 근접 RGB 거리 ${nameInfo.distance.toFixed(1)}`;
+            document.getElementById('manualHexInput').value = currentBaseColor;
+            document.getElementById('hueSlider').value = h;
+            document.getElementById('saturationSlider').value = s;
+            document.getElementById('lightnessSlider').value = l;
+            document.getElementById('hueValue').textContent = `${h}°`;
+            document.getElementById('saturationValue').textContent = `${s}%`;
+            document.getElementById('lightnessValue').textContent = `${l}%`;
+            const baseCompare = comparisonColors.find(c => c.source === 'base');
+            if (baseCompare) baseCompare.hex = currentBaseColor;
+
+            renderTintsAndShades(h, s);
+            renderHarmonies();
+            renderComparisonTable();
+            if (document.getElementById('deltaBaseSwatch')) {
+                document.getElementById('deltaBaseSwatch').style.backgroundColor = currentBaseColor;
+                document.getElementById('deltaBaseHex').textContent = currentBaseColor;
+                updateExpertDifference();
+                const expertSection = document.getElementById('expertSection');
+                if (expertSection && !expertSection.classList.contains('hidden')) renderExpertExport();
+            }
+        }
+
+        function randomizeBaseColor() {
+            const randomHex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            updateBaseColor(randomHex);
+            toast("새로운 기준 색상이 지정되었습니다!");
+        }
+
+        async function openEyeDropper() {
+            if ('EyeDropper' in window) {
+                try {
+                    const eyeDropper = new EyeDropper();
+                    const result = await eyeDropper.open();
+                    updateBaseColor(result.sRGBHex);
+                } catch (e) {
+                    // User canceled
+                }
+            }
+        }
+
+        // --- RENDER TINTS AND SHADES ---
+        function renderTintsAndShades(h, s) {
+            const tintsCont = document.getElementById('tintsContainer');
+            const shadesCont = document.getElementById('shadesContainer');
+            tintsCont.innerHTML = '';
+            shadesCont.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                // Tints: Lightness 50% -> 95%
+                const tintL = Math.round(50 + (i * 4.8));
+                const { r: tr, g: tg, b: tb } = hslToRgb(h, s, tintL);
+                const tintHex = rgbToHex(tr, tg, tb);
+
+                const tDiv = document.createElement('div');
+                tDiv.className = "cursor-pointer hover:opacity-80 transition-opacity relative group flex items-end justify-center pb-1";
+                tDiv.style.backgroundColor = tintHex;
+                tDiv.title = `${findCssColorInfo(tintHex).name} · ${tintHex} (복사)`;
+                tDiv.onclick = () => copyToClipboard(tintHex, 'Tint');
+                tDiv.innerHTML = `<span class="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 ${tintL > 70 ? 'text-slate-900' : 'text-white'}">${tintHex}</span>`;
+                tintsCont.appendChild(tDiv);
+
+                // Shades: Lightness 50% -> 5%
+                const shadeL = Math.round(50 - (i * 4.8));
+                const { r: sr, g: sg, b: sb } = hslToRgb(h, s, shadeL);
+                const shadeHex = rgbToHex(sr, sg, sb);
+
+                const sDiv = document.createElement('div');
+                sDiv.className = "cursor-pointer hover:opacity-80 transition-opacity relative group flex items-end justify-center pb-1";
+                sDiv.style.backgroundColor = shadeHex;
+                sDiv.title = `${findCssColorInfo(shadeHex).name} · ${shadeHex} (복사)`;
+                sDiv.onclick = () => copyToClipboard(shadeHex, 'Shade');
+                sDiv.innerHTML = `<span class="text-[9px] font-mono font-bold opacity-0 group-hover:opacity-100 ${shadeL > 70 ? 'text-slate-900' : 'text-white'}">${shadeHex}</span>`;
+                shadesCont.appendChild(sDiv);
+            }
+        }
+
+        // --- EXPANDED COLOR HARMONY DATA ---
+        function buildHarmonyData(baseHex = currentBaseColor) {
+            const normalizedBase = rgbToHex(hexToRgb(baseHex).r, hexToRgb(baseHex).g, hexToRgb(baseHex).b);
+            const { r, g, b } = hexToRgb(normalizedBase);
+            const { h, s, l } = rgbToHsl(r, g, b);
+            const clamp = (value, min = 0, max = 100) => Math.max(min, Math.min(max, value));
+            const makeHex = (newH, newS = s, newL = l) => {
+                const normH = ((newH % 360) + 360) % 360;
+                const rgb = hslToRgb(normH, clamp(newS), clamp(newL));
+                return rgbToHex(rgb.r, rgb.g, rgb.b);
+            };
+            const unique = colors => [...new Set(colors.map(color => color.toUpperCase()))];
+            const hues = (offsets, sat = s, light = l) => offsets.map(offset => makeHex(h + offset, sat, light));
+            const analogous7 = [-45, -30, -15, 0, 15, 30, 45];
+            const analogous9 = [-60, -45, -30, -15, 0, 15, 30, 45, 60];
+            const monoLevels = [-40, -30, -20, -10, 0, 10, 20, 30, 40].map(delta => clamp(l + delta, 3, 97)).sort((a, b) => a - b);
+            const wheelSat = clamp(Math.max(65, s));
+            const wheelLight = clamp(l, 46, 62);
+            const grayscale = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(level => makeHex(h, 0, level));
+            const complementLevels = [25, 35, 45, 55, 65].flatMap(level => [makeHex(h, s, level), makeHex(h + 180, s, level)]);
+            const neutralAccent = [normalizedBase, makeHex(h + 180), ...[12, 24, 36, 48, 60, 72, 84].map(level => makeHex(h, 0, level))];
+
+            return [
+                { title: '보색 (Complementary)', desc: '색상환 반대편 180° · 강한 대비', colors: [normalizedBase, makeHex(h + 180)] },
+                { title: '분할 보색 (Split Complementary)', desc: '보색 주변 ±30° · 균형 있는 대비', colors: unique([normalizedBase, makeHex(h + 150), makeHex(h + 210)]) },
+                { title: '확장 분할 보색', desc: '보색 양쪽을 세분화한 5색 구성', colors: unique([normalizedBase, ...hues([135, 155, 205, 225])]) },
+                { title: '유사색 (Analogous)', desc: '15° 간격으로 부드럽게 연결되는 7색', colors: unique(hues(analogous7)) },
+                { title: '확장 유사색', desc: '±60°까지 확장한 9색 그라데이션 조합', colors: unique(hues(analogous9)) },
+                { title: '삼각 배색 (Triadic)', desc: '120° 간격 · 생동감 있는 3색', colors: unique(hues([0, 120, 240])) },
+                { title: '직사각 배색 (Tetradic)', desc: '두 쌍의 보색을 결합한 4색', colors: unique(hues([0, 60, 180, 240])) },
+                { title: '정사각 배색 (Square)', desc: '90° 간격으로 균형 잡은 4색', colors: unique(hues([0, 90, 180, 270])) },
+                { title: '이중 보색 배색', desc: '기준색과 보색 주변색을 함께 비교', colors: unique(hues([0, 30, 180, 210])) },
+                { title: '단색 명도 스케일', desc: '같은 색상의 어두운 톤부터 밝은 톤까지', colors: unique(monoLevels.map(level => makeHex(h, s, level))) },
+                { title: '파스텔 유사색', desc: '밝고 부드러운 UI·배경용 7색', colors: unique(hues(analogous7, clamp(s * 0.55, 30, 62), 82)) },
+                { title: '비비드 유사색', desc: '고채도·중간 명도의 선명한 7색', colors: unique(hues(analogous7, 90, 55)) },
+                { title: '저채도 모던 유사색', desc: '차분한 UI와 세련된 톤에 어울리는 7색', colors: unique(hues(analogous7, 28, clamp(l, 35, 72))) },
+                { title: '회색조 스케일', desc: '검정에서 흰색까지 11단계 중립색', colors: unique(grayscale) },
+                { title: '12분할 색상환', desc: '30° 간격으로 전체 색상 흐름 비교', colors: unique(Array.from({ length: 12 }, (_, i) => makeHex(h + i * 30, wheelSat, wheelLight))) },
+                { title: '24분할 색상환', desc: '15° 간격 · 더 세밀한 색상 차이 비교', colors: unique(Array.from({ length: 24 }, (_, i) => makeHex(h + i * 15, wheelSat, wheelLight))) },
+                { title: '웜톤 기준 팔레트', desc: '빨강·주황·노랑 계열의 따뜻한 색상 비교', colors: unique([0, 12, 24, 36, 48, 60, 72, 84].map(degree => makeHex(degree, 72, 55))) },
+                { title: '쿨톤 기준 팔레트', desc: '청록·파랑·보라 계열의 차가운 색상 비교', colors: unique([150, 165, 180, 195, 210, 225, 240, 255].map(degree => makeHex(degree, 68, 52))) },
+                { title: '중성색 + 포인트', desc: '회색 단계에 기준색과 보색을 더한 구성', colors: unique(neutralAccent) },
+                { title: '보색 명도 비교', desc: '기준색과 보색을 5단계 명도로 교차 비교', colors: unique(complementLevels) },
+                { title: '6방향 색상 대비', desc: '색상환 60° 간격의 다채로운 6색', colors: unique(hues([0, 60, 120, 180, 240, 300], 82, 54)) },
+                { title: '유사색 + 파스텔 단계', desc: '유사색 5종을 밝은 톤으로 통일', colors: unique(hues([-30, -15, 0, 15, 30], clamp(s * 0.45, 25, 55), 88)) }
+            ];
+        }
+
+        // --- RENDER EXPANDED HARMONIES ---
+        function renderHarmonies() {
+            const container = document.getElementById('harmonyContainer');
+            container.innerHTML = '';
+            const harmonies = buildHarmonyData(currentBaseColor);
+            const sampleCount = harmonies.reduce((sum, item) => sum + item.colors.length, 0);
+            const stats = document.getElementById('harmonyStats');
+            if (stats) stats.textContent = `${harmonies.length}가지 배색 방식 · ${sampleCount}개 색상 샘플`;
+
+            harmonies.forEach(item => {
+                const card = document.createElement('article');
+                card.className = 'glass-panel p-3 rounded-2xl flex flex-col gap-3 shadow-lg hover:border-slate-700 transition-all min-w-0';
+
+                const header = document.createElement('div');
+                header.className = 'flex items-start justify-between gap-2';
+                const titleGroup = document.createElement('div');
+                titleGroup.className = 'min-w-0';
+                const title = document.createElement('h4');
+                title.className = 'font-bold text-sm text-white leading-snug';
+                title.textContent = item.title;
+                const description = document.createElement('p');
+                description.className = 'text-[10px] text-slate-400 mt-1 leading-relaxed';
+                description.textContent = item.desc;
+                titleGroup.append(title, description);
+
+                const actionGroup = document.createElement('div');
+                actionGroup.className = 'flex items-center gap-1 shrink-0';
+                const count = document.createElement('span');
+                count.className = 'text-[10px] rounded-md px-1.5 py-1 bg-slate-900 border border-slate-700 text-indigo-300 font-mono';
+                count.textContent = `${item.colors.length}색`;
+                count.title = '이 팔레트의 색상 수';
+                const copyButton = document.createElement('button');
+                copyButton.type = 'button';
+                copyButton.className = 'text-[10px] px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700';
+                copyButton.textContent = 'HEX 복사';
+                copyButton.title = '이 팔레트의 HEX 코드를 모두 복사';
+                copyButton.addEventListener('click', () => copyToClipboard(item.colors.join(', '), `${item.title} HEX`));
+                const pngButton = document.createElement('button');
+                pngButton.type = 'button';
+                pngButton.className = 'p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800';
+                pngButton.title = '팔레트 PNG 다운로드';
+                pngButton.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i>';
+                pngButton.addEventListener('click', () => exportCardAsPng(item.title, item.colors));
+                actionGroup.append(count, copyButton, pngButton);
+                header.append(titleGroup, actionGroup);
+
+                const strip = document.createElement('div');
+                strip.className = 'flex h-11 rounded-lg overflow-hidden border border-slate-700/60';
+                item.colors.forEach(color => {
+                    const swatch = document.createElement('button');
+                    swatch.type = 'button';
+                    swatch.className = 'flex-1 min-w-0 h-full border-r border-black/10 last:border-r-0 hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white/70';
+                    swatch.style.backgroundColor = color;
+                    const info = findCssColorInfo(color);
+                    swatch.title = `${info.exact ? info.name : '가장 가까운 CSS 색상명: ' + info.name} · ${color} · 클릭하여 HEX 복사`;
+                    swatch.setAttribute('aria-label', `${color} HEX 복사`);
+                    swatch.addEventListener('click', () => copyToClipboard(color, 'HEX'));
+                    strip.appendChild(swatch);
+                });
+
+                const detailGrid = document.createElement('div');
+                detailGrid.className = 'grid grid-cols-3 gap-1';
+                item.colors.forEach(color => {
+                    const info = findCssColorInfo(color);
+                    const colorButton = document.createElement('button');
+                    colorButton.type = 'button';
+                    colorButton.className = 'min-w-0 flex items-center gap-1.5 p-1 rounded-md bg-slate-950/70 border border-slate-800 hover:border-indigo-500/70 text-left';
+                    colorButton.title = `${info.exact ? 'CSS 표준 색상명' : '가장 가까운 CSS 표준 색상명'}: ${info.name} · 정확한 색상값: ${color} · 클릭하여 HEX 복사`;
+                    colorButton.addEventListener('click', () => copyToClipboard(color, 'HEX'));
+                    const miniSwatch = document.createElement('span');
+                    miniSwatch.className = 'w-4 h-4 rounded-sm border border-white/10 shrink-0';
+                    miniSwatch.style.backgroundColor = color;
+                    const labelWrap = document.createElement('span');
+                    labelWrap.className = 'min-w-0 flex-1';
+                    const colorName = document.createElement('span');
+                    colorName.className = 'block truncate text-[9px] leading-tight text-slate-300';
+                    colorName.textContent = info.exact ? info.name : `≈ ${info.name}`;
+                    const hexText = document.createElement('code');
+                    hexText.className = 'block truncate text-[9px] leading-tight font-mono text-indigo-300';
+                    hexText.textContent = color;
+                    labelWrap.append(colorName, hexText);
+                    colorButton.append(miniSwatch, labelWrap);
+                    detailGrid.appendChild(colorButton);
+                });
+
+                card.append(header, strip, detailGrid);
+                container.appendChild(card);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // --- PROFESSIONAL COLOR PICKER / IMAGE SAMPLER ---
+        let capturedColor = '#6366F1';
+        let samplerCanvasContext = null;
+        let samplerSourceSize = { width: 0, height: 0 };
+        let samplerDisplayName = '';
+
+        function normalizeHex(value) {
+            let hex = String(value || '').trim();
+            if (!hex.startsWith('#')) hex = `#${hex}`;
+            if (/^#[0-9a-f]{3}$/i.test(hex)) hex = '#' + [...hex.slice(1)].map(ch => ch + ch).join('');
+            return /^#[0-9a-f]{6}$/i.test(hex) ? hex.toUpperCase() : null;
+        }
+
+        async function captureScreenColor() {
+            if (!('EyeDropper' in window)) {
+                toast('이 브라우저는 화면 캡처를 지원하지 않습니다. 이미지 열기를 이용하세요.');
+                return;
+            }
+            try {
+                const result = await new EyeDropper().open();
+                setCapturedColor(result.sRGBHex, '화면 컬러 캡처', '화면 픽셀');
+                toast(`${result.sRGBHex.toUpperCase()} 색상을 캡처했습니다.`);
+            } catch (error) {
+                if (!error || error.name !== 'AbortError') toast('화면 색상을 가져오지 못했습니다. 브라우저 권한과 실행 환경을 확인하세요.');
+            }
+        }
+
+        function setCapturedColor(hex, source, detail = '') {
+            const normalized = normalizeHex(hex);
+            if (!normalized) return;
+            capturedColor = normalized;
+            const rgb = hexToRgb(normalized);
+            const info = findCssColorInfo(normalized);
+            const swatch = document.getElementById('capturedColorSwatch');
+            const hexNode = document.getElementById('capturedColorHex');
+            const nameNode = document.getElementById('capturedColorName');
+            const metaNode = document.getElementById('capturedColorMeta');
+            if (swatch) swatch.style.backgroundColor = normalized;
+            if (hexNode) hexNode.textContent = normalized;
+            if (nameNode) nameNode.textContent = info.exact ? `CSS 표준 색상명: ${info.names.join(' / ')}` : `가장 가까운 CSS 색상명: ${info.name}`;
+            if (metaNode) metaNode.textContent = `${source || '캡처 색상'}${detail ? ' · ' + detail : ''} · RGB ${rgb.r}, ${rgb.g}, ${rgb.b}`;
+        }
+
+        function copyCapturedColor() { copyToClipboard(capturedColor, '캡처 HEX'); }
+        function applyCapturedColorAsBase() { updateBaseColor(capturedColor); toast(`${capturedColor}을(를) 기준색으로 적용했습니다.`); }
+        function addCapturedColorToComparison() { addColorToComparison(capturedColor); }
+        function saveCapturedColor() {
+            const info = findCssColorInfo(capturedColor);
+            savedItems.unshift({ id: Date.now(), type: 'palette', title: `Captured ${capturedColor} · ${info.name}`, color: capturedColor, colors: [capturedColor] });
+            persistSavedItems();
+            toast('캡처 색상을 보관함에 저장했습니다.');
+        }
+
+        function initImageColorPicker() {
+            const input = document.getElementById('samplerImageInput');
+            const canvas = document.getElementById('imageSamplerCanvas');
+            const magnifier = document.getElementById('imageMagnifier');
+            if (!input || !canvas || !magnifier) return;
+            input.addEventListener('change', event => {
+                const file = event.target.files && event.target.files[0];
+                if (file) loadSamplerImage(file);
+                input.value = '';
+            });
+            canvas.addEventListener('pointermove', event => {
+                if (!samplerCanvasContext) return;
+                const point = samplerPointFromEvent(event, canvas);
+                const color = readSamplerPixel(point.x, point.y);
+                showSamplerHover(color, point.x, point.y);
+                drawSamplerMagnifier(point.x, point.y);
+            });
+            canvas.addEventListener('pointerleave', () => {
+                const status = document.getElementById('imageSamplerStatus');
+                if (status && samplerCanvasContext) status.textContent = '이미지 위에 포인터를 올려 미리 보고 클릭하여 픽셀을 선택하세요.';
+            });
+            canvas.addEventListener('pointerdown', event => {
+                if (!samplerCanvasContext) return;
+                event.preventDefault();
+                const point = samplerPointFromEvent(event, canvas);
+                const color = readSamplerPixel(point.x, point.y);
+                setCapturedColor(color, '이미지 컬러 캡처', `x ${point.x}, y ${point.y} · 샘플 이미지 기준`);
+                showSamplerHover(color, point.x, point.y, true);
+                drawSamplerMagnifier(point.x, point.y);
+                toast(`${color} 픽셀을 선택했습니다.`);
+            });
+            const wrapper = document.getElementById('imageSamplerWrap');
+            wrapper.addEventListener('dragover', event => { event.preventDefault(); wrapper.classList.add('border-indigo-400'); });
+            wrapper.addEventListener('dragleave', () => wrapper.classList.remove('border-indigo-400'));
+            wrapper.addEventListener('drop', event => {
+                event.preventDefault(); wrapper.classList.remove('border-indigo-400');
+                const file = [...(event.dataTransfer?.files || [])].find(f => f.type.startsWith('image/'));
+                if (file) loadSamplerImage(file);
+            });
+        }
+
+        function loadSamplerImage(file) {
+            if (!file || !file.type || !file.type.startsWith('image/')) { toast('이미지 파일을 선택하세요.'); return; }
+            const url = URL.createObjectURL(file);
+            const image = new Image();
+            image.onload = () => {
+                try {
+                    const maxPixels = 16000000;
+                    const maxSide = 6000;
+                    const scale = Math.min(1, Math.sqrt(maxPixels / (image.naturalWidth * image.naturalHeight)), maxSide / image.naturalWidth, maxSide / image.naturalHeight);
+                    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+                    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+                    const canvas = document.getElementById('imageSamplerCanvas');
+                    canvas.width = width; canvas.height = height;
+                    samplerCanvasContext = canvas.getContext('2d', { willReadFrequently: true });
+                    if (!samplerCanvasContext) throw new Error('canvas context unavailable');
+                    samplerCanvasContext.imageSmoothingEnabled = false;
+                    samplerCanvasContext.drawImage(image, 0, 0, width, height);
+                    samplerSourceSize = { width: image.naturalWidth, height: image.naturalHeight };
+                    samplerDisplayName = file.name;
+                    const info = document.getElementById('samplerImageInfo');
+                    info.textContent = `${file.name} · 원본 ${image.naturalWidth}×${image.naturalHeight}${scale < 1 ? ` · 샘플 축소 ${width}×${height}` : ` · 원본 해상도`}`;
+                    document.getElementById('imageSamplerWrap').classList.remove('hidden');
+                    const initialX = Math.floor(width / 2), initialY = Math.floor(height / 2);
+                    const initialColor = readSamplerPixel(initialX, initialY);
+                    showSamplerHover(initialColor, initialX, initialY);
+                    drawSamplerMagnifier(initialX, initialY);
+                    setCapturedColor(initialColor, '이미지 중앙 미리보기', `x ${initialX}, y ${initialY}`);
+                    toast('이미지를 불러왔습니다. 이미지의 픽셀을 클릭해 색상을 선택하세요.');
+                } catch (error) {
+                    toast('이미지를 처리할 수 없습니다. 파일 크기나 형식을 확인하세요.');
+                } finally {
+                    URL.revokeObjectURL(url);
+                }
+            };
+            image.onerror = () => { URL.revokeObjectURL(url); toast('이미지를 읽을 수 없습니다.'); };
+            image.src = url;
+        }
+
+        function clearSamplerImage() {
+            samplerCanvasContext = null;
+            samplerSourceSize = { width: 0, height: 0 };
+            samplerDisplayName = '';
+            document.getElementById('imageSamplerWrap').classList.add('hidden');
+            const canvas = document.getElementById('imageSamplerCanvas');
+            canvas.width = 1; canvas.height = 1;
+            const magnifier = document.getElementById('imageMagnifier');
+            const ctx = magnifier.getContext('2d');
+            ctx.clearRect(0, 0, magnifier.width, magnifier.height);
+        }
+
+        function samplerPointFromEvent(event, canvas) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.max(0, Math.min(canvas.width - 1, Math.floor((event.clientX - rect.left) * canvas.width / Math.max(1, rect.width))));
+            const y = Math.max(0, Math.min(canvas.height - 1, Math.floor((event.clientY - rect.top) * canvas.height / Math.max(1, rect.height))));
+            return { x, y };
+        }
+
+        function readSamplerPixel(x, y) {
+            const pixel = samplerCanvasContext.getImageData(x, y, 1, 1).data;
+            if (pixel[3] < 255) {
+                const alpha = pixel[3] / 255;
+                return rgbToHex(pixel[0] * alpha + 255 * (1 - alpha), pixel[1] * alpha + 255 * (1 - alpha), pixel[2] * alpha + 255 * (1 - alpha));
+            }
+            return rgbToHex(pixel[0], pixel[1], pixel[2]);
+        }
+
+        function showSamplerHover(hex, x, y, selected = false) {
+            const rgb = hexToRgb(hex);
+            const swatch = document.getElementById('imageHoverSwatch');
+            swatch.style.backgroundColor = hex;
+            document.getElementById('imageHoverHex').textContent = hex;
+            document.getElementById('imageHoverRgb').textContent = `RGB ${rgb.r}, ${rgb.g}, ${rgb.b}`;
+            document.getElementById('imageSamplerStatus').textContent = `${selected ? '선택됨' : '미리보기'} · x ${x}, y ${y} · ${selected ? '아래 캡처 색상에 저장됨' : '클릭하면 이 픽셀을 선택합니다.'}`;
+        }
+
+        function drawSamplerMagnifier(x, y) {
+            const canvas = document.getElementById('imageSamplerCanvas');
+            const magnifier = document.getElementById('imageMagnifier');
+            const ctx = magnifier.getContext('2d');
+            const sampleSize = Math.min(15, canvas.width, canvas.height);
+            const sx = Math.max(0, Math.min(canvas.width - sampleSize, x - Math.floor(sampleSize / 2)));
+            const sy = Math.max(0, Math.min(canvas.height - sampleSize, y - Math.floor(sampleSize / 2)));
+            ctx.imageSmoothingEnabled = false;
+            ctx.clearRect(0, 0, magnifier.width, magnifier.height);
+            ctx.drawImage(canvas, sx, sy, sampleSize, sampleSize, 0, 0, magnifier.width, magnifier.height);
+            const cell = magnifier.width / sampleSize;
+            const cx = (x - sx + 0.5) * cell, cy = (y - sy + 0.5) * cell;
+            ctx.strokeStyle = 'rgba(0,0,0,.9)'; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(cx, cy - cell * 1.4); ctx.lineTo(cx, cy + cell * 1.4); ctx.moveTo(cx - cell * 1.4, cy); ctx.lineTo(cx + cell * 1.4, cy); ctx.stroke();
+            ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(cx, cy - cell * 1.4); ctx.lineTo(cx, cy + cell * 1.4); ctx.moveTo(cx - cell * 1.4, cy); ctx.lineTo(cx + cell * 1.4, cy); ctx.stroke();
+        }
+
+        // --- CIEDE2000 PERCEPTUAL COLOR DIFFERENCE ---
+        function srgbToLinear(channel) {
+            const value = channel / 255;
+            return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+        }
+
+        function hexToLab(hex) {
+            const rgb = hexToRgb(hex);
+            const r = srgbToLinear(rgb.r), g = srgbToLinear(rgb.g), b = srgbToLinear(rgb.b);
+            const x = (r * 0.4124564 + g * 0.3575761 + b * 0.1804375) * 100 / 95.047;
+            const y = (r * 0.2126729 + g * 0.7151522 + b * 0.0721750) * 100 / 100;
+            const z = (r * 0.0193339 + g * 0.1191920 + b * 0.9503041) * 100 / 108.883;
+            const f = t => t > Math.pow(6 / 29, 3) ? Math.cbrt(t) : t / (3 * Math.pow(6 / 29, 2)) + 4 / 29;
+            const fx = f(x), fy = f(y), fz = f(z);
+            return { L: 116 * fy - 16, a: 500 * (fx - fy), b: 200 * (fy - fz) };
+        }
+
+        function deltaE2000(hex1, hex2) {
+            const lab1 = hexToLab(hex1), lab2 = hexToLab(hex2);
+            const rad = Math.PI / 180, deg = 180 / Math.PI;
+            const C1 = Math.hypot(lab1.a, lab1.b), C2 = Math.hypot(lab2.a, lab2.b);
+            const cBar = (C1 + C2) / 2;
+            const c7 = Math.pow(cBar, 7), twentyFive7 = Math.pow(25, 7);
+            const G = 0.5 * (1 - Math.sqrt(c7 / (c7 + twentyFive7)));
+            const a1p = (1 + G) * lab1.a, a2p = (1 + G) * lab2.a;
+            const C1p = Math.hypot(a1p, lab1.b), C2p = Math.hypot(a2p, lab2.b);
+            const hp = (a, b) => { const v = Math.atan2(b, a) * deg; return v < 0 ? v + 360 : v; };
+            const h1p = C1p === 0 ? 0 : hp(a1p, lab1.b), h2p = C2p === 0 ? 0 : hp(a2p, lab2.b);
+            const dLp = lab2.L - lab1.L, dCp = C2p - C1p;
+            let dhp;
+            if (C1p * C2p === 0) dhp = 0;
+            else if (Math.abs(h2p - h1p) <= 180) dhp = h2p - h1p;
+            else if (h2p <= h1p) dhp = h2p - h1p + 360;
+            else dhp = h2p - h1p - 360;
+            const dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin((dhp / 2) * rad);
+            const Lbarp = (lab1.L + lab2.L) / 2, Cbarp = (C1p + C2p) / 2;
+            let hbarp;
+            if (C1p * C2p === 0) hbarp = h1p + h2p;
+            else if (Math.abs(h1p - h2p) <= 180) hbarp = (h1p + h2p) / 2;
+            else if (h1p + h2p < 360) hbarp = (h1p + h2p + 360) / 2;
+            else hbarp = (h1p + h2p - 360) / 2;
+            const T = 1 - 0.17 * Math.cos((hbarp - 30) * rad) + 0.24 * Math.cos(2 * hbarp * rad) + 0.32 * Math.cos((3 * hbarp + 6) * rad) - 0.20 * Math.cos((4 * hbarp - 63) * rad);
+            const deltaTheta = 30 * Math.exp(-Math.pow((hbarp - 275) / 25, 2));
+            const RC = 2 * Math.sqrt(Math.pow(Cbarp, 7) / (Math.pow(Cbarp, 7) + twentyFive7));
+            const SL = 1 + (0.015 * Math.pow(Lbarp - 50, 2)) / Math.sqrt(20 + Math.pow(Lbarp - 50, 2));
+            const SC = 1 + 0.045 * Cbarp, SH = 1 + 0.015 * Cbarp * T;
+            const RT = -Math.sin(2 * deltaTheta * rad) * RC;
+            const lTerm = dLp / SL, cTerm = dCp / SC, hTerm = dHp / SH;
+            return Math.sqrt(Math.max(0, lTerm * lTerm + cTerm * cTerm + hTerm * hTerm + RT * cTerm * hTerm));
+        }
+
+        function updateExpertDifference() {
+            const input = document.getElementById('expertCompareHex');
+            if (!input) return;
+            const normalized = normalizeHex(input.value);
+            const baseSwatch = document.getElementById('deltaBaseSwatch');
+            if (baseSwatch) baseSwatch.style.backgroundColor = currentBaseColor;
+            const baseHexNode = document.getElementById('deltaBaseHex');
+            if (baseHexNode) baseHexNode.textContent = currentBaseColor;
+            const invalid = !normalized;
+            input.classList.toggle('border-rose-500', invalid);
+            input.setAttribute('aria-invalid', String(invalid));
+            if (invalid) {
+                document.getElementById('deltaEValue').textContent = '—';
+                document.getElementById('deltaECategory').textContent = 'HEX 형식 확인';
+                document.getElementById('deltaEExplanation').textContent = '#RGB 또는 #RRGGBB 형식으로 입력하세요.';
+                document.getElementById('deltaEBar').style.width = '0%';
+                return;
+            }
+            const rgb = hexToRgb(normalized);
+            document.getElementById('deltaCompareSwatch').style.backgroundColor = normalized;
+            document.getElementById('deltaCompareRgb').textContent = `RGB ${rgb.r}, ${rgb.g}, ${rgb.b}`;
+            const difference = deltaE2000(currentBaseColor, normalized);
+            document.getElementById('deltaEValue').textContent = difference.toFixed(2);
+            let category, explanation;
+            if (difference < 1) { category = '거의 구별하기 어려움'; explanation = 'ΔE00 1 미만: 일반적인 조건에서 색차가 매우 작게 느껴지는 범위입니다.'; }
+            else if (difference < 2) { category = '미세한 차이'; explanation = 'ΔE00 1~2: 민감한 관찰 환경에서 차이를 감지할 수 있는 작은 색차입니다.'; }
+            else if (difference < 5) { category = '눈에 띄는 차이'; explanation = 'ΔE00 2~5: 인접 배색이나 제품 색상 비교에서 차이가 보일 수 있습니다.'; }
+            else if (difference < 10) { category = '뚜렷한 차이'; explanation = 'ΔE00 5~10: 대부분의 환경에서 비교적 분명하게 구별될 가능성이 큽니다.'; }
+            else { category = '매우 큰 차이'; explanation = 'ΔE00 10 이상: 일반적으로 두 색상이 상당히 다르게 인지되는 범위입니다.'; }
+            document.getElementById('deltaECategory').textContent = category;
+            document.getElementById('deltaEExplanation').textContent = explanation + ' 실제 지각은 디스플레이·밝기·주변색에 따라 달라질 수 있습니다.';
+            document.getElementById('deltaEBar').style.width = `${Math.min(100, difference / 30 * 100)}%`;
+            document.getElementById('deltaBaseContrast').textContent = `${getContrastRatio(currentBaseColor, '#FFFFFF').toFixed(2)} : 1`;
+            document.getElementById('deltaCompareContrast').textContent = `${getContrastRatio(normalized, '#FFFFFF').toFixed(2)} : 1`;
+        }
+
+        // --- PROFESSIONAL PALETTE EXPORTS ---
+        function getExpertPaletteData() {
+            return buildHarmonyData(currentBaseColor).map((harmony, index) => ({
+                id: index + 1,
+                title: harmony.title,
+                description: harmony.desc,
+                colors: harmony.colors.map((hex, colorIndex) => {
+                    const rgb = hexToRgb(hex), hsl = rgbToHsl(rgb.r, rgb.g, rgb.b), oklch = rgbToOklch(rgb.r, rgb.g, rgb.b);
+                    const info = findCssColorInfo(hex);
+                    return { index: colorIndex + 1, cssName: info.name, exactCssName: info.exact, hex, rgb, hsl, oklch, luminance: Number(getLuminance(rgb.r, rgb.g, rgb.b).toFixed(5)), contrastWhite: getContrastRatio(hex, '#FFFFFF'), contrastBlack: getContrastRatio(hex, '#000000') };
+                })
+            }));
+        }
+
+        function makeExpertExportText(format) {
+            const palettes = getExpertPaletteData();
+            const baseInfo = findCssColorInfo(currentBaseColor);
+            if (format === 'json') return JSON.stringify({ generatedBy: 'ChromaCraft Pro', baseColor: { hex: currentBaseColor, cssName: baseInfo.name, exactCssName: baseInfo.exact }, palettes }, null, 2);
+            if (format === 'csv') {
+                const rows = [['Palette', 'Palette_ID', 'Color_Index', 'CSS_Name_Nearest', 'Exact_CSS_Name', 'HEX', 'RGB', 'HSL', 'OKLCH', 'WCAG_Luminance', 'Contrast_White', 'Contrast_Black']];
+                rows.push(['Base color', '0', '1', baseInfo.name, baseInfo.exact, currentBaseColor, (() => { const c = hexToRgb(currentBaseColor); return `${c.r}, ${c.g}, ${c.b}`; })(), (() => { const c = hexToRgb(currentBaseColor), v = rgbToHsl(c.r, c.g, c.b); return `${v.h}, ${v.s}%, ${v.l}%`; })(), (() => { const c = hexToRgb(currentBaseColor), v = rgbToOklch(c.r, c.g, c.b); return `${v.l} ${v.c} ${v.h}`; })(), getLuminance(...Object.values(hexToRgb(currentBaseColor))).toFixed(5), getContrastRatio(currentBaseColor, '#FFFFFF'), getContrastRatio(currentBaseColor, '#000000')]);
+                palettes.forEach(p => p.colors.forEach(c => rows.push([p.title, p.id, c.index, c.cssName, c.exactCssName, c.hex, `${c.rgb.r}, ${c.rgb.g}, ${c.rgb.b}`, `${c.hsl.h}, ${c.hsl.s}%, ${c.hsl.l}%`, `${c.oklch.l} ${c.oklch.c} ${c.oklch.h}`, c.luminance, c.contrastWhite, c.contrastBlack])));
+                return rows.map(row => row.map(value => { const text = String(value ?? ''); return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text; }).join(',')).join('\r\n');
+            }
+            if (format === 'tailwind') {
+                const colors = { 'base': currentBaseColor };
+                palettes.forEach(p => p.colors.forEach(c => { colors[`p${String(p.id).padStart(2, '0')}-c${String(c.index).padStart(2, '0')}`] = c.hex; }));
+                return `/** ChromaCraft Pro · generated palette */\nmodule.exports = {\n  theme: {\n    extend: {\n      colors: {\n        chroma: ${JSON.stringify(colors, null, 8).replace(/\n/g, '\n        ')}\n      }\n    }\n  }\n};\n`;
+            }
+            const lines = [':root {', `  --cc-base: ${currentBaseColor};`];
+            palettes.forEach(p => {
+                const pToken = `palette-${String(p.id).padStart(2, '0')}`;
+                p.colors.forEach(c => lines.push(`  --cc-${pToken}-color-${String(c.index).padStart(2, '0')}: ${c.hex}; /* ${p.title} · ${c.cssName} */`));
+            });
+            lines.push('}', '');
+            return lines.join('\n');
+        }
+
+        function renderExpertExport() {
+            const output = document.getElementById('expertExportPreview');
+            const format = document.getElementById('expertExportFormat');
+            if (!output || !format) return;
+            try {
+                output.textContent = makeExpertExportText(format.value);
+            } catch (error) {
+                output.textContent = `내보내기 생성 오류: ${error.message || error}`;
+            }
+        }
+
+        function copyExpertExport() {
+            const format = document.getElementById('expertExportFormat').value;
+            copyToClipboard(makeExpertExportText(format), `${format.toUpperCase()} 내보내기`);
+        }
+
+        function downloadExpertExport() {
+            const format = document.getElementById('expertExportFormat').value;
+            const content = makeExpertExportText(format);
+            const extensions = { css: 'css', json: 'json', csv: 'csv', tailwind: 'cjs' };
+            const mimeTypes = { css: 'text/css;charset=utf-8', json: 'application/json;charset=utf-8', csv: 'text/csv;charset=utf-8', tailwind: 'text/javascript;charset=utf-8' };
+            const blob = new Blob([content], { type: mimeTypes[format] || 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `ChromaCraft_${currentBaseColor.slice(1)}_Palette.${extensions[format] || 'txt'}`;
+            document.body.appendChild(link); link.click(); link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            toast('전문가 팔레트 파일을 저장했습니다.');
+        }
+
+        // --- GRADIENT LOGIC ---
+        function setGradientType(type) {
+            gradientState.type = type;
+            ['Linear', 'Radial', 'Conic'].forEach(t => {
+                const btn = document.getElementById(`gradType${t}`);
+                if (t.toLowerCase() === type) {
+                    btn.className = "py-2 text-xs font-medium rounded-lg bg-indigo-600 text-white transition-all";
+                } else {
+                    btn.className = "py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all";
+                }
+            });
+            updateGradient();
+        }
+
+        function setAngle(angle) {
+            gradientState.angle = angle;
+            document.getElementById('gradientAngle').value = angle;
+            updateGradient();
+        }
+
+        function renderGradientStops() {
+            const container = document.getElementById('stopsContainer');
+            container.innerHTML = '';
+            gradientState.stops.sort((a, b) => a.position - b.position);
+
+            gradientState.stops.forEach((stop, index) => {
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-slate-800";
+                div.innerHTML = `
+                    <input type="color" value="${stop.color}" onchange="updateStopColor(${index}, this.value)" class="w-7 h-7 rounded-lg bg-transparent cursor-pointer">
+                    <input type="text" value="${stop.color}" onchange="updateStopColor(${index}, this.value)" class="w-16 bg-slate-800 border border-slate-700 rounded-lg px-2 py-0.5 text-xs font-mono text-white">
+                    <input type="range" min="0" max="100" value="${stop.position}" oninput="updateStopPos(${index}, this.value)" class="flex-1 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                    <span class="text-xs font-mono text-slate-400 w-8 text-right">${stop.position}%</span>
+                    ${gradientState.stops.length > 2 ? `
+                        <button onclick="removeGradientStop(${index})" class="text-slate-500 hover:text-rose-400 p-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    ` : '<div class="w-5"></div>'}
+                `;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function updateStopColor(index, val) {
+            if (/^#[0-9A-F]{6}$/i.test(val)) {
+                gradientState.stops[index].color = val.toUpperCase();
+                updateGradient();
+            }
+        }
+
+        function updateStopPos(index, val) {
+            gradientState.stops[index].position = parseInt(val);
+            updateGradient();
+        }
+
+        function addGradientStop() {
+            if (gradientState.stops.length >= 6) {
+                toast("최대 6개까지 생성 가능합니다.");
+                return;
+            }
+            const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            gradientState.stops.push({ color: randomColor.toUpperCase(), position: 50 });
+            renderGradientStops();
+            updateGradient();
+        }
+
+        function removeGradientStop(index) {
+            if (gradientState.stops.length <= 2) return;
+            gradientState.stops.splice(index, 1);
+            renderGradientStops();
+            updateGradient();
+        }
+
+        function renderPresetButtons() {
+            const container = document.getElementById('gradientPresets');
+            container.innerHTML = '';
+            PRESET_GRADIENTS.forEach(p => {
+                const btn = document.createElement('button');
+                btn.className = "py-1.5 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg text-[11px] text-slate-300 truncate flex items-center gap-2 transition-colors";
+                
+                const css = `linear-gradient(90deg, ${p.stops.map(s => `${s.color} ${s.position}%`).join(', ')})`;
+                btn.innerHTML = `<span class="w-3 h-3 rounded-full border border-white/20 shrink-0" style="background: ${css}"></span><span class="truncate">${p.name}</span>`;
+                btn.onclick = () => {
+                    gradientState.type = 'linear';
+                    gradientState.stops = JSON.parse(JSON.stringify(p.stops));
+                    renderGradientStops();
+                    updateGradient();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function updateGradient() {
+            const angle = document.getElementById('gradientAngle').value;
+            gradientState.angle = angle;
+            document.getElementById('angleValueDisplay').innerText = `${angle}°`;
+
+            gradientState.stops.sort((a, b) => a.position - b.position);
+            const stopsStr = gradientState.stops.map(s => `${s.color} ${s.position}%`).join(', ');
+
+            let cssStr = "";
+            if (gradientState.type === 'linear') {
+                cssStr = `linear-gradient(${angle}deg, ${stopsStr})`;
+            } else if (gradientState.type === 'radial') {
+                cssStr = `radial-gradient(circle at center, ${stopsStr})`;
+            } else {
+                cssStr = `conic-gradient(from ${angle}deg at 50% 50%, ${stopsStr})`;
+            }
+
+            document.getElementById('gradientPreview').style.background = cssStr;
+            document.getElementById('fullscreenPreviewBg').style.background = cssStr;
+
+            // Output Formats
+            document.getElementById('cssOutput').innerText = `background: ${cssStr};`;
+
+            // Tailwind CSS Generator
+            const firstStop = gradientState.stops[0].color;
+            const lastStop = gradientState.stops[gradientState.stops.length - 1].color;
+            let twAngle = "bg-gradient-to-r";
+            if (angle >= 45 && angle < 135) twAngle = "bg-gradient-to-b";
+            else if (angle >= 135 && angle < 225) twAngle = "bg-gradient-to-l";
+            else if (angle >= 225 && angle < 315) twAngle = "bg-gradient-to-t";
+            document.getElementById('tailwindOutput').innerText = `${twAngle} from-[${firstStop}] to-[${lastStop}]`;
+
+            // SVG Gradient Code
+            const svgStops = gradientState.stops.map(s => `<stop offset="${s.position}%" stop-color="${s.color}" />`).join('\n  ');
+            const svgCode = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">\n<defs>\n <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">\n  ${svgStops}\n </linearGradient>\n</defs>\n<rect width="100%" height="100%" fill="url(#grad)" />\n</svg>`;
+            document.getElementById('svgOutput').innerText = svgCode;
+        }
+
+        function generateRandomGradient() {
+            const count = Math.floor(Math.random() * 2) + 2;
+            const newStops = [];
+            for (let i = 0; i < count; i++) {
+                const color = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+                newStops.push({ color: color.toUpperCase(), position: Math.round(i * (100 / (count - 1))) });
+            }
+            gradientState.stops = newStops;
+            gradientState.angle = Math.floor(Math.random() * 360);
+            document.getElementById('gradientAngle').value = gradientState.angle;
+            renderGradientStops();
+            updateGradient();
+            toast("새로운 그래디언트가 생성되었습니다!");
+        }
+
+        // --- ACCESSIBILITY TAB RENDER ---
+        function renderAccessibility() {
+            const container = document.getElementById('wcagContainer');
+            container.innerHTML = '';
+
+            const whiteRatio = getContrastRatio(currentBaseColor, '#FFFFFF');
+            const darkRatio = getContrastRatio(currentBaseColor, '#121212');
+
+            const makeBadge = (ratio, level) => {
+                const req = level === 'AAA' ? 7.0 : 4.5;
+                const pass = ratio >= req;
+                return `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${pass ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">${level}: ${pass ? '통과' : '미달'}</span>`;
+            };
+
+            container.innerHTML = `
+                <!-- White Text Preview -->
+                <div class="glass-card p-5 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">흰색 텍스트 (#FFFFFF) 대비</span>
+                        <span class="font-mono text-sm font-bold text-indigo-400">${whiteRatio} : 1</span>
+                    </div>
+                    <div class="p-4 rounded-xl flex flex-col justify-center items-center text-center space-y-1 shadow-inner" style="background-color: ${currentBaseColor}; color: #FFFFFF">
+                        <span class="text-lg font-bold">ChromaCraft Design System</span>
+                        <span class="text-xs opacity-90">선명하고 가독성이 뛰어난 텍스트 샘플입니다.</span>
+                    </div>
+                    <div class="flex items-center gap-2 pt-2">
+                        ${makeBadge(whiteRatio, 'AA')}
+                        ${makeBadge(whiteRatio, 'AAA')}
+                    </div>
+                </div>
+
+                <!-- Dark Text Preview -->
+                <div class="glass-card p-5 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">어두운 텍스트 (#121212) 대비</span>
+                        <span class="font-mono text-sm font-bold text-indigo-400">${darkRatio} : 1</span>
+                    </div>
+                    <div class="p-4 rounded-xl flex flex-col justify-center items-center text-center space-y-1 shadow-inner" style="background-color: ${currentBaseColor}; color: #121212">
+                        <span class="text-lg font-bold">ChromaCraft Design System</span>
+                        <span class="text-xs opacity-90">선명하고 가독성이 뛰어난 텍스트 샘플입니다.</span>
+                    </div>
+                    <div class="flex items-center gap-2 pt-2">
+                        ${makeBadge(darkRatio, 'AA')}
+                        ${makeBadge(darkRatio, 'AAA')}
+                    </div>
+                </div>
+            `;
+
+            // Color Blindness Simulation
+            const blindCont = document.getElementById('blindnessContainer');
+            blindCont.innerHTML = '';
+
+            const types = [
+                { id: 'protanopia', title: "제1색각이상 (적색맹)" },
+                { id: 'deuteranopia', title: "제2색각이상 (녹색맹)" },
+                { id: 'tritanopia', title: "제3색각이상 (청색맹)" },
+                { id: 'achromatopsia', title: "전색맹 (Monochromacy)" }
+            ];
+
+            types.forEach(t => {
+                const simHex = simulateColorBlindness(currentBaseColor, t.id);
+                const div = document.createElement('div');
+                div.className = "glass-card p-3 rounded-xl flex flex-col space-y-2 border border-slate-800";
+                div.innerHTML = `
+                    <div class="h-16 rounded-lg shadow-inner" style="background-color: ${simHex}"></div>
+                    <div>
+                        <span class="text-xs font-bold text-white block">${t.title}</span>
+                        <span class="text-[10px] font-mono text-slate-400">${simHex}</span>
+                    </div>
+                `;
+                blindCont.appendChild(div);
+            });
+        }
+
+        // --- SAVED LIBRARY & STORAGE LOGIC ---
+        function saveCurrentPalette() {
+            const item = {
+                id: Date.now(),
+                type: 'palette',
+                title: `Palette ${currentBaseColor}`,
+                color: currentBaseColor,
+                colors: calculateHarmoniesRaw(currentBaseColor)
+            };
+            savedItems.unshift(item);
+            persistSavedItems();
+            toast("팔레트가 보관함에 저장되었습니다!");
+        }
+
+        function saveCurrentGradient() {
+            const stopsStr = gradientState.stops.map(s => `${s.color} ${s.position}%`).join(', ');
+            const css = gradientState.type === 'linear' ? `linear-gradient(${gradientState.angle}deg, ${stopsStr})` : gradientState.type === 'radial' ? `radial-gradient(circle at center, ${stopsStr})` : `conic-gradient(from ${gradientState.angle}deg at 50% 50%, ${stopsStr})`;
+            const item = {
+                id: Date.now(),
+                type: 'gradient',
+                title: `Gradient (${gradientState.type})`,
+                css: css
+            };
+            savedItems.unshift(item);
+            persistSavedItems();
+            toast("그래디언트가 보관함에 저장되었습니다!");
+        }
+
+        function calculateHarmoniesRaw(hex) {
+            return [...new Set(buildHarmonyData(hex).flatMap(item => item.colors))];
+        }
+
+        function persistSavedItems() {
+            localStorage.setItem('chromacraft_saved', JSON.stringify(savedItems));
+            updateSavedCount();
+        }
+
+        function updateSavedCount() {
+            document.getElementById('savedCount').innerText = savedItems.length;
+        }
+
+        function clearAllSaved() {
+            if (confirm("보관함의 모든 항목을 삭제하시겠습니까?")) {
+                savedItems = [];
+                persistSavedItems();
+                renderSavedLibrary();
+                toast("보관함이 비워졌습니다.");
+            }
+        }
+
+        function removeSavedItem(id) {
+            savedItems = savedItems.filter(i => i.id !== id);
+            persistSavedItems();
+            renderSavedLibrary();
+        }
+
+        function renderSavedLibrary() {
+            const container = document.getElementById('savedItemsContainer');
+            container.innerHTML = '';
+
+            if (savedItems.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-500 space-y-2">
+                        <i data-lucide="bookmark-x" class="w-8 h-8 mx-auto opacity-50"></i>
+                        <p class="text-sm">저장된 팔레트나 그래디언트가 없습니다.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            savedItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-2xl space-y-3 relative group border border-slate-800";
+
+                if (item.type === 'palette') {
+                    let colorSwatches = `<div class="flex h-16 rounded-xl overflow-hidden border border-slate-700/50">`;
+                    item.colors.forEach(c => {
+                        colorSwatches += `<div class="flex-1 cursor-pointer" style="background-color: ${c}" onclick="copyToClipboard('${c}', '${c}')"></div>`;
+                    });
+                    colorSwatches += `</div>`;
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-white">${item.title}</span>
+                            <button onclick="removeSavedItem(${item.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        </div>
+                        ${colorSwatches}
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-white">${item.title}</span>
+                            <button onclick="removeSavedItem(${item.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        </div>
+                        <div class="h-16 rounded-xl border border-slate-700/50 cursor-pointer" style="background: ${item.css}" onclick="copyToClipboard('${item.css}', 'Gradient')"></div>
+                    `;
+                }
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // --- CANVAS EXPORT AS PNG ---
+        function exportCardAsPng(title, colors) {
+            const canvas = document.getElementById('exportCanvas');
+            const ctx = canvas.getContext('2d');
+            const colorList = Array.isArray(colors) && colors.length ? colors : [currentBaseColor];
+            const columns = Math.min(12, colorList.length);
+            const rows = Math.ceil(colorList.length / columns);
+            const tileWidth = (900 - 60) / columns;
+            const rowHeight = 105;
+            canvas.width = 900;
+            canvas.height = 95 + rows * rowHeight + 25;
+
+            ctx.fillStyle = '#0f172a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 22px Inter, sans-serif';
+            ctx.fillText(String(title).slice(0, 48), 30, 38);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '12px Inter, sans-serif';
+            ctx.fillText(`ChromaCraft Pro · ${colorList.length} colors`, 30, 61);
+
+            colorList.forEach((color, index) => {
+                const col = index % columns;
+                const row = Math.floor(index / columns);
+                const x = 30 + col * tileWidth;
+                const y = 80 + row * rowHeight;
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, Math.max(1, tileWidth - 2), 68);
+                ctx.fillStyle = '#e2e8f0';
+                ctx.font = `bold ${columns > 8 ? 10 : 12}px monospace`;
+                ctx.fillText(color, x + 2, y + 86);
+                const info = findCssColorInfo(color);
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = ` ${columns > 8 ? 9 : 10}px Inter, sans-serif`;
+                ctx.fillText(String(info.name).slice(0, columns > 8 ? 13 : 18), x + 2, y + 99);
+            });
+
+            const link = document.createElement('a');
+            link.download = `${String(title).replace(/[^a-z0-9_-]+/gi, '_')}_Palette.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            toast('PNG 이미지 카드가 다운로드되었습니다!');
+        }
+
+        // --- FULLSCREEN PREVIEW & TOAST UTILS ---
+        function toggleFullscreenPreview() {
+            document.getElementById('fullscreenOverlay').classList.toggle('hidden');
+        }
+
+        async function copyToClipboard(text, label = "") {
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(String(text));
+                } else {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = String(text);
+                    textarea.style.position = 'fixed'; textarea.style.opacity = '0';
+                    document.body.appendChild(textarea); textarea.select();
+                    const success = document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    if (!success) throw new Error('copy failed');
+                }
+                toast(`${label ? label + ' ' : ''}복사되었습니다!`);
+            } catch (err) { toast('복사 실패: 브라우저 권한을 확인하세요.'); }
+        }
+
+        function toast(msg) {
+            const toastEl = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
+            toastEl.classList.remove('hidden');
+            setTimeout(() => toastEl.classList.add('hidden'), 2200);
+        }
+    </script>
+</body>
+</html>
