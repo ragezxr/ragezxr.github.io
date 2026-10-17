@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChromaCraft Pro - CSS 색상명·팔레트·비교 스튜디오</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
+<head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>ChromaCraft Pro - CSS 색상명·팔레트·비교 스튜디오</title> <!-- Tailwind CSS CDN --> <script src="https://cdn.tailwindcss.com"></script> <!-- Lucide Icons --> <script src="https://unpkg.com/lucide@latest"></script> <!-- Google Fonts --> <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -24,8 +12,7 @@
                 }
             }
         }
-    </script>
-    <style>
+    </script> <style>
         body {
             background-color: #090d16;
             color: #f8fafc;
@@ -82,586 +69,49 @@
             animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
+        .color-wheel-canvas { display:block; width:112px; height:112px; border-radius:50%; cursor:crosshair; touch-action:none; filter:drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
+        .color-wheel-canvas:focus-visible { outline:2px solid #a5b4fc; outline-offset:4px; }
         #imageSamplerCanvas { display:block; width:100%; height:auto; cursor:crosshair; touch-action:pan-y; }
         #imageMagnifier { width:150px; height:150px; image-rendering:pixelated; }
         .expert-output { min-height:220px; max-height:460px; overflow:auto; white-space:pre; tab-size:2; }
         input[type="range"] { cursor: pointer; }
         #comparisonTableBody td { vertical-align: middle; }
-        button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #818cf8; outline-offset: 2px; }
+        button:focus-visible, input:focus-visible, select:focus-visible, canvas:focus-visible { outline: 2px solid #818cf8; outline-offset: 2px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen">
-
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 flex flex-wrap gap-2 items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                    <i data-lucide="palette" class="w-5 h-5 text-white"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
-                        ChromaCraft Pro
-                    </h1>
-                    <p class="text-xs text-slate-400 hidden sm:block">CSS 색상명 · 정밀 조정 · 팔레트 비교</p>
-                </div>
-            </div>
-
-            <!-- Tab Switcher -->
-            <div class="flex flex-wrap max-w-full bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium">
-                <button id="tabPaletteBtn" onclick="switchTab('palette')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-md">
-                    <i data-lucide="swatch-book" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">색상 & 조화</span>
-                </button>
-                <button id="tabColorsBtn" onclick="switchTab('colors')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
-                    <i data-lucide="swatch-book" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">CSS 색상표·비교</span>
-                </button>
-                <button id="tabExpertBtn" onclick="switchTab('expert')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
-                    <i data-lucide="pipette" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">전문가 도구</span>
-                </button>
-                <button id="tabGradientBtn" onclick="switchTab('gradient')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
-                    <i data-lucide="blend" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">CSS 그래디언트</span>
-                </button>
-                <button id="tabAccessibilityBtn" onclick="switchTab('accessibility')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
-                    <i data-lucide="eye" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">대비 & 시각 모의</span>
-                </button>
-                <button id="tabLibraryBtn" onclick="switchTab('library')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white">
-                    <i data-lucide="bookmark" class="w-4 h-4"></i>
-                    <span class="hidden md:inline">보관함 (<span id="savedCount">0</span>)</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <!-- TAB 1: COLOR PICKER, HARMONIES, TINTS & SHADES -->
-        <div id="paletteSection" class="space-y-8">
-            
-            <!-- Base Inspector & Eyedropper Card -->
-            <div class="glass-panel rounded-2xl p-6 shadow-xl">
-                <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
-                    
-                    <div class="flex items-center gap-4 w-full lg:w-auto">
-                        <div class="relative group">
-                            <input type="color" id="baseColorPicker" value="#6366F1" class="w-20 h-20 rounded-2xl shadow-xl border-2 border-slate-700 bg-transparent cursor-pointer transition-transform group-hover:scale-105" oninput="updateBaseColor(this.value)">
-                        </div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">기준 색상</span>
-                                <button onclick="randomizeBaseColor()" class="p-1 text-slate-400 hover:text-white transition-colors" title="랜덤 색상 (스페이스바)">
-                                    <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button id="eyedropperBtn" onclick="openEyeDropper()" class="p-1 text-slate-400 hover:text-indigo-400 transition-colors hidden" title="화면 색상 추출 (Eyedropper)">
-                                    <i data-lucide="pipette" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                            <h2 id="baseHexDisplay" class="text-3xl font-bold font-mono text-white tracking-wide">#6366F1</h2>
-                            <p id="baseColorName" class="mt-1 text-xs font-semibold text-amber-300" aria-live="polite">가장 가까운 CSS 색상명 확인 중…</p>
-                        </div>
-                    </div>
-
-                    <!-- Color Codes Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full lg:w-auto flex-1">
-                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 font-semibold block">HEX</span>
-                            <div class="flex items-center justify-between mt-1">
-                                <span id="codeHex" class="font-mono text-xs font-semibold truncate">#6366F1</span>
-                                <button onclick="copyToClipboard(document.getElementById('codeHex').innerText, 'HEX')" class="text-slate-400 hover:text-white">
-                                    <i data-lucide="copy" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 font-semibold block">RGB</span>
-                            <div class="flex items-center justify-between mt-1">
-                                <span id="codeRgb" class="font-mono text-xs font-semibold truncate">99, 102, 241</span>
-                                <button onclick="copyToClipboard('rgb(' + document.getElementById('codeRgb').innerText + ')', 'RGB')" class="text-slate-400 hover:text-white">
-                                    <i data-lucide="copy" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 font-semibold block">HSL</span>
-                            <div class="flex items-center justify-between mt-1">
-                                <span id="codeHsl" class="font-mono text-xs font-semibold truncate">239, 84%, 67%</span>
-                                <button onclick="copyToClipboard('hsl(' + document.getElementById('codeHsl').innerText + ')', 'HSL')" class="text-slate-400 hover:text-white">
-                                    <i data-lucide="copy" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 font-semibold block">HSV</span>
-                            <div class="flex items-center justify-between mt-1">
-                                <span id="codeHsv" class="font-mono text-xs font-semibold truncate">239, 59%, 95%</span>
-                                <button onclick="copyToClipboard('hsv(' + document.getElementById('codeHsv').innerText + ')', 'HSV')" class="text-slate-400 hover:text-white">
-                                    <i data-lucide="copy" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 font-semibold block">CMYK</span>
-                            <div class="flex items-center justify-between mt-1">
-                                <span id="codeCmyk" class="font-mono text-xs font-semibold truncate">59, 58, 0, 5</span>
-                                <button onclick="copyToClipboard('cmyk(' + document.getElementById('codeCmyk').innerText + ')', 'CMYK')" class="text-slate-400 hover:text-white">
-                                    <i data-lucide="copy" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="glass-card p-2.5 rounded-xl border border-slate-800/80">
-                            <span class="text-[10px] text-slate-400 font-semibold block">OKLCH</span>
-                            <div class="flex items-center justify-between mt-1">
-                                <span id="codeOklch" class="font-mono text-xs font-semibold truncate">0.58 0.22 264</span>
-                                <button onclick="copyToClipboard('oklch(' + document.getElementById('codeOklch').innerText + ')', 'OKLCH')" class="text-slate-400 hover:text-white">
-                                    <i data-lucide="copy" class="w-3 h-3"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- Fine-grained HSL controls -->
-            <div class="glass-panel rounded-2xl p-5 shadow-lg space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div>
-                        <h3 class="font-bold text-white">정밀 색상 조정 <span class="text-xs text-slate-400 font-normal">HSL</span></h3>
-                        <p class="text-xs text-slate-400 mt-1">색상·채도·명도를 1단위로 조절합니다. HEX 입력과 색상 선택기도 서로 연동됩니다.</p>
-                    </div>
-                    <div class="flex gap-2 items-center">
-                        <input id="manualHexInput" type="text" value="#6366F1" maxlength="7" spellcheck="false" aria-label="HEX 색상 코드" class="w-28 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs font-mono uppercase text-white focus:outline-none focus:border-indigo-500">
-                        <button onclick="applyManualHex()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">HEX 적용</button>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs"><label for="hueSlider" class="text-slate-300">색상 Hue</label><span id="hueValue" class="font-mono text-indigo-300">239°</span></div>
-                        <input id="hueSlider" type="range" min="0" max="360" step="1" value="239" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500">
-                        <div class="h-2 rounded-full" style="background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)"></div>
-                    </div>
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs"><label for="saturationSlider" class="text-slate-300">채도 Saturation</label><span id="saturationValue" class="font-mono text-indigo-300">84%</span></div>
-                        <input id="saturationSlider" type="range" min="0" max="100" step="1" value="84" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500">
-                    </div>
-                    <div class="space-y-2">
-                        <div class="flex justify-between text-xs"><label for="lightnessSlider" class="text-slate-300">명도 Lightness</label><span id="lightnessValue" class="font-mono text-indigo-300">67%</span></div>
-                        <input id="lightnessSlider" type="range" min="0" max="100" step="1" value="67" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tints & Shades Section -->
-            <div class="glass-panel p-6 rounded-2xl space-y-4 shadow-xl">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i data-lucide="sun-moon" class="w-5 h-5 text-indigo-400"></i>
-                    <span>명도 스펙트럼 (Tints & Shades)</span>
-                </h3>
-                <div class="space-y-3">
-                    <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Tints (밝은 톤)</span>
-                        <div id="tintsContainer" class="grid grid-cols-10 h-12 rounded-xl overflow-hidden border border-slate-700/50"></div>
-                    </div>
-                    <div>
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Shades (어두운 톤)</span>
-                        <div id="shadesContainer" class="grid grid-cols-10 h-12 rounded-xl overflow-hidden border border-slate-700/50"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Color Harmonies Grid -->
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="text-xl font-bold text-white">색상 조화 팔레트 (Harmonies)</h3>
-                        <p class="text-sm text-slate-400">22가지 배색 방식과 160개 이상의 색상 샘플을 한눈에 비교합니다. 색상 칸을 누르면 HEX를 복사할 수 있습니다.</p>
-                        <p id="harmonyStats" class="text-xs text-indigo-300 mt-1">배색 방식 22개 · 색상 샘플 계산 중</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="saveCurrentPalette()" class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium text-xs transition-all">
-                            <i data-lucide="bookmark-plus" class="w-4 h-4 text-indigo-400"></i>
-                            <span>팔레트 저장</span>
-                        </button>
-                        <button onclick="randomizeBaseColor()" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-medium text-xs shadow-lg shadow-indigo-500/25 transition-all transform active:scale-95">
-                            <i data-lucide="sparkles" class="w-4 h-4"></i>
-                            <span>랜덤 전체 생성</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="harmonyContainer">
-                    <!-- Dynamically generated palette cards -->
-                </div>
-            </div>
-
-        </div>
-
-        <!-- TAB: CSS NAMED COLORS & DETAILED COMPARISON -->
-        <div id="colorsSection" class="hidden space-y-6">
-            <div class="glass-panel rounded-2xl p-5 md:p-6 space-y-4">
-                <div class="flex flex-wrap justify-between items-start gap-3">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">CSS 표준 색상명 탐색기</h2>
-                        <p class="text-sm text-slate-400 mt-1">CSS 표준 색상 148개를 검색하고, <b class="text-slate-200">이름 복사</b>로 DarkGray 같은 색상명만 간편하게 복사합니다.</p>
-                    </div>
-                    <span id="colorLibraryCount" class="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">148 colors</span>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_190px] gap-3">
-                    <input id="colorSearchInput" type="search" placeholder="색상명 또는 HEX 검색 (예: DarkGray, Black, #A9A9A9)" oninput="renderNamedColors()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500">
-                    <select id="colorFamilyFilter" onchange="renderNamedColors()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
-                        <option value="all">모든 색상 계열</option>
-                        <option value="neutral">무채색·흰색·검정</option>
-                        <option value="red">빨강</option><option value="orange">주황</option><option value="yellow">노랑</option>
-                        <option value="green">초록</option><option value="cyan">청록</option><option value="blue">파랑</option>
-                        <option value="purple">보라</option><option value="pink">분홍</option><option value="brown">갈색</option>
-                    </select>
-                </div>
-                <p class="text-xs text-slate-500">이름 복사는 CSS 색상명만 복사하며, 기준색 적용과 비교 추가는 각각 현재 색상 변경 및 비교표 추가 기능입니다.</p>
-                <div id="namedColorsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"></div>
-                <p id="namedColorsEmpty" class="hidden py-8 text-center text-sm text-slate-500">검색 조건에 맞는 색상이 없습니다.</p>
-            </div>
-
-            <div class="glass-panel rounded-2xl p-5 md:p-6 space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">상세 색상 비교표</h2>
-                        <p class="text-sm text-slate-400 mt-1">색상명, HEX, RGB, HSL, HSV, CMYK, OKLCH, 명도와 흰색·검정 대비를 한눈에 비교합니다.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="addBaseToComparison()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">현재 기준색 추가</button>
-                        <button onclick="resetComparison()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs">비교 초기화</button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-800">
-                    <table class="min-w-[1120px] w-full text-left text-xs">
-                        <thead class="bg-slate-900 text-slate-300"><tr>
-                            <th class="px-3 py-3 font-semibold">색상 / CSS 이름</th><th class="px-3 py-3 font-semibold">HEX</th><th class="px-3 py-3 font-semibold">RGB</th><th class="px-3 py-3 font-semibold">HSL</th><th class="px-3 py-3 font-semibold">HSV</th><th class="px-3 py-3 font-semibold">CMYK</th><th class="px-3 py-3 font-semibold">OKLCH</th><th class="px-3 py-3 font-semibold">명도</th><th class="px-3 py-3 font-semibold">흰색 대비</th><th class="px-3 py-3 font-semibold">검정 대비</th><th class="px-3 py-3 font-semibold">관리</th>
-                        </tr></thead>
-                        <tbody id="comparisonTableBody" class="divide-y divide-slate-800 bg-slate-950/50"></tbody>
-                    </table>
-                </div>
-                <p class="text-[11px] text-slate-500">명도는 WCAG 상대 휘도(0~1)입니다. 대비 비율은 해당 색상과 순백(#FFFFFF)·순흑(#000000) 사이의 비율입니다. CMYK는 RGB에서 변환한 근삿값으로 실제 인쇄 결과는 프로파일·용지에 따라 달라질 수 있습니다.</p>
-            </div>
-        </div>
-
-        <!-- EXPERT TOOLS: SCREEN / IMAGE COLOR SAMPLER, DELTA E, EXPORT -->
-        <div id="expertSection" class="hidden space-y-8">
-            <div class="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">전문가 색상 도구</h2>
-                    <p class="text-sm text-slate-400 mt-1">화면·이미지 픽셀 캡처, 지각 색차(ΔE00), 디자인 토큰 내보내기를 한곳에서 사용합니다.</p>
-                </div>
-                <span class="text-xs px-3 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-200">LOCAL · 브라우저 내부 처리</span>
-            </div>
-
-            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-5">
-                    <div>
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="pipette" class="w-5 h-5 text-indigo-400"></i>컬러 캡처 피커</h3>
-                        <p class="text-xs text-slate-400 mt-1">화면에서 바로 추출하거나 이미지 파일을 열고 픽셀을 클릭해 정확한 HEX를 선택합니다.</p>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button type="button" onclick="captureScreenColor()" class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold"><i data-lucide="monitor" class="w-4 h-4"></i>화면에서 색상 캡처</button>
-                        <label class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-sm font-semibold cursor-pointer"><i data-lucide="image-plus" class="w-4 h-4"></i>이미지 열기<input id="samplerImageInput" type="file" accept="image/*" class="hidden"></label>
-                    </div>
-                    <p id="screenPickerHelp" class="text-[11px] text-slate-500">화면 캡처는 EyeDropper를 지원하는 최신 Chrome/Edge에서 사용합니다. 지원되지 않는 환경에서는 이미지 열기를 이용하세요.</p>
-
-                    <div id="imageSamplerWrap" class="hidden space-y-3">
-                        <div class="flex flex-wrap items-center justify-between gap-2">
-                            <span id="samplerImageInfo" class="text-xs text-slate-400">이미지를 불러왔습니다.</span>
-                            <button type="button" onclick="clearSamplerImage()" class="text-xs text-slate-400 hover:text-rose-300">이미지 닫기</button>
-                        </div>
-                        <div class="rounded-xl overflow-auto max-h-[520px] border border-slate-700 bg-slate-950 p-1">
-                            <canvas id="imageSamplerCanvas" width="1" height="1" aria-label="이미지 픽셀 컬러 캡처 영역"></canvas>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-[150px_minmax(0,1fr)] gap-4 items-center">
-                            <div class="rounded-xl border border-slate-700 bg-slate-950 p-2 flex justify-center"><canvas id="imageMagnifier" width="150" height="150" aria-label="픽셀 확대 미리보기"></canvas></div>
-                            <div class="space-y-2 min-w-0">
-                                <div class="flex items-center gap-2"><span id="imageHoverSwatch" class="w-8 h-8 rounded-lg border border-white/20 shrink-0" style="background:#6366F1"></span><code id="imageHoverHex" class="text-sm font-mono text-white">#6366F1</code></div>
-                                <p id="imageHoverRgb" class="text-xs text-slate-400 font-mono">RGB 99, 102, 241</p>
-                                <p id="imageSamplerStatus" class="text-xs text-slate-500">이미지 위에 포인터를 올려 미리 보고 클릭하여 픽셀을 선택하세요.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rounded-xl border border-slate-700 bg-slate-950/70 p-4 space-y-3">
-                        <div class="flex items-center gap-3">
-                            <span id="capturedColorSwatch" class="w-14 h-14 rounded-xl border border-white/15 shadow-inner shrink-0" style="background:#6366F1"></span>
-                            <div class="min-w-0 flex-1">
-                                <div class="flex flex-wrap items-center gap-2"><code id="capturedColorHex" class="text-xl font-bold font-mono text-white">#6366F1</code><button type="button" onclick="copyCapturedColor()" class="text-xs text-indigo-300 hover:text-white">HEX 복사</button></div>
-                                <p id="capturedColorName" class="text-xs text-amber-300 mt-1">MediumSlateBlue에 가까운 색상</p>
-                                <p id="capturedColorMeta" class="text-[11px] text-slate-500 mt-1">선택된 캡처 색상 · 대기 중</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <button type="button" onclick="applyCapturedColorAsBase()" class="py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">기준색 적용</button>
-                            <button type="button" onclick="addCapturedColorToComparison()" class="py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs">비교표 추가</button>
-                            <button type="button" onclick="saveCapturedColor()" class="py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs">보관함 저장</button>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-5">
-                    <div>
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="git-compare" class="w-5 h-5 text-indigo-400"></i>지각 색차 분석 · CIEDE2000</h3>
-                        <p class="text-xs text-slate-400 mt-1">두 sRGB 색상을 CIE Lab로 변환하고 CIEDE2000(ΔE00) 공식으로 지각 차이를 비교합니다.</p>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div class="rounded-xl border border-slate-700 bg-slate-950 p-3 space-y-2">
-                            <label class="block text-[11px] font-semibold text-slate-400">색상 A · 현재 기준색</label>
-                            <div class="flex items-center gap-2"><span id="deltaBaseSwatch" class="w-9 h-9 rounded-lg border border-white/10" style="background:#6366F1"></span><code id="deltaBaseHex" class="font-mono text-sm text-white">#6366F1</code></div>
-                        </div>
-                        <div class="rounded-xl border border-slate-700 bg-slate-950 p-3 space-y-2">
-                            <label for="expertCompareHex" class="block text-[11px] font-semibold text-slate-400">색상 B · 비교 색상 HEX</label>
-                            <input id="expertCompareHex" type="text" value="#A855F7" maxlength="7" spellcheck="false" oninput="updateExpertDifference()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-sm uppercase text-white focus:outline-none focus:border-indigo-500">
-                            <div class="flex items-center gap-2"><span id="deltaCompareSwatch" class="w-6 h-6 rounded-md border border-white/10" style="background:#A855F7"></span><span id="deltaCompareRgb" class="text-[11px] text-slate-400 font-mono">RGB 168, 85, 247</span></div>
-                        </div>
-                    </div>
-                    <div class="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4">
-                        <div class="flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs text-indigo-200">CIEDE2000 색차</p><div class="flex items-baseline gap-2 mt-1"><strong id="deltaEValue" class="text-4xl font-bold font-mono text-white">—</strong><span class="text-xs text-indigo-200">ΔE00</span></div></div><span id="deltaECategory" class="text-sm font-semibold text-white">HEX 색상을 확인하세요.</span></div>
-                        <div class="h-2 rounded-full bg-slate-900 mt-4 overflow-hidden"><div id="deltaEBar" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500" style="width:0%"></div></div>
-                        <p id="deltaEExplanation" class="text-xs text-slate-300 mt-3">일반적인 근사 해석이며, 관찰 환경·디스플레이·주변색에 따라 지각은 달라질 수 있습니다.</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="rounded-xl border border-slate-700 p-3"><p class="text-[11px] text-slate-400">색상 A → 흰색 대비</p><p id="deltaBaseContrast" class="text-lg font-mono text-white mt-1">—</p></div>
-                        <div class="rounded-xl border border-slate-700 p-3"><p class="text-[11px] text-slate-400">색상 B → 흰색 대비</p><p id="deltaCompareContrast" class="text-lg font-mono text-white mt-1">—</p></div>
-                    </div>
-                </section>
-            </div>
-
-            <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-4">
-                <div class="flex flex-wrap items-end justify-between gap-3">
-                    <div>
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="file-code-2" class="w-5 h-5 text-indigo-400"></i>전문가용 팔레트 내보내기</h3>
-                        <p class="text-xs text-slate-400 mt-1">현재 기준색과 22가지 배색 팔레트를 CSS 변수·JSON·CSV·Tailwind 설정으로 내보냅니다.</p>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <select id="expertExportFormat" onchange="renderExpertExport()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"><option value="css">CSS 변수</option><option value="json">JSON 데이터</option><option value="csv">CSV 비교표</option><option value="tailwind">Tailwind 설정</option></select>
-                        <button type="button" onclick="renderExpertExport()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white">미리보기 갱신</button>
-                        <button type="button" onclick="copyExpertExport()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white">코드 복사</button>
-                        <button type="button" onclick="downloadExpertExport()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white">파일 저장</button>
-                    </div>
-                </div>
-                <pre id="expertExportPreview" class="expert-output rounded-xl border border-slate-800 bg-slate-950 p-4 text-[11px] leading-relaxed font-mono text-emerald-200">내보내기 형식을 선택한 후 미리보기를 갱신하세요.</pre>
-                <p class="text-[11px] text-slate-500">내보내기 팔레트는 현재 기준색에 따라 실시간 생성됩니다. CSV에는 CSS 이름 근사값, HEX, RGB, HSL, OKLCH, WCAG 상대 휘도와 흰색·검정 대비가 포함됩니다.</p>
-            </section>
-        </div>
-
-        <!-- TAB 2: ADVANCED CSS GRADIENT STUDIO -->
-        <div id="gradientSection" class="hidden space-y-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                <!-- Left: Control Panel -->
-                <div class="lg:col-span-5 space-y-6">
-                    <div class="glass-panel p-6 rounded-2xl space-y-6">
-                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
-                            <span>그래디언트 설정</span>
-                        </h3>
-
-                        <!-- Type Selector (Linear, Radial, Conic) -->
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">유형 (Gradient Type)</label>
-                            <div class="grid grid-cols-3 gap-1 p-1 bg-slate-900 rounded-xl border border-slate-800">
-                                <button id="gradTypeLinear" onclick="setGradientType('linear')" class="py-2 text-xs font-medium rounded-lg bg-indigo-600 text-white transition-all">선형 (Linear)</button>
-                                <button id="gradTypeRadial" onclick="setGradientType('radial')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">원형 (Radial)</button>
-                                <button id="gradTypeConic" onclick="setGradientType('conic')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">원뿔형 (Conic)</button>
-                            </div>
-                        </div>
-
-                        <!-- Angle Slider (Linear / Conic) -->
-                        <div id="angleControlGroup" class="space-y-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">각도 / 시작점</label>
-                                <span id="angleValueDisplay" class="text-xs font-mono text-indigo-400 font-semibold">90°</span>
-                            </div>
-                            <input type="range" id="gradientAngle" min="0" max="360" value="90" oninput="updateGradient()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
-                            <div class="grid grid-cols-4 gap-1.5 pt-1">
-                                <button onclick="setAngle(0)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">0° (→)</button>
-                                <button onclick="setAngle(90)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">90° (↓)</button>
-                                <button onclick="setAngle(180)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">180° (←)</button>
-                                <button onclick="setAngle(270)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">270° (↑)</button>
-                            </div>
-                        </div>
-
-                        <!-- Color Stops List -->
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">색상 지점 (Color Stops)</label>
-                                <button onclick="addGradientStop()" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium">
-                                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
-                                    <span>색상 추가</span>
-                                </button>
-                            </div>
-                            <div id="stopsContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
-                        </div>
-
-                        <!-- Preset Library Dropdown -->
-                        <div class="space-y-2">
-                            <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">추천 프리셋 (Presets)</label>
-                            <div class="grid grid-cols-2 gap-2" id="gradientPresets">
-                                <!-- Preset Buttons rendered dynamically -->
-                            </div>
-                        </div>
-
-                        <button onclick="generateRandomGradient()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors">
-                            <i data-lucide="dices" class="w-4 h-4 text-purple-400"></i>
-                            <span>랜덤 그래디언트 생성</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Right: Preview & Code Outputs -->
-                <div class="lg:col-span-7 space-y-6 flex flex-col">
-                    
-                    <div class="glass-panel p-4 rounded-2xl flex-1 flex flex-col">
-                        <div class="flex items-center justify-between mb-3 px-1">
-                            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">실시간 프리뷰</span>
-                            <div class="flex items-center gap-2">
-                                <button onclick="saveCurrentGradient()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-                                    <i data-lucide="bookmark" class="w-3.5 h-3.5 text-indigo-400"></i>
-                                    <span>저장</span>
-                                </button>
-                                <button onclick="toggleFullscreenPreview()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
-                                    <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-                                    <span>전체화면</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="gradientPreview" class="w-full h-72 sm:h-80 md:h-96 rounded-xl shadow-2xl transition-all duration-200 border border-slate-700/50 flex items-center justify-center relative overflow-hidden group">
-                            <span class="text-xs font-medium bg-slate-950/70 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity">
-                                Interactive Live Preview
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- CSS & Tailwind Code Output Cards -->
-                    <div class="glass-panel p-5 rounded-2xl space-y-4">
-                        <!-- Standard CSS -->
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">CSS Background Code</span>
-                                <button onclick="copyToClipboard(document.getElementById('cssOutput').innerText, 'CSS')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300">
-                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사
-                                </button>
-                            </div>
-                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300 overflow-x-auto">
-                                <code id="cssOutput">background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);</code>
-                            </div>
-                        </div>
-
-                        <!-- Tailwind CSS -->
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tailwind CSS Classes</span>
-                                <button onclick="copyToClipboard(document.getElementById('tailwindOutput').innerText, 'Tailwind')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300">
-                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사
-                                </button>
-                            </div>
-                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto">
-                                <code id="tailwindOutput">bg-gradient-to-r from-[#6366f1] to-[#a855f7]</code>
-                            </div>
-                        </div>
-
-                        <!-- SVG Gradient -->
-                        <div>
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">SVG Gradient Code</span>
-                                <button onclick="copyToClipboard(document.getElementById('svgOutput').innerText, 'SVG')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300">
-                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사
-                                </button>
-                            </div>
-                            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-amber-300 max-h-24 overflow-y-auto">
-                                <code id="svgOutput">&lt;svg&gt;...&lt;/svg&gt;</code>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 3: CONTRAST CHECKER & COLOR BLINDNESS SIMULATOR -->
-        <div id="accessibilitySection" class="hidden space-y-8">
-            
-            <!-- WCAG Contrast Checker -->
-            <div class="glass-panel p-6 rounded-2xl space-y-6">
-                <div>
-                    <h3 class="text-xl font-bold text-white">WCAG 웹 접근성 텍스트 대비 분석</h3>
-                    <p class="text-sm text-slate-400">선택한 기준 색상 상에서 흰색/어두운색 텍스트의 가독성 및 가이드라인 충족 여부입니다.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="wcagContainer">
-                    <!-- Contrast Analysis Cards rendered dynamically -->
-                </div>
-            </div>
-
-            <!-- Color Blindness Simulator -->
-            <div class="glass-panel p-6 rounded-2xl space-y-6">
-                <div>
-                    <h3 class="text-xl font-bold text-white">색각 이상 시각 모의 (Color Blindness Simulation)</h3>
-                    <p class="text-sm text-slate-400">다양한 유형의 색각 이상 사용자의 시선에서 기준 색상이 어떻게 인지되는지 시뮬레이션합니다.</p>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="blindnessContainer">
-                    <!-- Blindness cards dynamically populated -->
-                </div>
-            </div>
-
-        </div>
-
-        <!-- TAB 4: SAVED LIBRARY & EXPORT -->
-        <div id="librarySection" class="hidden space-y-8">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-xl font-bold text-white">마이 보관함 (Saved Items)</h3>
-                    <p class="text-sm text-slate-400">로컬 스토리지에 저장된 나만의 색상 팔레트 및 그래디언트입니다.</p>
-                </div>
-                <button onclick="clearAllSaved()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 border border-rose-500/30 px-3 py-1.5 rounded-xl bg-rose-500/10">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 전체 삭제
-                </button>
-            </div>
-
-            <!-- Saved Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="savedItemsContainer">
-                <!-- Dynamically rendered saved cards -->
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden">
-        <div class="bg-slate-900 text-white border border-slate-700 shadow-2xl px-5 py-3 rounded-xl flex items-center gap-3 toast-animate">
-            <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <i data-lucide="check" class="w-4 h-4"></i>
-            </div>
-            <span id="toastMessage" class="text-sm font-medium">복사되었습니다!</span>
-        </div>
-    </div>
-
-    <!-- Fullscreen Overlay -->
-    <div id="fullscreenOverlay" class="fixed inset-0 z-50 hidden flex flex-col justify-end p-6 bg-black">
-        <div id="fullscreenPreviewBg" class="absolute inset-0"></div>
-        <button onclick="toggleFullscreenPreview()" class="relative z-10 self-end px-5 py-2.5 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-md text-white rounded-xl border border-white/20 font-medium text-sm flex items-center gap-2 shadow-2xl transition-all">
-            <i data-lucide="minimize-2" class="w-4 h-4"></i>
-            <span>닫기 (ESC)</span>
-        </button>
-    </div>
-
-    <!-- Hidden Canvas for PNG Export -->
-    <canvas id="exportCanvas" class="hidden"></canvas>
-
-    <!-- JavaScript Application Core Logic -->
-    <script>
+<body class="bg-slate-950 text-slate-100 flex flex-col min-h-screen"> <!-- Header Navigation --> <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md"> <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 flex flex-wrap gap-2 items-center justify-between"> <div class="flex items-center gap-3"> <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20"> <i data-lucide="palette" class="w-5 h-5 text-white"></i> </div> <div> <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent"> ChromaCraft Pro </h1> <p class="text-xs text-slate-400 hidden sm:block">CSS 색상명 · 정밀 조정 · 팔레트 비교</p> </div> </div> <!-- Tab Switcher --> <div class="flex flex-wrap max-w-full bg-slate-900/90 p-1 rounded-xl border border-slate-800 text-xs sm:text-sm font-medium"> <button id="tabPaletteBtn" onclick="switchTab('palette')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-md"> <i data-lucide="swatch-book" class="w-4 h-4"></i> <span class="hidden md:inline">색상 & 조화</span> </button> <button id="tabColorsBtn" onclick="switchTab('colors')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white"> <i data-lucide="swatch-book" class="w-4 h-4"></i> <span class="hidden md:inline">CSS 색상표·비교</span> </button> <button id="tabExpertBtn" onclick="switchTab('expert')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white"> <i data-lucide="pipette" class="w-4 h-4"></i> <span class="hidden md:inline">전문가 도구</span> </button> <button id="tabGradientBtn" onclick="switchTab('gradient')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white"> <i data-lucide="blend" class="w-4 h-4"></i> <span class="hidden md:inline">CSS 그래디언트</span> </button> <button id="tabAccessibilityBtn" onclick="switchTab('accessibility')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white"> <i data-lucide="eye" class="w-4 h-4"></i> <span class="hidden md:inline">대비 & 시각 모의</span> </button> <button id="tabLibraryBtn" onclick="switchTab('library')" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg transition-all text-slate-400 hover:text-white"> <i data-lucide="bookmark" class="w-4 h-4"></i> <span class="hidden md:inline">보관함 (<span id="savedCount">0</span>)</span> </button> </div> </div> </header> <!-- Main Workspace --> <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8"> <!-- TAB 1: COLOR PICKER, HARMONIES, TINTS & SHADES --> <div id="paletteSection" class="space-y-8"> <!-- Base Inspector & Eyedropper Card --> <div class="glass-panel rounded-2xl p-6 shadow-xl"> <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between"> <div class="flex items-center gap-4 w-full lg:w-auto"> <div class="flex flex-col items-center gap-1.5 flex-shrink-0"> <div id="legacyColorPickerGroup" class="flex flex-col items-center gap-1.5" style="display:flex"> <input type="color" id="baseColorPicker" value="#6366F1" class="w-20 h-20 rounded-2xl shadow-xl border-2 border-slate-700 bg-transparent cursor-pointer transition-transform hover:scale-105" aria-label="기준 색상 선택기" title="기본 색상 선택기" oninput="updateBaseColor(this.value)"> <span class="text-[10px] text-slate-500">기본 색상 선택기</span> </div> <div id="colorWheelPickerGroup" class="flex-col items-center gap-1.5" style="display:none"> <canvas id="colorWheelCanvas" width="224" height="224" class="color-wheel-canvas" role="slider" tabindex="0" aria-label="원형 색상 선택기: 각도로 색상, 중심에서 바깥쪽으로 채도 선택" aria-valuetext="#6366F1" title="클릭하거나 드래그하여 색상을 선택하세요"></canvas> <span class="text-[10px] text-slate-500">색상환 · 드래그 선택</span> </div> </div> <div> <div class="flex items-center gap-2 flex-wrap"> <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">기준 색상</span> <button id="colorPickerModeToggle" type="button" onclick="toggleColorPickerMode()" aria-pressed="false" class="px-2 py-1 rounded-md border border-indigo-400/30 bg-indigo-500/10 text-[10px] font-semibold text-indigo-200 hover:bg-indigo-500/20 transition-colors" title="원형 색상 선택기로 전환">원형 선택기</button> <button onclick="randomizeBaseColor()" class="p-1 text-slate-400 hover:text-white transition-colors" title="랜덤 색상 (스페이스바)"> <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> </button> <button id="eyedropperBtn" onclick="openEyeDropper()" class="p-1 text-slate-400 hover:text-indigo-400 transition-colors hidden" title="화면 색상 추출 (Eyedropper)"> <i data-lucide="pipette" class="w-3.5 h-3.5"></i> </button> </div> <h2 id="baseHexDisplay" class="text-3xl font-bold font-mono text-white tracking-wide">#6366F1</h2> <div class="mt-1 flex flex-wrap items-center gap-2"><p id="baseColorName" class="text-xs font-semibold text-amber-300" aria-live="polite">가장 가까운 CSS 색상명 확인 중…</p><button type="button" onclick="copyBaseColorName()" class="inline-flex items-center gap-1 rounded-md border border-amber-400/25 bg-amber-400/10 px-2 py-1 text-[10px] font-semibold text-amber-200 hover:bg-amber-400/20" title="기준 색상의 CSS 색상명만 복사"><i data-lucide="copy" class="w-3 h-3"></i> 이름 복사</button></div> </div> </div> <!-- Color Codes Grid --> <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full lg:w-auto flex-1"> <div class="glass-card p-2.5 rounded-xl border border-slate-800/80"> <span class="text-[10px] text-slate-400 font-semibold block">HEX</span> <div class="flex items-center justify-between mt-1"> <span id="codeHex" class="font-mono text-xs font-semibold truncate">#6366F1</span> <button onclick="copyToClipboard(document.getElementById('codeHex').innerText, 'HEX')" class="text-slate-400 hover:text-white"> <i data-lucide="copy" class="w-3 h-3"></i> </button> </div> </div> <div class="glass-card p-2.5 rounded-xl border border-slate-800/80"> <span class="text-[10px] text-slate-400 font-semibold block">RGB</span> <div class="flex items-center justify-between mt-1"> <span id="codeRgb" class="font-mono text-xs font-semibold truncate">99, 102, 241</span> <button onclick="copyToClipboard('rgb(' + document.getElementById('codeRgb').innerText + ')', 'RGB')" class="text-slate-400 hover:text-white"> <i data-lucide="copy" class="w-3 h-3"></i> </button> </div> </div> <div class="glass-card p-2.5 rounded-xl border border-slate-800/80"> <span class="text-[10px] text-slate-400 font-semibold block">HSL</span> <div class="flex items-center justify-between mt-1"> <span id="codeHsl" class="font-mono text-xs font-semibold truncate">239, 84%, 67%</span> <button onclick="copyToClipboard('hsl(' + document.getElementById('codeHsl').innerText + ')', 'HSL')" class="text-slate-400 hover:text-white"> <i data-lucide="copy" class="w-3 h-3"></i> </button> </div> </div> <div class="glass-card p-2.5 rounded-xl border border-slate-800/80"> <span class="text-[10px] text-slate-400 font-semibold block">HSV</span> <div class="flex items-center justify-between mt-1"> <span id="codeHsv" class="font-mono text-xs font-semibold truncate">239, 59%, 95%</span> <button onclick="copyToClipboard('hsv(' + document.getElementById('codeHsv').innerText + ')', 'HSV')" class="text-slate-400 hover:text-white"> <i data-lucide="copy" class="w-3 h-3"></i> </button> </div> </div> <div class="glass-card p-2.5 rounded-xl border border-slate-800/80"> <span class="text-[10px] text-slate-400 font-semibold block">CMYK</span> <div class="flex items-center justify-between mt-1"> <span id="codeCmyk" class="font-mono text-xs font-semibold truncate">59, 58, 0, 5</span> <button onclick="copyToClipboard('cmyk(' + document.getElementById('codeCmyk').innerText + ')', 'CMYK')" class="text-slate-400 hover:text-white"> <i data-lucide="copy" class="w-3 h-3"></i> </button> </div> </div> <div class="glass-card p-2.5 rounded-xl border border-slate-800/80"> <span class="text-[10px] text-slate-400 font-semibold block">OKLCH</span> <div class="flex items-center justify-between mt-1"> <span id="codeOklch" class="font-mono text-xs font-semibold truncate">0.58 0.22 264</span> <button onclick="copyToClipboard('oklch(' + document.getElementById('codeOklch').innerText + ')', 'OKLCH')" class="text-slate-400 hover:text-white"> <i data-lucide="copy" class="w-3 h-3"></i> </button> </div> </div> </div> </div> </div> <!-- Fine-grained HSL controls --> <div class="glass-panel rounded-2xl p-5 shadow-lg space-y-4"> <div class="flex flex-wrap items-center justify-between gap-2"> <div> <h3 class="font-bold text-white">정밀 색상 조정 <span class="text-xs text-slate-400 font-normal">HSL</span></h3> <p class="text-xs text-slate-400 mt-1">색상·채도·명도를 1단위로 조절합니다. HEX 입력과 색상 선택기도 서로 연동됩니다.</p> </div> <div class="flex gap-2 items-center"> <input id="manualHexInput" type="text" value="#6366F1" maxlength="7" spellcheck="false" aria-label="HEX 색상 코드" class="w-28 bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-2 text-xs font-mono uppercase text-white focus:outline-none focus:border-indigo-500"> <button onclick="applyManualHex()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">HEX 적용</button> </div> </div> <div class="grid grid-cols-1 md:grid-cols-3 gap-4"> <div class="space-y-2"> <div class="flex justify-between text-xs"><label for="hueSlider" class="text-slate-300">색상 Hue</label><span id="hueValue" class="font-mono text-indigo-300">239°</span></div> <input id="hueSlider" type="range" min="0" max="360" step="1" value="239" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500"> <div class="h-2 rounded-full" style="background:linear-gradient(90deg,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)"></div> </div> <div class="space-y-2"> <div class="flex justify-between text-xs"><label for="saturationSlider" class="text-slate-300">채도 Saturation</label><span id="saturationValue" class="font-mono text-indigo-300">84%</span></div> <input id="saturationSlider" type="range" min="0" max="100" step="1" value="84" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500"> <div id="saturationGradient" class="h-2 rounded-full border border-white/10 shadow-inner" role="img" aria-label="현재 색상의 채도 조정 미리보기"></div> <div class="flex justify-between text-[10px] text-slate-500"><span>무채색 0%</span><span>고채도 100%</span></div> </div> <div class="space-y-2"> <div class="flex justify-between text-xs"><label for="lightnessSlider" class="text-slate-300">명도 Lightness</label><span id="lightnessValue" class="font-mono text-indigo-300">67%</span></div> <input id="lightnessSlider" type="range" min="0" max="100" step="1" value="67" oninput="updateBaseFromHsl()" class="w-full accent-indigo-500"> <div id="lightnessGradient" class="h-2 rounded-full border border-white/10 shadow-inner" role="img" aria-label="현재 색상의 명도 조정 미리보기"></div> <div class="flex justify-between text-[10px] text-slate-500"><span>검정 0%</span><span>중간 명도 50%</span><span>흰색 100%</span></div> </div> </div> </div> <!-- Tints & Shades Section --> <div class="glass-panel p-6 rounded-2xl space-y-4 shadow-xl"> <h3 class="text-lg font-bold text-white flex items-center gap-2"> <i data-lucide="sun-moon" class="w-5 h-5 text-indigo-400"></i> <span>명도 스펙트럼 (Tints & Shades)</span> </h3> <div class="space-y-3"> <div> <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Tints (밝은 톤)</span> <div id="tintsContainer" class="grid grid-cols-10 h-12 rounded-xl overflow-hidden border border-slate-700/50"></div> </div> <div> <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Shades (어두운 톤)</span> <div id="shadesContainer" class="grid grid-cols-10 h-12 rounded-xl overflow-hidden border border-slate-700/50"></div> </div> </div> </div> <!-- Color Harmonies Grid --> <div class="space-y-4"> <div class="flex justify-between items-center"> <div> <h3 class="text-xl font-bold text-white">색상 조화 팔레트 (Harmonies)</h3> <p class="text-sm text-slate-400">22가지 배색 방식과 기준색에 따라 약 120~160개 이상의 색상 샘플을 비교합니다. 색상 칸을 누르면 HEX를 복사할 수 있습니다.</p> <p id="harmonyStats" class="text-xs text-indigo-300 mt-1">배색 방식 22개 · 색상 샘플 계산 중</p> </div> <div class="flex items-center gap-2"> <button onclick="saveCurrentPalette()" class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium text-xs transition-all"> <i data-lucide="bookmark-plus" class="w-4 h-4 text-indigo-400"></i> <span>팔레트 저장</span> </button> <button onclick="randomizeBaseColor()" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-medium text-xs shadow-lg shadow-indigo-500/25 transition-all transform active:scale-95"> <i data-lucide="sparkles" class="w-4 h-4"></i> <span>랜덤 전체 생성</span> </button> </div> </div> <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4" id="harmonyContainer"> <!-- Dynamically generated palette cards --> </div> </div> </div> <!-- TAB: CSS NAMED COLORS & DETAILED COMPARISON --> <div id="colorsSection" class="hidden space-y-6"> <div class="glass-panel rounded-2xl p-5 md:p-6 space-y-4"> <div class="flex flex-wrap justify-between items-start gap-3"> <div> <h2 class="text-xl font-bold text-white">CSS 표준 색상명 탐색기</h2> <p class="text-sm text-slate-400 mt-1">CSS 표준 색상 148개를 검색하고, <b class="text-slate-200">이름 복사</b>로 DarkGray 같은 색상명만 간편하게 복사합니다.</p> </div> <span id="colorLibraryCount" class="text-xs text-slate-400 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2">148 colors</span> </div> <div class="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_190px] gap-3"> <input id="colorSearchInput" type="search" placeholder="색상명 또는 HEX 검색 (예: DarkGray, Black, #A9A9A9)" oninput="renderNamedColors()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"> <select id="colorFamilyFilter" onchange="renderNamedColors()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:border-indigo-500"> <option value="all">모든 색상 계열</option> <option value="neutral">무채색·흰색·검정</option> <option value="red">빨강</option><option value="orange">주황</option><option value="yellow">노랑</option> <option value="green">초록</option><option value="cyan">청록</option><option value="blue">파랑</option> <option value="purple">보라</option><option value="pink">분홍</option><option value="brown">갈색</option> </select> </div> <p class="text-xs text-slate-500">이름 복사는 CSS 색상명만 복사하며, 기준색 적용과 비교 추가는 각각 현재 색상 변경 및 비교표 추가 기능입니다.</p> <div id="namedColorsGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3"></div> <p id="namedColorsEmpty" class="hidden py-8 text-center text-sm text-slate-500">검색 조건에 맞는 색상이 없습니다.</p> </div> <div class="glass-panel rounded-2xl p-5 md:p-6 space-y-4"> <div class="flex flex-wrap items-center justify-between gap-3"> <div> <h2 class="text-xl font-bold text-white">상세 색상 비교표</h2> <p class="text-sm text-slate-400 mt-1">색상명, HEX, RGB, HSL, HSV, CMYK, OKLCH, 명도와 흰색·검정 대비를 한눈에 비교합니다.</p> </div> <div class="flex flex-wrap gap-2"> <button onclick="addBaseToComparison()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">현재 기준색 추가</button> <button onclick="resetComparison()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs">비교 초기화</button> </div> </div> <div class="overflow-x-auto rounded-xl border border-slate-800"> <table class="min-w-[1120px] w-full text-left text-xs"> <thead class="bg-slate-900 text-slate-300"><tr> <th class="px-3 py-3 font-semibold">색상 / CSS 이름</th><th class="px-3 py-3 font-semibold">HEX</th><th class="px-3 py-3 font-semibold">RGB</th><th class="px-3 py-3 font-semibold">HSL</th><th class="px-3 py-3 font-semibold">HSV</th><th class="px-3 py-3 font-semibold">CMYK</th><th class="px-3 py-3 font-semibold">OKLCH</th><th class="px-3 py-3 font-semibold">명도</th><th class="px-3 py-3 font-semibold">흰색 대비</th><th class="px-3 py-3 font-semibold">검정 대비</th><th class="px-3 py-3 font-semibold">관리</th> </tr></thead> <tbody id="comparisonTableBody" class="divide-y divide-slate-800 bg-slate-950/50"></tbody> </table> </div> <p class="text-[11px] text-slate-500">명도는 WCAG 상대 휘도(0~1)입니다. 대비 비율은 해당 색상과 순백(#FFFFFF)·순흑(#000000) 사이의 비율입니다. CMYK는 RGB에서 변환한 근삿값으로 실제 인쇄 결과는 프로파일·용지에 따라 달라질 수 있습니다.</p> </div> </div> <!-- EXPERT TOOLS: SCREEN / IMAGE COLOR SAMPLER, DELTA E, EXPORT --> <div id="expertSection" class="hidden space-y-8"> <div class="flex flex-wrap items-end justify-between gap-3"> <div> <h2 class="text-2xl font-bold text-white">전문가 색상 도구</h2> <p class="text-sm text-slate-400 mt-1">화면·이미지 픽셀 캡처, 지각 색차(ΔE00), 디자인 토큰 내보내기를 한곳에서 사용합니다.</p> </div> <span class="text-xs px-3 py-2 rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-200">LOCAL · 브라우저 내부 처리</span> </div> <div class="grid grid-cols-1 xl:grid-cols-2 gap-6"> <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-5"> <div> <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="pipette" class="w-5 h-5 text-indigo-400"></i>컬러 캡처 피커</h3> <p class="text-xs text-slate-400 mt-1">화면에서 바로 추출하거나 이미지 파일을 열고 픽셀을 클릭해 정확한 HEX를 선택합니다.</p> </div> <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"> <button type="button" onclick="captureScreenColor()" class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold"><i data-lucide="monitor" class="w-4 h-4"></i>화면에서 색상 캡처</button> <label class="flex items-center justify-center gap-2 py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-sm font-semibold cursor-pointer"><i data-lucide="image-plus" class="w-4 h-4"></i>이미지 열기<input id="samplerImageInput" type="file" accept="image/*" class="hidden"></label> </div> <p id="screenPickerHelp" class="text-[11px] text-slate-500">화면 캡처는 EyeDropper를 지원하는 최신 Chrome/Edge에서 사용합니다. 지원되지 않는 환경에서는 이미지 열기를 이용하세요.</p> <div id="imageSamplerWrap" class="hidden space-y-3"> <div class="flex flex-wrap items-center justify-between gap-2"> <span id="samplerImageInfo" class="text-xs text-slate-400">이미지를 불러왔습니다.</span> <button type="button" onclick="clearSamplerImage()" class="text-xs text-slate-400 hover:text-rose-300">이미지 닫기</button> </div> <div class="rounded-xl overflow-auto max-h-[520px] border border-slate-700 bg-slate-950 p-1"> <canvas id="imageSamplerCanvas" width="1" height="1" aria-label="이미지 픽셀 컬러 캡처 영역"></canvas> </div> <div class="grid grid-cols-1 sm:grid-cols-[150px_minmax(0,1fr)] gap-4 items-center"> <div class="rounded-xl border border-slate-700 bg-slate-950 p-2 flex justify-center"><canvas id="imageMagnifier" width="150" height="150" aria-label="픽셀 확대 미리보기"></canvas></div> <div class="space-y-2 min-w-0"> <div class="flex items-center gap-2"><span id="imageHoverSwatch" class="w-8 h-8 rounded-lg border border-white/20 shrink-0" style="background:#6366F1"></span><code id="imageHoverHex" class="text-sm font-mono text-white">#6366F1</code></div> <p id="imageHoverRgb" class="text-xs text-slate-400 font-mono">RGB 99, 102, 241</p> <p id="imageSamplerStatus" class="text-xs text-slate-500">이미지 위에 포인터를 올려 미리 보고 클릭하여 픽셀을 선택하세요.</p> </div> </div> </div> <div class="rounded-xl border border-slate-700 bg-slate-950/70 p-4 space-y-3"> <div class="flex items-center gap-3"> <span id="capturedColorSwatch" class="w-14 h-14 rounded-xl border border-white/15 shadow-inner shrink-0" style="background:#6366F1"></span> <div class="min-w-0 flex-1"> <div class="flex flex-wrap items-center gap-2"><code id="capturedColorHex" class="text-xl font-bold font-mono text-white">#6366F1</code><button type="button" onclick="copyCapturedColor()" class="text-xs text-indigo-300 hover:text-white">HEX 복사</button></div> <p id="capturedColorName" class="text-xs text-amber-300 mt-1">MediumSlateBlue에 가까운 색상</p> <p id="capturedColorMeta" class="text-[11px] text-slate-500 mt-1">선택된 캡처 색상 · 대기 중</p> </div> </div> <div class="grid grid-cols-1 sm:grid-cols-3 gap-2"> <button type="button" onclick="applyCapturedColorAsBase()" class="py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold">기준색 적용</button> <button type="button" onclick="addCapturedColorToComparison()" class="py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs">비교표 추가</button> <button type="button" onclick="saveCapturedColor()" class="py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs">보관함 저장</button> </div> </div> </section> <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-5"> <div> <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="git-compare" class="w-5 h-5 text-indigo-400"></i>지각 색차 분석 · CIEDE2000</h3> <p class="text-xs text-slate-400 mt-1">두 sRGB 색상을 CIE Lab로 변환하고 CIEDE2000(ΔE00) 공식으로 지각 차이를 비교합니다.</p> </div> <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"> <div class="rounded-xl border border-slate-700 bg-slate-950 p-3 space-y-2"> <label class="block text-[11px] font-semibold text-slate-400">색상 A · 현재 기준색</label> <div class="flex items-center gap-2"><span id="deltaBaseSwatch" class="w-9 h-9 rounded-lg border border-white/10" style="background:#6366F1"></span><code id="deltaBaseHex" class="font-mono text-sm text-white">#6366F1</code></div> </div> <div class="rounded-xl border border-slate-700 bg-slate-950 p-3 space-y-2"> <label for="expertCompareHex" class="block text-[11px] font-semibold text-slate-400">색상 B · 비교 색상 HEX</label> <input id="expertCompareHex" type="text" value="#A855F7" maxlength="7" spellcheck="false" oninput="updateExpertDifference()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 font-mono text-sm uppercase text-white focus:outline-none focus:border-indigo-500"> <div class="flex items-center gap-2"><span id="deltaCompareSwatch" class="w-6 h-6 rounded-md border border-white/10" style="background:#A855F7"></span><span id="deltaCompareRgb" class="text-[11px] text-slate-400 font-mono">RGB 168, 85, 247</span></div> </div> </div> <div class="rounded-xl border border-indigo-500/30 bg-indigo-500/10 p-4"> <div class="flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs text-indigo-200">CIEDE2000 색차</p><div class="flex items-baseline gap-2 mt-1"><strong id="deltaEValue" class="text-4xl font-bold font-mono text-white">—</strong><span class="text-xs text-indigo-200">ΔE00</span></div></div><span id="deltaECategory" class="text-sm font-semibold text-white">HEX 색상을 확인하세요.</span></div> <div class="h-2 rounded-full bg-slate-900 mt-4 overflow-hidden"><div id="deltaEBar" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500" style="width:0%"></div></div> <p id="deltaEExplanation" class="text-xs text-slate-300 mt-3">일반적인 근사 해석이며, 관찰 환경·디스플레이·주변색에 따라 지각은 달라질 수 있습니다.</p> </div> <div class="grid grid-cols-2 gap-3"> <div class="rounded-xl border border-slate-700 p-3"><p class="text-[11px] text-slate-400">색상 A → 흰색 대비</p><p id="deltaBaseContrast" class="text-lg font-mono text-white mt-1">—</p></div> <div class="rounded-xl border border-slate-700 p-3"><p class="text-[11px] text-slate-400">색상 B → 흰색 대비</p><p id="deltaCompareContrast" class="text-lg font-mono text-white mt-1">—</p></div> </div> </section> </div> <section class="glass-panel rounded-2xl p-5 md:p-6 space-y-4"> <div class="flex flex-wrap items-end justify-between gap-3"> <div> <h3 class="text-lg font-bold text-white flex items-center gap-2"><i data-lucide="file-code-2" class="w-5 h-5 text-indigo-400"></i>전문가용 팔레트 내보내기</h3> <p class="text-xs text-slate-400 mt-1">현재 기준색과 22가지 배색 팔레트를 CSS 변수·JSON·CSV·Tailwind 설정으로 내보냅니다.</p> </div> <div class="flex flex-wrap gap-2"> <select id="expertExportFormat" onchange="renderExpertExport()" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"><option value="css">CSS 변수</option><option value="json">JSON 데이터</option><option value="csv">CSV 비교표</option><option value="tailwind">Tailwind 설정</option></select> <button type="button" onclick="renderExpertExport()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white">미리보기 갱신</button> <button type="button" onclick="copyExpertExport()" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white">코드 복사</button> <button type="button" onclick="downloadExpertExport()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-white">파일 저장</button> </div> </div> <pre id="expertExportPreview" class="expert-output rounded-xl border border-slate-800 bg-slate-950 p-4 text-[11px] leading-relaxed font-mono text-emerald-200">내보내기 형식을 선택한 후 미리보기를 갱신하세요.</pre> <p class="text-[11px] text-slate-500">내보내기 팔레트는 현재 기준색에 따라 실시간 생성됩니다. CSV에는 CSS 이름 근사값, HEX, RGB, HSL, OKLCH, WCAG 상대 휘도와 흰색·검정 대비가 포함됩니다.</p> </section> </div> <!-- TAB 2: ADVANCED CSS GRADIENT STUDIO --> <div id="gradientSection" class="hidden space-y-8"> <div class="grid grid-cols-1 lg:grid-cols-12 gap-8"> <!-- Left: Control Panel --> <div class="lg:col-span-5 space-y-6"> <div class="glass-panel p-6 rounded-2xl space-y-6"> <h3 class="text-xl font-bold text-white flex items-center gap-2"> <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i> <span>그래디언트 설정</span> </h3> <!-- Type Selector (Linear, Radial, Conic) --> <div class="space-y-2"> <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">유형 (Gradient Type)</label> <div class="grid grid-cols-3 gap-1 p-1 bg-slate-900 rounded-xl border border-slate-800"> <button id="gradTypeLinear" onclick="setGradientType('linear')" class="py-2 text-xs font-medium rounded-lg bg-indigo-600 text-white transition-all">선형 (Linear)</button> <button id="gradTypeRadial" onclick="setGradientType('radial')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">원형 (Radial)</button> <button id="gradTypeConic" onclick="setGradientType('conic')" class="py-2 text-xs font-medium rounded-lg text-slate-400 hover:text-white transition-all">원뿔형 (Conic)</button> </div> </div> <!-- Angle Slider (Linear / Conic) --> <div id="angleControlGroup" class="space-y-2"> <div class="flex justify-between items-center"> <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">각도 / 시작점</label> <span id="angleValueDisplay" class="text-xs font-mono text-indigo-400 font-semibold">90°</span> </div> <input type="range" id="gradientAngle" min="0" max="360" value="90" oninput="updateGradient()" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"> <div class="grid grid-cols-4 gap-1.5 pt-1"> <button onclick="setAngle(0)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">0° (→)</button> <button onclick="setAngle(90)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">90° (↓)</button> <button onclick="setAngle(180)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">180° (←)</button> <button onclick="setAngle(270)" class="py-1 text-[10px] bg-slate-800 hover:bg-slate-700 rounded text-slate-300 font-mono">270° (↑)</button> </div> </div> <!-- Color Stops List --> <div class="space-y-3"> <div class="flex justify-between items-center"> <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">색상 지점 (Color Stops)</label> <button onclick="addGradientStop()" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 font-medium"> <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> <span>색상 추가</span> </button> </div> <div id="stopsContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div> </div> <!-- Preset Library Dropdown --> <div class="space-y-2"> <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">추천 프리셋 (Presets)</label> <div class="grid grid-cols-2 gap-2" id="gradientPresets"> <!-- Preset Buttons rendered dynamically --> </div> </div> <button onclick="generateRandomGradient()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors"> <i data-lucide="dices" class="w-4 h-4 text-purple-400"></i> <span>랜덤 그래디언트 생성</span> </button> </div> </div> <!-- Right: Preview & Code Outputs --> <div class="lg:col-span-7 space-y-6 flex flex-col"> <div class="glass-panel p-4 rounded-2xl flex-1 flex flex-col"> <div class="flex items-center justify-between mb-3 px-1"> <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">실시간 프리뷰</span> <div class="flex items-center gap-2"> <button onclick="saveCurrentGradient()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700"> <i data-lucide="bookmark" class="w-3.5 h-3.5 text-indigo-400"></i> <span>저장</span> </button> <button onclick="toggleFullscreenPreview()" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700"> <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i> <span>전체화면</span> </button> </div> </div> <div id="gradientPreview" class="w-full h-72 sm:h-80 md:h-96 rounded-xl shadow-2xl transition-all duration-200 border border-slate-700/50 flex items-center justify-center relative overflow-hidden group"> <span class="text-xs font-medium bg-slate-950/70 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity"> Interactive Live Preview </span> </div> </div> <!-- CSS & Tailwind Code Output Cards --> <div class="glass-panel p-5 rounded-2xl space-y-4"> <!-- Standard CSS --> <div> <div class="flex items-center justify-between mb-1.5"> <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">CSS Background Code</span> <button onclick="copyToClipboard(document.getElementById('cssOutput').innerText, 'CSS')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"> <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사 </button> </div> <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300 overflow-x-auto"> <code id="cssOutput">background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);</code> </div> </div> <!-- Tailwind CSS --> <div> <div class="flex items-center justify-between mb-1.5"> <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tailwind CSS Classes</span> <button onclick="copyToClipboard(document.getElementById('tailwindOutput').innerText, 'Tailwind')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"> <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사 </button> </div> <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto"> <code id="tailwindOutput">bg-gradient-to-r from-[#6366f1] to-[#a855f7]</code> </div> </div> <!-- SVG Gradient --> <div> <div class="flex items-center justify-between mb-1.5"> <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">SVG Gradient Code</span> <button onclick="copyToClipboard(document.getElementById('svgOutput').innerText, 'SVG')" class="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300"> <i data-lucide="copy" class="w-3.5 h-3.5"></i> 복사 </button> </div> <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-[11px] text-amber-300 max-h-24 overflow-y-auto"> <code id="svgOutput">&lt;svg&gt;...&lt;/svg&gt;</code> </div> </div> </div> </div> </div> </div> <!-- TAB 3: CONTRAST CHECKER & COLOR BLINDNESS SIMULATOR --> <div id="accessibilitySection" class="hidden space-y-8"> <!-- WCAG Contrast Checker --> <div class="glass-panel p-6 rounded-2xl space-y-6"> <div> <h3 class="text-xl font-bold text-white">WCAG 웹 접근성 텍스트 대비 분석</h3> <p class="text-sm text-slate-400">선택한 기준 색상 상에서 흰색/어두운색 텍스트의 가독성 및 가이드라인 충족 여부입니다.</p> </div> <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="wcagContainer"> <!-- Contrast Analysis Cards rendered dynamically --> </div> </div> <!-- Color Blindness Simulator --> <div class="glass-panel p-6 rounded-2xl space-y-6"> <div> <h3 class="text-xl font-bold text-white">색각 이상 시각 모의 (Color Blindness Simulation)</h3> <p class="text-sm text-slate-400">다양한 유형의 색각 이상 사용자의 시선에서 기준 색상이 어떻게 인지되는지 시뮬레이션합니다.</p> </div> <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="blindnessContainer"> <!-- Blindness cards dynamically populated --> </div> </div> </div> <!-- TAB 4: SAVED LIBRARY & EXPORT --> <div id="librarySection" class="hidden space-y-8"> <div class="flex justify-between items-center"> <div> <h3 class="text-xl font-bold text-white">마이 보관함 (Saved Items)</h3> <p class="text-sm text-slate-400">로컬 스토리지에 저장된 나만의 색상 팔레트 및 그래디언트입니다.</p> </div> <button onclick="clearAllSaved()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 border border-rose-500/30 px-3 py-1.5 rounded-xl bg-rose-500/10"> <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 전체 삭제 </button> </div> <!-- Saved Grid --> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="savedItemsContainer"> <!-- Dynamically rendered saved cards --> </div> </div> </main> <!-- Toast Notification --> <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden"> <div class="bg-slate-900 text-white border border-slate-700 shadow-2xl px-5 py-3 rounded-xl flex items-center gap-3 toast-animate"> <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center"> <i data-lucide="check" class="w-4 h-4"></i> </div> <span id="toastMessage" class="text-sm font-medium">복사되었습니다!</span> </div> </div> <!-- Fullscreen Overlay --> <div id="fullscreenOverlay" class="fixed inset-0 z-50 hidden flex flex-col justify-end p-6 bg-black"> <div id="fullscreenPreviewBg" class="absolute inset-0"></div> <button onclick="toggleFullscreenPreview()" class="relative z-10 self-end px-5 py-2.5 bg-slate-900/80 hover:bg-slate-900 backdrop-blur-md text-white rounded-xl border border-white/20 font-medium text-sm flex items-center gap-2 shadow-2xl transition-all"> <i data-lucide="minimize-2" class="w-4 h-4"></i> <span>닫기 (ESC)</span> </button> </div> <!-- Hidden Canvas for PNG Export --> <canvas id="exportCanvas" class="hidden"></canvas> <!-- JavaScript Application Core Logic --> <script>
         // --- GLOBAL STATE ---
-        let currentBaseColor = "#6366F1";
+        const BASE_COLOR_STORAGE_KEY = 'chromacraft_base_color';
+        function readSavedBaseColor() {
+            try {
+                const saved = localStorage.getItem(BASE_COLOR_STORAGE_KEY);
+                return saved && /^#[0-9A-F]{6}$/i.test(saved) ? saved.toUpperCase() : '#6366F1';
+            } catch (_) {
+                return '#6366F1';
+            }
+        }
+        let currentBaseColor = readSavedBaseColor();
+        let baseColorSaveTimer = null;
+        function saveBaseColorNow() {
+            if (baseColorSaveTimer !== null) {
+                clearTimeout(baseColorSaveTimer);
+                baseColorSaveTimer = null;
+            }
+            try { localStorage.setItem(BASE_COLOR_STORAGE_KEY, currentBaseColor); } catch (_) {}
+        }
+        function scheduleBaseColorSave(hex) {
+            if (baseColorSaveTimer !== null) clearTimeout(baseColorSaveTimer);
+            baseColorSaveTimer = setTimeout(saveBaseColorNow, 120);
+        }
+        let colorPickerMode = 'classic';
+        let colorWheelCanvas = null;
+        let colorWheelContext = null;
+        let colorWheelBuffer = null;
+        let colorWheelBufferContext = null;
+        let colorWheelRenderedLightness = null;
+        let colorWheelPointerActive = false;
+        let colorWheelPendingPoint = null;
+        let colorWheelFramePending = false;
         let gradientState = {
             type: 'linear',
             angle: 90,
@@ -688,26 +138,32 @@
             { name: "Flame Burst", stops: [{color:"#f83600", position:0}, {color:"#fe8c00", position:100}] }
         ];
 
+        // Reuse small SVGs for repeated dynamic controls; avoid rescanning the full page for icons.
+        const INLINE_ICON_SVG = {
+            download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>',
+            trash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>',
+            bookmarkX: '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mx-auto opacity-50" aria-hidden="true"><path d="M6 4.5A2.5 2.5 0 0 1 8.5 2h7A2.5 2.5 0 0 1 18 4.5V22l-6-4-6 4z"/><path d="m9 8 6 6m0-6-6 6"/></svg>'
+        };
+
         // --- INIT ON LOAD ---
         window.onload = function() {
-            lucide.createIcons();
+            if (window.lucide && typeof window.lucide.createIcons === 'function') window.lucide.createIcons();
             if ('EyeDropper' in window) {
                 document.getElementById('eyedropperBtn').classList.remove('hidden');
             } else {
                 const helper = document.getElementById('screenPickerHelp');
                 if (helper) helper.textContent = '현재 브라우저는 화면 직접 캡처를 지원하지 않습니다. 이미지 열기를 사용하면 이미지 픽셀을 선택할 수 있습니다.';
             }
+            setColorPickerMode('classic');
+            initColorWheel();
+            window.addEventListener('pagehide', saveBaseColorNow);
             updateBaseColor(currentBaseColor);
             renderGradientStops();
             renderPresetButtons();
             updateGradient();
             updateSavedCount();
-            renderNamedColors();
-            renderComparisonTable();
             initImageColorPicker();
             setCapturedColor(currentBaseColor, '초기 기준색', '');
-            updateExpertDifference();
-            renderExpertExport();
 
             // Keyboard shortcut (Spacebar for random color)
             document.addEventListener('keydown', function(e) {
@@ -917,24 +373,42 @@
             const words = splitAt(0);
             return words ? words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('') : name.charAt(0).toUpperCase() + name.slice(1);
         }
-        const CSS_NAMED_COLOR_LIST = Object.entries(CSS_NAMED_COLORS).map(([name, hex]) => ({ name, displayName: titleCssName(name), hex, family: colorFamily(hex, name) }));
+        const CSS_NAMED_COLOR_LIST = Object.entries(CSS_NAMED_COLORS).map(([name, hex]) => ({
+            name, displayName: titleCssName(name), hex, rgb: hexToRgb(hex), family: colorFamily(hex, name)
+        }));
+        const CSS_EXACT_COLOR_NAMES = new Map();
+        CSS_NAMED_COLOR_LIST.forEach(entry => {
+            if (!CSS_EXACT_COLOR_NAMES.has(entry.hex)) CSS_EXACT_COLOR_NAMES.set(entry.hex, []);
+            CSS_EXACT_COLOR_NAMES.get(entry.hex).push(entry.displayName);
+        });
+        const CSS_COLOR_INFO_CACHE = new Map();
+        const CSS_COLOR_INFO_CACHE_LIMIT = 4096;
 
-        function colorDistance(hexA, hexB) {
-            const a = hexToRgb(hexA), b = hexToRgb(hexB);
-            const rmean = (a.r + b.r) / 2, dr = a.r - b.r, dg = a.g - b.g, db = a.b - b.b;
-            return Math.sqrt((2 + rmean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rmean) / 256) * db * db);
-        }
-
+        // Cached color-name lookup: nearest-color comparisons reuse precomputed RGB values.
         function findCssColorInfo(hex) {
-            const normalized = rgbToHex(hexToRgb(hex).r, hexToRgb(hex).g, hexToRgb(hex).b);
-            const exact = CSS_NAMED_COLOR_LIST.filter(entry => entry.hex === normalized);
-            if (exact.length) return { exact: true, names: exact.map(entry => entry.displayName), name: exact[0].displayName, hex: normalized, distance: 0 };
+            const rgb = hexToRgb(hex);
+            const normalized = rgbToHex(rgb.r, rgb.g, rgb.b);
+            const cached = CSS_COLOR_INFO_CACHE.get(normalized);
+            if (cached) return cached;
+
+            const exactNames = CSS_EXACT_COLOR_NAMES.get(normalized);
+            if (exactNames) {
+                const result = { exact: true, names: exactNames, name: exactNames[0], hex: normalized, distance: 0 };
+                CSS_COLOR_INFO_CACHE.set(normalized, result);
+                return result;
+            }
+
             let bestName = 'Black', bestHex = '#000000', bestDistance = Infinity;
             for (const entry of CSS_NAMED_COLOR_LIST) {
-                const distance = colorDistance(normalized, entry.hex);
+                const rmean = (rgb.r + entry.rgb.r) / 2;
+                const dr = rgb.r - entry.rgb.r, dg = rgb.g - entry.rgb.g, db = rgb.b - entry.rgb.b;
+                const distance = Math.sqrt((2 + rmean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rmean) / 256) * db * db);
                 if (distance < bestDistance) { bestDistance = distance; bestName = entry.displayName; bestHex = entry.hex; }
             }
-            return { exact: false, names: [bestName], name: bestName, hex: bestHex, distance: bestDistance };
+            const result = { exact: false, names: [bestName], name: bestName, hex: bestHex, distance: bestDistance };
+            if (CSS_COLOR_INFO_CACHE.size >= CSS_COLOR_INFO_CACHE_LIMIT) CSS_COLOR_INFO_CACHE.clear();
+            CSS_COLOR_INFO_CACHE.set(normalized, result);
+            return result;
         }
 
         function colorFamily(hex, rawName = '') {
@@ -953,6 +427,149 @@
             return 'pink';
         }
 
+        // Circular HSL picker: angle selects hue, radius selects saturation, the HSL slider controls lightness.
+        function setColorPickerMode(mode) {
+            colorPickerMode = mode === 'wheel' ? 'wheel' : 'classic';
+            const classicGroup = document.getElementById('legacyColorPickerGroup');
+            const wheelGroup = document.getElementById('colorWheelPickerGroup');
+            const toggle = document.getElementById('colorPickerModeToggle');
+            if (!classicGroup || !wheelGroup || !toggle) return;
+            const useWheel = colorPickerMode === 'wheel';
+            classicGroup.style.display = useWheel ? 'none' : 'flex';
+            wheelGroup.style.display = useWheel ? 'flex' : 'none';
+            toggle.textContent = useWheel ? '기본 선택기' : '원형 선택기';
+            toggle.setAttribute('aria-pressed', String(useWheel));
+            toggle.title = useWheel ? '기본 색상 선택기로 전환' : '원형 색상 선택기로 전환';
+            if (useWheel && colorWheelCanvas) {
+                const rgb = hexToRgb(currentBaseColor);
+                const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+                drawColorWheel(hsl.h, hsl.s, hsl.l);
+            }
+        }
+
+        function toggleColorPickerMode() {
+            setColorPickerMode(colorPickerMode === 'wheel' ? 'classic' : 'wheel');
+        }
+
+        function initColorWheel() {
+            colorWheelCanvas = document.getElementById('colorWheelCanvas');
+            if (!colorWheelCanvas) return;
+            colorWheelContext = colorWheelCanvas.getContext('2d', { alpha: true });
+            colorWheelBuffer = document.createElement('canvas');
+            colorWheelBuffer.width = colorWheelCanvas.width;
+            colorWheelBuffer.height = colorWheelCanvas.height;
+            colorWheelBufferContext = colorWheelBuffer.getContext('2d', { alpha: true });
+            const chooseFromPointer = (event) => {
+                const rect = colorWheelCanvas.getBoundingClientRect();
+                const scaleX = colorWheelCanvas.width / Math.max(1, rect.width);
+                const scaleY = colorWheelCanvas.height / Math.max(1, rect.height);
+                const x = (event.clientX - rect.left) * scaleX;
+                const y = (event.clientY - rect.top) * scaleY;
+                const centerX = colorWheelCanvas.width / 2;
+                const centerY = colorWheelCanvas.height / 2;
+                const radius = Math.min(colorWheelCanvas.width, colorWheelCanvas.height) * 0.46;
+                let dx = x - centerX;
+                let dy = y - centerY;
+                const distance = Math.hypot(dx, dy);
+                if (distance > radius) {
+                    dx *= radius / distance;
+                    dy *= radius / distance;
+                }
+                const hue = (Math.round((Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360)) % 360;
+                const saturation = Math.round(Math.min(100, Math.hypot(dx, dy) / radius * 100));
+                const lightness = Number(document.getElementById('lightnessSlider').value);
+                document.getElementById('hueSlider').value = hue;
+                document.getElementById('saturationSlider').value = saturation;
+                document.getElementById('hueValue').textContent = `${hue}°`;
+                document.getElementById('saturationValue').textContent = `${saturation}%`;
+                const rgb = hslToRgb(hue, saturation, lightness);
+                updateBaseColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+                colorWheelCanvas.setAttribute('aria-valuetext', `${currentBaseColor}; Hue ${hue}°, Saturation ${saturation}%, Lightness ${lightness}%`);
+            };
+            colorWheelCanvas.addEventListener('pointerdown', (event) => {
+                event.preventDefault();
+                colorWheelPointerActive = true;
+                if (colorWheelCanvas.setPointerCapture) colorWheelCanvas.setPointerCapture(event.pointerId);
+                chooseFromPointer(event);
+            });
+            colorWheelCanvas.addEventListener('pointermove', (event) => {
+                if (!colorWheelPointerActive) return;
+                event.preventDefault();
+                chooseFromPointer(event);
+            });
+            const stopWheelDrag = () => { colorWheelPointerActive = false; };
+            colorWheelCanvas.addEventListener('pointerup', stopWheelDrag);
+            colorWheelCanvas.addEventListener('pointercancel', stopWheelDrag);
+            colorWheelCanvas.addEventListener('lostpointercapture', stopWheelDrag);
+            colorWheelCanvas.addEventListener('keydown', (event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+                event.preventDefault();
+                const hue = Number(document.getElementById('hueSlider').value);
+                const sat = Number(document.getElementById('saturationSlider').value);
+                const light = Number(document.getElementById('lightnessSlider').value);
+                const nextHue = (hue + (event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0) + 360) % 360;
+                const nextSat = Math.max(0, Math.min(100, sat + (event.key === 'ArrowUp' ? 1 : event.key === 'ArrowDown' ? -1 : 0)));
+                document.getElementById('hueSlider').value = nextHue;
+                document.getElementById('saturationSlider').value = nextSat;
+                const rgb = hslToRgb(nextHue, nextSat, light);
+                updateBaseColor(rgbToHex(rgb.r, rgb.g, rgb.b));
+            });
+        }
+
+        function drawColorWheel(hue, saturation, lightness) {
+            if (!colorWheelCanvas || !colorWheelContext || !colorWheelBufferContext) return;
+            const size = colorWheelCanvas.width;
+            const center = size / 2;
+            const radius = Math.min(size, colorWheelCanvas.height) * 0.46;
+            // Rebuild the pixel field only when lightness changes; hue/saturation moves only the marker.
+            if (colorWheelRenderedLightness !== lightness) {
+                const image = colorWheelBufferContext.createImageData(size, colorWheelCanvas.height);
+                const data = image.data;
+                for (let y = 0; y < colorWheelCanvas.height; y++) {
+                    const dy = y - center;
+                    for (let x = 0; x < size; x++) {
+                        const dx = x - center;
+                        const distance = Math.hypot(dx, dy);
+                        if (distance > radius) continue;
+                        const h = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+                        const sat = Math.min(100, distance / radius * 100);
+                        const rgb = hslToRgb(h, sat, lightness);
+                        const offset = (y * size + x) * 4;
+                        data[offset] = rgb.r;
+                        data[offset + 1] = rgb.g;
+                        data[offset + 2] = rgb.b;
+                        data[offset + 3] = 255;
+                    }
+                }
+                colorWheelBufferContext.clearRect(0, 0, size, colorWheelCanvas.height);
+                colorWheelBufferContext.putImageData(image, 0, 0);
+                colorWheelRenderedLightness = lightness;
+            }
+            colorWheelContext.clearRect(0, 0, size, colorWheelCanvas.height);
+            colorWheelContext.drawImage(colorWheelBuffer, 0, 0);
+            const angle = hue * Math.PI / 180;
+            const markerRadius = radius * Math.max(0, Math.min(100, saturation)) / 100;
+            const x = center + Math.cos(angle) * markerRadius;
+            const y = center + Math.sin(angle) * markerRadius;
+            colorWheelContext.beginPath();
+            colorWheelContext.arc(x, y, 7.5, 0, Math.PI * 2);
+            colorWheelContext.strokeStyle = '#FFFFFF';
+            colorWheelContext.lineWidth = 3;
+            colorWheelContext.stroke();
+            colorWheelContext.beginPath();
+            colorWheelContext.arc(x, y, 9.2, 0, Math.PI * 2);
+            colorWheelContext.strokeStyle = 'rgba(15,23,42,.95)';
+            colorWheelContext.lineWidth = 1.5;
+            colorWheelContext.stroke();
+            colorWheelCanvas.setAttribute('aria-valuetext', `${currentBaseColor}; Hue ${hue}°, Saturation ${saturation}%, Lightness ${lightness}%`);
+        }
+
+        function copyBaseColorName() {
+            const info = findCssColorInfo(currentBaseColor);
+            const name = info.exact ? info.names[0] : info.name;
+            copyToClipboard(name, 'CSS 색상명');
+        }
+
         function applyManualHex() {
             const value = document.getElementById('manualHexInput').value.trim();
             if (!/^#?(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(value)) { toast('HEX는 #RGB 또는 #RRGGBB 형식으로 입력하세요.'); return; }
@@ -960,6 +577,14 @@
             if (hex.length === 4) hex = '#' + [...hex.slice(1)].map(c => c + c).join('');
             updateBaseColor(hex);
             toast('HEX 색상을 적용했습니다.');
+        }
+
+        function updateHslAdjustmentGradients(h, s, l) {
+            const satTrack = document.getElementById('saturationGradient');
+            const lightTrack = document.getElementById('lightnessGradient');
+            const toHex = (hh, ss, ll) => { const rgb = hslToRgb(hh, ss, ll); return rgbToHex(rgb.r, rgb.g, rgb.b); };
+            if (satTrack) satTrack.style.background = `linear-gradient(90deg, ${toHex(h, 0, l)} 0%, ${toHex(h, 100, l)} 100%)`;
+            if (lightTrack) lightTrack.style.background = `linear-gradient(90deg, ${toHex(h, s, 0)} 0%, ${toHex(h, s, 50)} 50%, ${toHex(h, s, 100)} 100%)`;
         }
 
         function updateBaseFromHsl() {
@@ -1010,6 +635,8 @@
             if (!grid) return;
             const query = (document.getElementById('colorSearchInput')?.value || '').trim().toLowerCase().replace(/^#/, '');
             const family = document.getElementById('colorFamilyFilter')?.value || 'all';
+            const renderKey = `${query}\u0000${family}`;
+            if (grid.dataset.renderKey === renderKey && grid.childElementCount) return;
             const filtered = CSS_NAMED_COLOR_LIST.filter(({ name, displayName, hex, family: colorGroup }) => {
                 const matchesQuery = !query || name.includes(query) || hex.toLowerCase().includes(query) || displayName.toLowerCase().includes(query);
                 return matchesQuery && (family === 'all' || colorGroup === family);
@@ -1033,6 +660,7 @@
                     </div>
                 </article>`;
             }).join('');
+            grid.dataset.renderKey = renderKey;
         }
 
         function renderComparisonTable() {
@@ -1064,7 +692,9 @@
 
         // --- BASE COLOR UPDATE ---
         function updateBaseColor(hex) {
+            if (!/^#[0-9A-F]{6}$/i.test(String(hex))) return;
             currentBaseColor = hex.toUpperCase();
+            scheduleBaseColorSave(currentBaseColor);
             document.getElementById('baseColorPicker').value = currentBaseColor;
             document.getElementById('baseHexDisplay').innerText = currentBaseColor;
 
@@ -1091,18 +721,23 @@
             document.getElementById('hueValue').textContent = `${h}°`;
             document.getElementById('saturationValue').textContent = `${s}%`;
             document.getElementById('lightnessValue').textContent = `${l}%`;
+            updateHslAdjustmentGradients(h, s, l);
+            drawColorWheel(h, s, l);
             const baseCompare = comparisonColors.find(c => c.source === 'base');
             if (baseCompare) baseCompare.hex = currentBaseColor;
 
             renderTintsAndShades(h, s);
             renderHarmonies();
-            renderComparisonTable();
-            if (document.getElementById('deltaBaseSwatch')) {
-                document.getElementById('deltaBaseSwatch').style.backgroundColor = currentBaseColor;
-                document.getElementById('deltaBaseHex').textContent = currentBaseColor;
+            const colorsSection = document.getElementById('colorsSection');
+            if (colorsSection && !colorsSection.classList.contains('hidden')) renderComparisonTable();
+            const expertSection = document.getElementById('expertSection');
+            if (expertSection && !expertSection.classList.contains('hidden')) {
+                const baseSwatch = document.getElementById('deltaBaseSwatch');
+                const baseHex = document.getElementById('deltaBaseHex');
+                if (baseSwatch) baseSwatch.style.backgroundColor = currentBaseColor;
+                if (baseHex) baseHex.textContent = currentBaseColor;
                 updateExpertDifference();
-                const expertSection = document.getElementById('expertSection');
-                if (expertSection && !expertSection.classList.contains('hidden')) renderExpertExport();
+                renderExpertExport();
             }
         }
 
@@ -1249,7 +884,7 @@
                 pngButton.type = 'button';
                 pngButton.className = 'p-1.5 rounded-md text-slate-400 hover:text-white hover:bg-slate-800';
                 pngButton.title = '팔레트 PNG 다운로드';
-                pngButton.innerHTML = '<i data-lucide="download" class="w-3.5 h-3.5"></i>';
+                pngButton.innerHTML = INLINE_ICON_SVG.download;
                 pngButton.addEventListener('click', () => exportCardAsPng(item.title, item.colors));
                 actionGroup.append(count, copyButton, pngButton);
                 header.append(titleGroup, actionGroup);
@@ -1296,7 +931,6 @@
                 card.append(header, strip, detailGrid);
                 container.appendChild(card);
             });
-            if (window.lucide) lucide.createIcons();
         }
 
         // --- PROFESSIONAL COLOR PICKER / IMAGE SAMPLER ---
@@ -1348,8 +982,7 @@
         function saveCapturedColor() {
             const info = findCssColorInfo(capturedColor);
             savedItems.unshift({ id: Date.now(), type: 'palette', title: `Captured ${capturedColor} · ${info.name}`, color: capturedColor, colors: [capturedColor] });
-            persistSavedItems();
-            toast('캡처 색상을 보관함에 저장했습니다.');
+            toast(persistSavedItems() ? '캡처 색상을 보관함에 저장했습니다.' : '브라우저 저장 공간이 부족해 영구 저장하지 못했습니다.');
         }
 
         function initImageColorPicker() {
@@ -1676,14 +1309,13 @@
                     <input type="range" min="0" max="100" value="${stop.position}" oninput="updateStopPos(${index}, this.value)" class="flex-1 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500">
                     <span class="text-xs font-mono text-slate-400 w-8 text-right">${stop.position}%</span>
                     ${gradientState.stops.length > 2 ? `
-                        <button onclick="removeGradientStop(${index})" class="text-slate-500 hover:text-rose-400 p-1">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        <button onclick="removeGradientStop(${index})" class="text-slate-500 hover:text-rose-400 p-1" aria-label="색상 지점 삭제">
+                            ${INLINE_ICON_SVG.trash}
                         </button>
                     ` : '<div class="w-5"></div>'}
                 `;
                 container.appendChild(div);
             });
-            lucide.createIcons();
         }
 
         function updateStopColor(index, val) {
@@ -1872,8 +1504,7 @@
                 colors: calculateHarmoniesRaw(currentBaseColor)
             };
             savedItems.unshift(item);
-            persistSavedItems();
-            toast("팔레트가 보관함에 저장되었습니다!");
+            toast(persistSavedItems() ? "팔레트가 보관함에 저장되었습니다!" : "브라우저 저장 공간이 부족해 영구 저장하지 못했습니다.");
         }
 
         function saveCurrentGradient() {
@@ -1886,8 +1517,7 @@
                 css: css
             };
             savedItems.unshift(item);
-            persistSavedItems();
-            toast("그래디언트가 보관함에 저장되었습니다!");
+            toast(persistSavedItems() ? "그래디언트가 보관함에 저장되었습니다!" : "브라우저 저장 공간이 부족해 영구 저장하지 못했습니다.");
         }
 
         function calculateHarmoniesRaw(hex) {
@@ -1895,8 +1525,14 @@
         }
 
         function persistSavedItems() {
-            localStorage.setItem('chromacraft_saved', JSON.stringify(savedItems));
-            updateSavedCount();
+            try {
+                localStorage.setItem('chromacraft_saved', JSON.stringify(savedItems));
+                updateSavedCount();
+                return true;
+            } catch (error) {
+                updateSavedCount();
+                return false;
+            }
         }
 
         function updateSavedCount() {
@@ -1906,16 +1542,17 @@
         function clearAllSaved() {
             if (confirm("보관함의 모든 항목을 삭제하시겠습니까?")) {
                 savedItems = [];
-                persistSavedItems();
+                const stored = persistSavedItems();
                 renderSavedLibrary();
-                toast("보관함이 비워졌습니다.");
+                toast(stored ? "보관함이 비워졌습니다." : "브라우저 저장 공간에 변경 사항을 기록하지 못했습니다.");
             }
         }
 
         function removeSavedItem(id) {
             savedItems = savedItems.filter(i => i.id !== id);
-            persistSavedItems();
+            const stored = persistSavedItems();
             renderSavedLibrary();
+            if (!stored) toast('삭제 내용은 현재 페이지에 반영했지만 브라우저에 저장하지 못했습니다.');
         }
 
         function renderSavedLibrary() {
@@ -1925,11 +1562,10 @@
             if (savedItems.length === 0) {
                 container.innerHTML = `
                     <div class="col-span-full py-12 text-center text-slate-500 space-y-2">
-                        <i data-lucide="bookmark-x" class="w-8 h-8 mx-auto opacity-50"></i>
+                        ${INLINE_ICON_SVG.bookmarkX}
                         <p class="text-sm">저장된 팔레트나 그래디언트가 없습니다.</p>
                     </div>
                 `;
-                lucide.createIcons();
                 return;
             }
 
@@ -1947,7 +1583,7 @@
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-bold text-white">${item.title}</span>
-                            <button onclick="removeSavedItem(${item.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            <button onclick="removeSavedItem(${item.id})" class="text-slate-500 hover:text-rose-400" aria-label="보관 항목 삭제">${INLINE_ICON_SVG.trash}</button>
                         </div>
                         ${colorSwatches}
                     `;
@@ -1955,14 +1591,13 @@
                     card.innerHTML = `
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-bold text-white">${item.title}</span>
-                            <button onclick="removeSavedItem(${item.id})" class="text-slate-500 hover:text-rose-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                            <button onclick="removeSavedItem(${item.id})" class="text-slate-500 hover:text-rose-400" aria-label="보관 항목 삭제">${INLINE_ICON_SVG.trash}</button>
                         </div>
                         <div class="h-16 rounded-xl border border-slate-700/50 cursor-pointer" style="background: ${item.css}" onclick="copyToClipboard('${item.css}', 'Gradient')"></div>
                     `;
                 }
                 container.appendChild(card);
             });
-            lucide.createIcons();
         }
 
         // --- CANVAS EXPORT AS PNG ---
