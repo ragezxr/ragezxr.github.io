@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows 설정 바로가기 구조도 (ms-settings)</title>
+<style>
+:root{--bg:#f2f5f9;--card:#fff;--ink:#1a2330;--mute:#5b6a7d;--line:#d9e0ea;--acc:#0b63c5;--n:#0f7a43;--nb:#dff5e8;--f:#a15200;--fb:#fff1d9;--o:#6d28d9;--ob:#f0e7ff;--u:#4b5563;--ub:#e8ebf0;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#12161d;--card:#1c222c;--ink:#e7ecf3;--mute:#98a6b8;--line:#2d3644;--acc:#6cb6ff;--n:#6ee7a2;--nb:#12341f;--f:#fbbf6a;--fb:#3a2a12;--o:#d8b4fe;--ob:#2d1d42;--u:#b4bdc9;--ub:#2a313c;color-scheme:dark}}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+.w{max-width:1100px;margin:0 auto;padding:0 20px}
+h1{margin:0;padding-top:26px;font-size:26px}
+.sub{color:var(--mute);margin:4px 0 14px}
+.sub a{color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+h2{margin:0 0 10px;font-size:17px}
+.uri{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;font:14px Consolas,monospace}
+.uri span{padding:8px 12px;border-radius:8px;border:1px solid var(--line)}
+.uri .a{background:var(--nb);color:var(--n)}.uri .b{background:var(--ob);color:var(--o)}.uri .c{background:var(--fb);color:var(--f)}
+.ex{font-size:13px;color:var(--mute);margin:8px 0 0}
+.tree{text-align:center}
+.root{display:inline-block;font:600 15px Consolas,monospace;padding:9px 18px;border-radius:10px;background:var(--acc);color:var(--card)}
+.stem{width:2px;height:16px;background:var(--line);margin:0 auto}
+.bus{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;border-top:2px solid var(--line);padding-top:14px}
+.tile{display:block;text-decoration:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 6px;position:relative}
+.tile:before{content:"";position:absolute;left:50%;top:-16px;width:2px;height:14px;background:var(--line)}
+.tile:hover{border-color:var(--acc)}
+.tile b{display:block;font-size:22px;font-weight:400}.tile i{display:block;font-style:normal;font-size:13px}.tile small{color:var(--mute);font-size:12px}
+.stat{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0}
+input{width:100%;padding:11px 14px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px}
+input:focus,a:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:var(--mute);padding:4px 8px;border-bottom:2px solid var(--line)}
+td{padding:6px 8px;border-top:1px solid var(--line);vertical-align:top}
+td.e{width:36px;font-size:18px;text-align:center}
+td a{color:var(--ink);text-decoration:none}td a:hover{color:var(--acc)}
+code{font:12.5px Consolas,monospace;color:var(--acc);overflow-wrap:anywhere}
+.nt{display:block;font-size:12px;color:var(--mute)}
+.g{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;margin-right:4px;white-space:nowrap}
+.g.n{background:var(--nb);color:var(--n)}.g.f{background:var(--fb);color:var(--f)}.g.o{background:var(--ob);color:var(--o)}.g.u{background:var(--ub);color:var(--u)}
+tr[hidden],section[hidden]{display:none}
+section{scroll-margin-top:70px}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>🗺️ Windows 설정 바로가기 구조도</h1>
+<div class="card" style="margin-top:14px"><div class="tree"><span class="root">⚙️ ms-settings:</span><div class="stem"></div><div class="bus" id="bus"></div></div></div>
+<div class="bar"><input id="q" type="search" placeholder="🔍 검색: 이름 또는 URI (예: 소리, wifi, privacy)" aria-label="검색"></div>
+<main id="m"></main>
+
+<h2 style="margin:28px 0 12px">📖 설명</h2>
+<div class="card"><h2>기준 문서</h2><p class="ex" style="margin:0;font-size:14px">ms-settings URI 모음. 기준 문서: Microsoft Learn <a href="https://learn.microsoft.com/en-us/windows/apps/develop/launch/launch-settings">Launch Windows Settings</a> (2026-09-26 갱신본). Windows에서 열어야 동작합니다.</p></div>
+
+
+<div class="card"><h2>URI는 이렇게 생겼습니다</h2>
+<div class="uri"><span class="a">ms-settings:</span><span class="b">카테고리-페이지</span><span class="c">?파라미터</span></div>
+<p class="ex">예: <code>ms-settings:privacy-webcam</code> 개인정보 › 카메라 · <code>ms-settings:defaultapps?registeredAppUser=앱이름</code> 특정 앱의 기본 앱 설정 · <code>ms-settings:appsfeatures-app?&lt;PFN&gt;</code> 앱 고급 옵션. 예외로 <code>ms-windows-store:</code>, <code>windowsdefender:</code>처럼 별도 프로토콜을 쓰는 항목도 있습니다.</p></div>
+
+
+<div class="card"><h2>표시 기준</h2>
+<div class="stat" id="stat"></div>
+<p class="ex">구분 칸이 비어 있으면 공식 문서에서 확인된 항목입니다. 공식 문서에 없는 항목은 지우지 않고 <span class="g u">미수록</span>으로 남겼으니 직접 눌러 확인하세요.</p></div>
+
+<div class="card"><h2>🛠️ 수정·확인 내역</h2><div class="wrap"><table id="log"><tr><th>항목</th><th>내용</th></tr></table></div></div>
+</div>
+
+<script>
+// 행 형식: 이모지|이름|URI|구분(n신규 f수정 o구버전 u미수록)|비고   (URI에 ':'가 없으면 ms-settings: 자동 접두)
+var D=[
+["🖥️","시스템","display","디스플레이·소리·전원·저장소",[
+"🖥️|디스플레이|display","🔄|화면 회전|screenrotation|n","🔎|고급 디스플레이|display-advanced||Win11에서는 디스플레이 페이지로 열림","🌙|야간 모드|nightlight","📡|무선 디스플레이 검색|ms-settings-connectabledevices:devicediscovery|u","🎮|그래픽 설정|display-advancedgraphics","🎮|그래픽 기본 설정|display-advancedgraphics-default|n",
+"🔊|소리|sound","🎧|소리 장치|sound-devices","🎙️|기본 마이크 속성|sound-defaultinputproperties|n","🔈|기본 출력 속성|sound-defaultoutputproperties|n","🎚️|볼륨 믹서|apps-volume",
+"🔔|알림 및 작업|notifications","🎯|집중 지원|quiethours|f|공식 표기는 quiethours (앞서 바꿨던 quietmomentshome은 되돌림)","⏰|지정 시간 동안|quietmomentsscheduled","📽️|디스플레이 복제 중|quietmomentspresentation","🕹️|전체 화면 게임 중|quietmomentsgame",
+"🔌|전원 및 절전|powersleep","🔋|절전 모드|batterysaver","🪫|절전 모드 설정|batterysaver-settings","📊|배터리 사용량|batterysaver-usagedetails","🌱|에너지 권장 사항|energyrecommendations|n|Win11 22H2 이상","👀|재실 감지|presence|n|Win11 22H2 이상",
+"💾|저장소|storagesense","🧹|저장소 센스|storagepolicies","💡|저장소 권장 사항|storagerecommendations|n","🗄️|디스크 및 볼륨|disksandvolumes|n","📂|기본 저장 위치|savelocations",
+"📱|태블릿 모드|tabletmode|o|Win11에서 제거됨","🪟|멀티태스킹|multitasking","🪟|멀티태스킹 업데이트|multitasking-sgupdate|n","📺|이 PC로 프로젝션|project","🔗|공유 환경|crossdevice","📋|클립보드|clipboard","🖧|원격 데스크톱|remotedesktop",
+"🔐|암호화|deviceencryption","🩺|문제 해결|troubleshoot","♻️|복구|recovery","🔑|정품 인증|activation","👨‍💻|개발자용|developers","ℹ️|정보|about","🎛️|제어 센터|controlcenter|n","📞|전화|phone|o|Win10 1809 이후 사용 중단"]],
+["🎧","Bluetooth 및 장치","bluetooth","연결 장치·입력 장치·휴대폰",[
+"🔵|Bluetooth|bluetooth","🔗|연결된 장치|connecteddevices|n","🖨️|프린터 및 스캐너|printers","🖱️|마우스 및 터치패드|mousetouchpad","👆|터치패드|devices-touchpad|||터치패드 하드웨어가 있을 때","☝️|터치|devices-touch|n","🎡|휠|wheel||Surface Dial 연결 시에만",
+"🖊️|펜 및 Windows Ink|pen","🔘|펜 바로 가기 버튼|pen-button|n","📷|카메라 설정|camera|n|Win11 이상, ?cameraId= 지원","⌨️|하드웨어 키보드 텍스트 제안|devicestyping-hwkbtextsuggestions","⌨️|입력|typing","▶️|자동 실행|autoplay","🔌|USB|usb",
+"📱|휴대폰|mobile-devices","➕|휴대폰 추가|mobile-devices-addphone","📲|Phone Link 열기|mobile-devices-addphone-direct|f|원문 '너 의 휴대폰'의 실제 동작","📈|기기 사용|deviceusage|n"]],
+["🌐","네트워크 및 인터넷","network-status","이더넷·Wi-Fi·VPN·프록시",[
+"📶|상태|network-status","⚙️|고급 네트워크 설정|network-advancedsettings|n","📈|데이터 사용량|datausage|u","📋|사용 가능한 네트워크|ms-availablenetworks:|u","📱|Cellular & SIM|network-cellular","🛜|Wi-Fi|network-wifi||Wi-Fi 어댑터가 있을 때","🗂️|알려진 네트워크|network-wifisettings","🧾|Wi-Fi 프로비저닝|wifi-provisioning|n","📞|Wi-Fi 호출|network-wificalling|u",
+"🔌|이더넷|network-ethernet","☎️|전화 접속|network-dialup|f|원문 '전하접속' 오타","🔁|DirectAccess|network-directaccess||DirectAccess 사용 시에만","🔒|VPN|network-vpn","✈️|비행기 모드|network-airplanemode","📶|근접 항목(비행기 모드)|proximity|n","📡|모바일 핫스팟|network-mobilehotspot","💳|NFC|nfctransactions|u","🧭|프록시|network-proxy"]],
+["🎨","개인 설정","personalization","배경·색·테마·시작·작업 표시줄",[
+"🎨|개인 설정|personalization","🖼️|배경|personalization-background","🎨|색|colors","🎨|색 (신규 주소)|personalization-colors|n","🔒|잠금 화면|lockscreen","🧩|테마|themes","🔤|글꼴|fonts","🚀|시작|personalization-start","📁|시작 메뉴 표시 폴더|personalization-start-places","📌|작업 표시줄|taskbar",
+"✍️|텍스트 입력|personalization-textinput|n","⌨️|터치 키보드|personalization-touchkeyboard|n","🤖|Copilot 키 설정|personalization-textinput-copilot-hardwarekey|n","💡|동적 조명|personalization-lighting|n","👀|Glance|personalization-glance|o|1809 이후 사용 중단","🧭|탐색 모음|personalization-navbar|o|1809 이후 사용 중단"]],
+["📦","앱","appsfeatures","설치된 앱·기본 앱·시작 프로그램",[
+"🗃️|앱 및 기능|appsfeatures","🧾|앱 세부 옵션|appsfeatures-app|n|뒤에 ?패키지패밀리이름 전달","🧰|선택적 기능|optionalfeatures","⭐|기본 앱|defaultapps||?registeredAppUser= 등으로 앱 지정 (Win11 2023-04 이후)","🌐|기본 브라우저 설정|defaultbrowsersettings|no|Win11에서 사용 중단","🗺️|오프라인 지도|maps","⬇️|지도 다운로드|maps-downloadmaps","🌍|웹 사이트용 앱|appsforwebsites","🎬|비디오 재생|videoplayback","🏁|시작 프로그램|startupapps"]],
+["👤","계정","yourinfo","로그인·이메일·가족·동기화",[
+"🙂|사용자 정보|yourinfo","📧|이메일 및 계정|emailandaccounts","🔐|로그인 옵션|signinoptions","📍|동적 잠금|signinoptions-dynamiclock","😀|Windows Hello 얼굴 인식|signinoptions-launchfaceenrollment","👆|Windows Hello 지문 인식|signinoptions-launchfingerprintenrollment","🔑|보안 키 설정|signinoptions-launchsecuritykeyenrollment",
+"🏢|회사 또는 학교 액세스|workplace","🛠️|프로비저닝(회사)|workplace-provisioning|n","📦|프로비저닝(모바일)|provisioning|n","🪙|토큰 복구|workplace-repairtoken|n","👪|가족 및 다른 사용자|otherusers","👨‍👩‍👧|가족 그룹|family-group|n","🏪|키오스크 설정|assignedaccess","💻|Windows Anywhere|windowsanywhere|n","🔄|설정 동기화|sync","☁️|백업|backup|fo|Win11에서 제거되어 동기화로 열림 (이전 설명 정정)"]],
+["🕒","시간 및 언어","dateandtime","시간·지역·입력 언어·음성",[
+"📅|날짜 및 시간|dateandtime","🌏|언어 및 지역|regionlanguage","🏳️|지역 형식|regionformatting|n","⌨️|키보드|keyboard|n","⌨️|고급 키보드|keyboard-advanced|n","🇯🇵|일본어 IME|regionlanguage-jpnime|f|원문 '일본 IME'",
+"🇨🇳|병음 IME|regionlanguage-chsime-pinyin","🇨🇳|병음 도메인 사전|regionlanguage-chsime-pinyin-domainlexicon|n","🇨🇳|병음 키 구성|regionlanguage-chsime-pinyin-keyconfig|n","🇨🇳|병음 사용자 사전|regionlanguage-chsime-pinyin-udp|n","🇨🇳|오필(Wubi) IME|regionlanguage-chsime-wubi|f|원문 'webi' 오타","🇨🇳|오필 사용자 사전|regionlanguage-chsime-wubi-udp|n",
+"🇹🇼|주음(Bopomofo) IME|regionlanguage-bpmfime|n","🇹🇼|창힐 IME|regionlanguage-cangjieime|n","🇹🇼|속성 IME|regionlanguage-quickime|n","🇰🇷|한국어 IME|regionlanguage-korime|n","🈳|표시 언어 설정|regionlanguage-setdisplaylanguage|u","➕|표시 언어 추가|regionlanguage-adddisplaylanguage|u","🎤|음성|speech","⏰|시계|ms-clock:|u"]],
+["🎮","게임","gaming-gamebar","게임 바·캡처·게임 모드",[
+"🎛️|게임 바|gaming-gamebar","🎥|캡처(Game DVR)|gaming-gamedvr","🚀|게임 모드|gaming-gamemode","🎮|Xbox 모드(전체 화면)|gaming-fullscreen|n","🟢|Xbox 네트워킹|gaming-xboxnetworking|u","🛑|TruePlay|gaming-trueplay|o|1809에서 제거됨"]],
+["♿","접근성","easeofaccess-display","시각·청각·상호작용",[
+"🔠|디스플레이|easeofaccess-display","✏️|텍스트 커서|easeofaccess-cursor","🔍|돋보기|easeofaccess-magnifier","🌈|색상 필터|easeofaccess-colorfilter","🌈|적응형 색상 링크|easeofaccess-colorfilter-adaptivecolorlink|n","🔵|블루라이트 링크|easeofaccess-colorfilter-bluelightlink|n","◐|고대비|easeofaccess-highcontrast",
+"🗣️|내레이터|easeofaccess-narrator","🔈|내레이터 자동 시작|easeofaccess-narrator-isautostartenabled","🔊|오디오|easeofaccess-audio","💬|자막|easeofaccess-closedcaptioning|f|원문 '선택 자막'","🎙️|음성|easeofaccess-speechrecognition","🦻|청각 장치|easeofaccess-hearingaids|n|Win11 24H2 이상",
+"⌨️|키보드|easeofaccess-keyboard","🖱️|마우스|easeofaccess-mouse","👆|마우스 포인터 및 터치|easeofaccess-mousepointer|n","👁️|시선 제어|easeofaccess-eyecontrol","✨|시각 효과|easeofaccess-visualeffects"]],
+["🛡️","개인 정보 및 보안","privacy","Windows 보안·검색·앱 권한",[
+"🛡️|Windows 보안|windowsdefender","🧱|Windows 보안 열기|windowsdefender:|u","🔎|검색|search|n","🔏|검색 권한 및 기록|search-permissions","🔍|Windows 검색 세부 정보|search-moredetails|f|원문 cortana-windowssearch는 공식 표에서 변경됨",
+"🔒|일반|privacy-general|f|원문과 같은 privacy 대신 privacy-general","🗣️|음성|privacy-speech","✍️|수동 입력 및 키 입력|privacy-speechtyping","💭|피드백 및 진단|privacy-feedback","📊|진단 데이터 보기|privacy-feedback-telemetryviewergroup|u","🕘|활동 기록|privacy-activityhistory","📍|위치|privacy-location",
+"📷|카메라|privacy-webcam","🎤|마이크|privacy-microphone","🔊|음성 활성화|privacy-voiceactivation","🔔|알림|privacy-notifications","🪪|계정 정보|privacy-accountinfo","📌|내 장치 찾기|findmydevice","👥|연락처|privacy-contacts","🗓️|일정|privacy-calendar","📞|전화 통화|privacy-phonecalls","📜|통화 기록|privacy-callhistory","✉️|메일|privacy-email","👁️|시선 추적|privacy-eyetracker",
+"✅|작업|privacy-tasks","💬|메시지|privacy-messaging","📻|라디오|privacy-radios","🔧|기타 장치|privacy-customdevices","🩻|앱 진단|privacy-appdiagnostics","⬇️|자동 파일 다운로드|privacy-automaticfiledownloads","📄|문서|privacy-documents","📥|다운로드 폴더|privacy-downloadsfolder","🖼️|사진|privacy-pictures","🎞️|동영상|privacy-videos|f|원문은 privacy-documents(중복)","🗄️|파일 시스템|privacy-broadfilesystemaccess",
+"🎵|음악 라이브러리|privacy-musiclibrary|n","🏃|모션|privacy-motion|n","🥽|백그라운드 공간 인식|privacy-backgroundspatialperception|n","🖼️|그래픽 캡처(프로그램)|privacy-graphicscaptureprogrammatic|n","🖼️|그래픽 캡처(테두리 없이)|privacy-graphicscapturewithoutborder|n",
+"🔄|백그라운드 앱|privacy-backgroundapps|o|Win11은 앱별 고급 옵션(appsfeatures-app)으로 이동","🔌|액세서리 앱|privacy-accessoryapps|o|1809 이후 사용 중단","📢|광고 ID|privacy-advertisingid|o|1809 이후 사용 중단"]],
+["🔄","Windows 업데이트","windowsupdate","업데이트·전송 최적화",[
+"🔄|Windows 업데이트|windowsupdate","🔍|업데이트 확인|windowsupdate-action","🧾|선택적 업데이트|windowsupdate-optionalupdates","⏱️|사용 시간|windowsupdate-activehours","📜|업데이트 기록|windowsupdate-history","🔁|다시 시작 옵션|windowsupdate-restartoptions","⚙️|고급 옵션|windowsupdate-options","⚡|Seeker on demand|windowsupdate-seekerondemand|n",
+"📦|전송 최적화|delivery-optimization","📈|전송 최적화 활동|delivery-optimization-activity|n","🔧|전송 최적화 고급|delivery-optimization-advanced|n","🧪|Windows 참가자 프로그램|windowsinsider||가입 상태일 때만","🧪|참가자 옵트인|windowsinsider-optin|n"]],
+["🧰","특수 장치·기타","extras","Surface Hub·혼합 현실·Extras",[
+"🖲️|Surface Hub 계정|surfacehub-accounts|u","🧹|Surface Hub 세션 클린업|surfacehub-sessioncleanup|u","📹|Surface Hub 팀 회의|surfacehub-calling|u","👋|Surface Hub 환영 화면|surfacehub-welcome|u","🛠️|Surface Hub 장치 관리|surfacehub-devicemanagement|fu|원문 devicemanagenent 철자 수정",
+"🥽|혼합 현실|holographic|u","🔊|혼합 현실 오디오|holographic-audio","🏠|혼합 현실 환경|privacy-holographic-environment","📺|헤드셋 디스플레이|holographic-headset","🗑️|혼합 현실 제거|holographic-management|n","🖥️|시작 및 데스크톱|holographic-startupandesktop|n",
+"➕|Extras|extras||타사 앱이 설치된 경우에만","🛍️|Microsoft Store|ms-windows-store:|u"]]
+];
+var L=[
+["집중 지원","앞 버전에서 quietmomentshome으로 바꿨으나 공식 문서는 quiethours라서 되돌림"],
+["백업","앞 버전 설명이 반대였음. 공식: Win11에서 백업 페이지가 제거되어 동기화로 열림"],
+["전화 접속 · 혼합 현실","앞서 붙인 '구버전' 표시는 공식 문서에 근거가 없어 철회. 혼합 현실 하위 주소는 공식 표에 여전히 있음"],
+["일반 · 동영상 · 검색","privacy-general, privacy-videos, search-moredetails는 공식 표로 확인됨"],
+["Surface Hub 전체","현재 공식 표에 없음. 삭제하지 않고 미수록 처리"],
+["신규","공식 표에는 있으나 원문에 없던 항목을 추가함"],
+["미수록","원문에는 있으나 공식 표에 없는 항목. 동작 여부는 Windows 버전별로 직접 확인 필요"],
+["오타·역자 오류","전하접속, 선택 자막, webi, 너 의 휴대폰, 띄어쓰기 오류는 표시 이름에서 정정"]
+];
+var NM={n:"신규",f:"수정",o:"구버전",u:"미수록"};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+var tot={n:0,f:0,o:0,u:0,all:0},bus="",html="";
+D.forEach(function(g,gi){
+var rows="",cn=0;
+g[4].forEach(function(s){
+var p=s.split("|"),uri=p[2].indexOf(":")>-1?p[2]:"ms-settings:"+p[2],fl=p[3]||"",gs="";
+tot.all++;
+fl.split("").forEach(function(c){if(NM[c]){tot[c]++;gs+='<span class="g '+c+'">'+NM[c]+"</span>";if(c=="n")cn++}});
+rows+='<tr><td class="e">'+p[0]+'</td><td><a href="'+uri+'">'+esc(p[1])+(p[4]?'</a><span class="nt">'+esc(p[4])+"</span>":"</a>")+'</td><td><a href="'+uri+'"><code>'+esc(uri)+"</code></a></td><td>"+gs+"</td></tr>";
+});
+bus+='<a class="tile" href="#c'+gi+'"><b>'+g[0]+"</b><i>"+esc(g[1])+"</i><small>"+g[4].length+"개"+(cn?" · 신규 "+cn:"")+"</small></a>";
+html+='<section id="c'+gi+'" class="card"><h2>'+g[0]+" "+esc(g[1])+' <small style="font-weight:400;color:var(--mute);font-size:13px">'+esc(g[3])+'</small></h2><div class="wrap"><table><tr><th></th><th>설정 페이지</th><th>URI</th><th>구분</th></tr>'+rows+"</table></div></section>";
+});
+document.getElementById("bus").innerHTML=bus;
+document.getElementById("m").innerHTML=html;
+document.getElementById("stat").innerHTML='<b>전체 '+tot.all+'개</b><span class="g n">신규 '+tot.n+'</span><span class="g f">수정 '+tot.f+'</span><span class="g o">구버전 '+tot.o+'</span><span class="g u">미수록 '+tot.u+"</span>";
+document.getElementById("log").insertAdjacentHTML("beforeend",L.map(function(r){return"<tr><td><b>"+esc(r[0])+"</b></td><td>"+esc(r[1])+"</td></tr>"}).join(""));
+document.getElementById("q").addEventListener("input",function(e){
+var k=e.target.value.trim().toLowerCase();
+document.querySelectorAll("#m section").forEach(function(s){
+var any=false;
+s.querySelectorAll("tr").forEach(function(r,i){if(!i)return;var ok=!k||r.textContent.toLowerCase().indexOf(k)>-1;r.hidden=!ok;if(ok)any=true});
+s.hidden=!any;
+});
+});
+</script>
+</body>
+</html>
