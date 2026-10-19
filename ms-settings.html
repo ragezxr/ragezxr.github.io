@@ -9,51 +9,50 @@
 @media(prefers-color-scheme:dark){:root{--bg:#12161d;--card:#1c222c;--ink:#e7ecf3;--mute:#98a6b8;--line:#2d3644;--acc:#6cb6ff;--n:#6ee7a2;--nb:#12341f;--f:#fbbf6a;--fb:#3a2a12;--o:#d8b4fe;--ob:#2d1d42;--u:#b4bdc9;--ub:#2a313c;color-scheme:dark}}
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0);scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
-.w{max-width:1100px;margin:0 auto;padding:0 20px}
-h1{margin:0;padding-top:26px;font-size:26px}
+body{margin:0;background:var(--bg);color:var(--ink);font:13.5px/1.35 "Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+.w{max-width:1440px;margin:0 auto;padding:0 14px}
+h1{margin:0;padding-top:12px;font-size:20px}
 .sub{color:var(--mute);margin:4px 0 14px}
 .sub a{color:var(--acc)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
-h2{margin:0 0 10px;font-size:17px}
-.uri{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch;font:14px Consolas,monospace}
-.uri span{padding:8px 12px;border-radius:8px;border:1px solid var(--line)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-bottom:10px}
+h2{margin:0 0 4px;font-size:14.5px}
+.uri{display:flex;flex-wrap:wrap;gap:5px;align-items:stretch;font:13px Consolas,monospace}
+.uri span{padding:4px 10px;border-radius:8px;border:1px solid var(--line)}
 .uri .a{background:var(--nb);color:var(--n)}.uri .b{background:var(--ob);color:var(--o)}.uri .c{background:var(--fb);color:var(--f)}
 .ex{font-size:13px;color:var(--mute);margin:8px 0 0}
 .tree{text-align:center}
-.root{display:inline-block;font:600 15px Consolas,monospace;padding:9px 18px;border-radius:10px;background:var(--acc);color:var(--card)}
-.stem{width:2px;height:16px;background:var(--line);margin:0 auto}
-.bus{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;border-top:2px solid var(--line);padding-top:14px}
-.tile{display:block;text-decoration:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 6px;position:relative}
-.tile:before{content:"";position:absolute;left:50%;top:-16px;width:2px;height:14px;background:var(--line)}
+.root{display:inline-block;font:600 13px Consolas,monospace;padding:4px 14px;border-radius:10px;background:#1c2430;color:#fff;border:1px solid #3a4658}
+.stem{width:2px;height:8px;background:var(--line);margin:0 auto}
+.bus{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:6px;border-top:2px solid var(--line);padding-top:8px}
+.tile{display:grid;grid-template-columns:auto 1fr;column-gap:7px;align-items:center;text-align:left;text-decoration:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:4px 8px;position:relative}
+.tile:before{content:"";position:absolute;left:50%;top:-8px;width:2px;height:6px;background:var(--line)}
 .tile:hover{border-color:var(--acc)}
-.tile b{display:block;font-size:22px;font-weight:400}.tile i{display:block;font-style:normal;font-size:13px}.tile small{color:var(--mute);font-size:12px}
+.tile b{grid-row:1/3;font-size:18px;font-weight:400}.tile i{font-style:normal;font-size:12.5px;font-weight:600;line-height:1.2}.tile small{color:var(--mute);font-size:11px;line-height:1.2}
 .stat{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
-.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0}
-input{width:100%;padding:11px 14px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0}
+input{width:100%;padding:7px 12px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px}
 input:focus,a:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;font-size:12px;color:var(--mute);padding:4px 8px;border-bottom:2px solid var(--line)}
-td{padding:6px 8px;border-top:1px solid var(--line);vertical-align:top}
-td.e{width:36px;font-size:18px;text-align:center}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11px;color:var(--mute);padding:2px 6px;border-bottom:2px solid var(--line)}
+td{padding:2px 6px;border-top:1px solid var(--line);vertical-align:top}
+td.e{width:26px;font-size:15px;text-align:center}
 td a{color:var(--ink);text-decoration:none}td a:hover{color:var(--acc)}
-code{font:12.5px Consolas,monospace;color:var(--acc);overflow-wrap:anywhere}
-.nt{display:block;font-size:12px;color:var(--mute)}
-.g{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;margin-right:4px;white-space:nowrap}
+code{font:11.5px Consolas,monospace;color:var(--acc);overflow-wrap:anywhere}
+.nt{display:block;font-size:11px;line-height:1.25;color:var(--mute)}
+.g{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:99px;margin-right:3px;white-space:nowrap}
 .g.n{background:var(--nb);color:var(--n)}.g.f{background:var(--fb);color:var(--f)}.g.o{background:var(--ob);color:var(--o)}.g.u{background:var(--ub);color:var(--u)}
 tr[hidden],section[hidden]{display:none}
-section{scroll-margin-top:70px}
+section{scroll-margin-top:52px}main{display:flex;gap:10px;align-items:flex-start}.col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}main .card{margin:0}section.hl{border-color:#f5c400;box-shadow:0 0 0 2px #f5c400,0 0 14px rgba(245,196,0,.55)}section{transition:box-shadow .15s,border-color .15s}
 </style>
 </head>
 <body>
 <div class="w">
-<h1>🗺️ Windows 설정 바로가기 구조도</h1>
-<div class="card" style="margin-top:14px"><div class="tree"><span class="root">⚙️ ms-settings:</span><div class="stem"></div><div class="bus" id="bus"></div></div></div>
+<div class="card" style="margin-top:8px"><div class="tree"><span class="root">🛠 ms-settings:</span><div class="stem"></div><div class="bus" id="bus"></div></div></div>
 <div class="bar"><input id="q" type="search" placeholder="🔍 검색: 이름 또는 URI (예: 소리, wifi, privacy)" aria-label="검색"></div>
 <main id="m"></main>
 
-<h2 style="margin:28px 0 12px">📖 설명</h2>
+<h2 style="margin:16px 0 8px">📖 설명</h2>
 <div class="card"><h2>기준 문서</h2><p class="ex" style="margin:0;font-size:14px">ms-settings URI 모음. 기준 문서: Microsoft Learn <a href="https://learn.microsoft.com/en-us/windows/apps/develop/launch/launch-settings">Launch Windows Settings</a> (2026-09-26 갱신본). Windows에서 열어야 동작합니다.</p></div>
 
 
@@ -142,7 +141,7 @@ fl.split("").forEach(function(c){if(NM[c]){tot[c]++;gs+='<span class="g '+c+'">'
 rows+='<tr><td class="e">'+p[0]+'</td><td><a href="'+uri+'">'+esc(p[1])+(p[4]?'</a><span class="nt">'+esc(p[4])+"</span>":"</a>")+'</td><td><a href="'+uri+'"><code>'+esc(uri)+"</code></a></td><td>"+gs+"</td></tr>";
 });
 bus+='<a class="tile" href="#c'+gi+'"><b>'+g[0]+"</b><i>"+esc(g[1])+"</i><small>"+g[4].length+"개"+(cn?" · 신규 "+cn:"")+"</small></a>";
-html+='<section id="c'+gi+'" class="card"><h2>'+g[0]+" "+esc(g[1])+' <small style="font-weight:400;color:var(--mute);font-size:13px">'+esc(g[3])+'</small></h2><div class="wrap"><table><tr><th></th><th>설정 페이지</th><th>URI</th><th>구분</th></tr>'+rows+"</table></div></section>";
+html+='<section id="c'+gi+'" class="card"><h2>'+g[0]+" "+esc(g[1])+' <small style="font-weight:400;color:var(--mute);font-size:11.5px">'+esc(g[3])+'</small></h2><div class="wrap"><table><tr><th></th><th>설정 페이지</th><th>URI</th><th>구분</th></tr>'+rows+"</table></div></section>";
 });
 document.getElementById("bus").innerHTML=bus;
 document.getElementById("m").innerHTML=html;
@@ -155,7 +154,14 @@ var any=false;
 s.querySelectorAll("tr").forEach(function(r,i){if(!i)return;var ok=!k||r.textContent.toLowerCase().indexOf(k)>-1;r.hidden=!ok;if(ok)any=true});
 s.hidden=!any;
 });
+layout();
 });
+var m=document.getElementById("m"),secs=[].slice.call(m.querySelectorAll("section")),nc=0;
+function layout(){var n=Math.max(1,Math.min(3,Math.floor(m.clientWidth/560)));nc=n;var cols=[];m.innerHTML="";for(var i=0;i<n;i++){var c=document.createElement("div");c.className="col";m.appendChild(c);cols.push(c)}
+secs.forEach(function(s){var t=cols[0];cols.forEach(function(c){if(c.offsetHeight<t.offsetHeight)t=c});t.appendChild(s)})}
+layout();
+var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){var n=Math.max(1,Math.min(3,Math.floor(m.clientWidth/560)));if(n!=nc)layout()},150)});
+document.getElementById("bus").addEventListener("click",function(e){var t=e.target.closest("a.tile");if(!t)return;e.preventDefault();var el=document.getElementById(t.getAttribute("href").slice(1));if(!el)return;el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.add("hl");clearTimeout(el._h);el._h=setTimeout(function(){el.classList.remove("hl")},1000)});
 </script>
 </body>
 </html>
