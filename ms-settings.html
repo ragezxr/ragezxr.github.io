@@ -11,7 +11,7 @@
 html{padding-top:env(safe-area-inset-top,0);scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:13.5px/1.35 "Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
 .w{max-width:1440px;margin:0 auto;padding:0 14px}
-h1{margin:0;padding-top:12px;font-size:20px}
+h1{margin:0;font-size:20px;white-space:nowrap}.scale-head{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 14px;max-width:1440px;margin:0 auto}.scale-control{display:flex;align-items:center;gap:8px;flex:1;min-width:260px;max-width:620px}.scale-control input[type=range]{padding:0;margin:0;min-width:120px;flex:1;accent-color:var(--acc);box-shadow:none}.scale-value{min-width:48px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}.scale-ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--mute);margin:0 54px 0 0}.scale-wrap{flex:1;min-width:220px}.scale-head label{font-size:12px;color:var(--mute);white-space:nowrap}
 .sub{color:var(--mute);margin:4px 0 14px}
 .sub a{color:var(--acc)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin-bottom:10px}
@@ -23,13 +23,13 @@ h2{margin:0 0 4px;font-size:14.5px}
 .tree{text-align:center}
 .root{display:inline-block;font:600 13px Consolas,monospace;padding:4px 14px;border-radius:10px;background:#1c2430;color:#fff;border:1px solid #3a4658}
 .stem{width:2px;height:8px;background:var(--line);margin:0 auto}
-.bus{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:6px;border-top:2px solid var(--line);padding-top:8px}
+.bus{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px;border-top:2px solid var(--line);padding-top:8px}
 .tile{display:grid;grid-template-columns:auto 1fr;column-gap:7px;align-items:center;text-align:left;text-decoration:none;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:4px 8px;position:relative}
 .tile:before{content:"";position:absolute;left:50%;top:-8px;width:2px;height:6px;background:var(--line)}
 .tile:hover{border-color:var(--acc)}
-.tile b{grid-row:1/3;font-size:18px;font-weight:400}.tile i{font-style:normal;font-size:12.5px;font-weight:600;line-height:1.2}.tile small{color:var(--mute);font-size:11px;line-height:1.2}
+.tile b{grid-row:1/3;font-size:18px;font-weight:400}.tile i{font-style:normal;font-size:12.5px;font-weight:600;line-height:1.2;white-space:nowrap}.tile small{color:var(--mute);font-size:11px;line-height:1.2}
 .stat{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
-.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0}
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0;display:flex;align-items:center;gap:14px}.scale-wrap{flex:0 1 420px;min-width:230px}.scale-control{display:flex;align-items:center;gap:8px}.scale-control label{white-space:nowrap;font-size:12px;color:var(--mute)}.scale-control input[type=range]{appearance:none;-webkit-appearance:none;width:100%;min-width:100px;height:16px;padding:0;margin:0;background:transparent;box-shadow:none;accent-color:var(--acc);cursor:pointer}.scale-control input[type=range]::-webkit-slider-runnable-track{height:9px;border:1px solid var(--line);border-radius:2px;background:linear-gradient(to right,transparent calc(50% - 1px),#0f7a43 calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),repeating-linear-gradient(to right,var(--mute) 0 1px,transparent 1px calc(100% / 10));background-color:var(--card)}.scale-control input[type=range]::-moz-range-track{height:9px;border:1px solid var(--line);border-radius:2px;background:linear-gradient(to right,transparent calc(50% - 1px),#0f7a43 calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),repeating-linear-gradient(to right,var(--mute) 0 1px,transparent 1px calc(100% / 10));background-color:var(--card)}.scale-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:-4px;border:2px solid var(--card);border-radius:50%;background:var(--acc);box-shadow:0 0 0 1px var(--acc)}.scale-control input[type=range]::-moz-range-thumb{width:11px;height:11px;border:2px solid var(--card);border-radius:50%;background:var(--acc);box-shadow:0 0 0 1px var(--acc)}.bar>input[type=search]{flex:1;min-width:120px;width:auto}@media(max-width:620px){.bar{align-items:stretch;flex-direction:column;gap:6px}.scale-wrap{flex:1;min-width:0;width:100%}}
 input{width:100%;padding:8px 12px;font:inherit;color:var(--ink);background:var(--card);border:1px solid color-mix(in srgb,var(--mute) 45%,var(--line));border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06)}input:focus{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 18%,transparent)}mark{background:none;color:var(--hl);font-weight:700;text-decoration:underline}
 input:focus,a:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{overflow-x:auto}
@@ -49,7 +49,12 @@ section{scroll-margin-top:52px}main{display:flex;gap:10px;align-items:flex-start
 <body>
 <div class="w">
 <div class="card" style="margin-top:8px"><div class="tree"><span class="root">🛠 ms-settings:</span><div class="stem"></div><div class="bus" id="bus"></div></div></div>
-<div class="bar"><input id="q" type="search" placeholder="🔍 검색: 이름 또는 URI (예: 소리, wifi, privacy)" aria-label="검색"></div>
+<div class="bar">
+<input id="q" type="search" placeholder="🔍 검색: 이름 또는 URI (예: 소리, wifi, privacy)" aria-label="검색">
+<div class="scale-wrap" aria-label="전체 화면 크기 조절">
+<div class="scale-control"><label for="pageScale">화면 크기</label><input id="pageScale" type="range" min="50" max="150" step="10" value="100" aria-label="전체 화면 크기 50에서 150퍼센트"><output id="scaleValue" for="pageScale" style="min-width:42px;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums">100%</output></div>
+</div>
+</div>
 <main id="m"></main>
 
 <h2 style="margin:16px 0 8px">📖 설명</h2>
@@ -402,6 +407,9 @@ layout();
 var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){var n=Math.max(1,Math.min(3,Math.floor(m.clientWidth/560)));if(n!=nc)layout()},150)});
 document.getElementById("bus").addEventListener("click",function(e){var t=e.target.closest("a.tile");if(!t)return;e.preventDefault();var el=document.getElementById(t.getAttribute("href").slice(1));if(!el)return;el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.add("hl");clearTimeout(el._h);el._h=setTimeout(function(){el.classList.remove("hl")},1000)});
 function mark(k){document.querySelectorAll("#m mark").forEach(function(x){x.replaceWith(document.createTextNode(x.textContent))});document.querySelectorAll("#m td").forEach(function(td){td.normalize()});if(!k)return;var re=new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");document.querySelectorAll("#m td:not(.e)").forEach(function(td){var w=document.createTreeWalker(td,NodeFilter.SHOW_TEXT),ns=[],n;while(n=w.nextNode())ns.push(n);ns.forEach(function(t){var v=t.nodeValue;if(!re.test(v)){re.lastIndex=0;return}re.lastIndex=0;var f=document.createDocumentFragment(),i=0,m;while((m=re.exec(v))){if(!m[0])break;f.appendChild(document.createTextNode(v.slice(i,m.index)));var mk=document.createElement("mark");mk.textContent=m[0];f.appendChild(mk);i=m.index+m[0].length}f.appendChild(document.createTextNode(v.slice(i)));t.parentNode.replaceChild(f,t)})})}
+var scaleSlider=document.getElementById("pageScale");
+function applyPageScale(){var v=Number(scaleSlider.value);document.querySelector(".w").style.zoom=(v/100);document.getElementById("scaleValue").textContent=v+"%";}
+scaleSlider.addEventListener("input",applyPageScale);
 </script>
 </body>
 </html>
