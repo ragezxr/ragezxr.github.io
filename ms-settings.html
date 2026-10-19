@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Windows 설정 바로가기 구조도 (ms-settings)</title>
 <style>
-:root{--bg:#f2f5f9;--card:#fff;--ink:#1a2330;--mute:#5b6a7d;--line:#d9e0ea;--acc:#0b63c5;--n:#0f7a43;--nb:#dff5e8;--f:#a15200;--fb:#fff1d9;--o:#6d28d9;--ob:#f0e7ff;--u:#4b5563;--ub:#e8ebf0;color-scheme:light}
-@media(prefers-color-scheme:dark){:root{--bg:#12161d;--card:#1c222c;--ink:#e7ecf3;--mute:#98a6b8;--line:#2d3644;--acc:#6cb6ff;--n:#6ee7a2;--nb:#12341f;--f:#fbbf6a;--fb:#3a2a12;--o:#d8b4fe;--ob:#2d1d42;--u:#b4bdc9;--ub:#2a313c;color-scheme:dark}}
+:root{--bg:#f2f5f9;--card:#fff;--ink:#1a2330;--mute:#5b6a7d;--line:#d9e0ea;--acc:#0b63c5;--n:#0f7a43;--nb:#dff5e8;--f:#a15200;--fb:#fff1d9;--o:#6d28d9;--ob:#f0e7ff;--u:#4b5563;--ub:#e8ebf0;--hl:#d6336c;color-scheme:light}
+@media(prefers-color-scheme:dark){:root{--bg:#12161d;--card:#1c222c;--ink:#e7ecf3;--mute:#98a6b8;--line:#2d3644;--acc:#6cb6ff;--n:#6ee7a2;--nb:#12341f;--f:#fbbf6a;--fb:#3a2a12;--o:#d8b4fe;--ob:#2d1d42;--u:#b4bdc9;--ub:#2a313c;--hl:#ffb454;color-scheme:dark}}
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0);scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:13.5px/1.35 "Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif}
@@ -30,7 +30,7 @@ h2{margin:0 0 4px;font-size:14.5px}
 .tile b{grid-row:1/3;font-size:18px;font-weight:400}.tile i{font-style:normal;font-size:12.5px;font-weight:600;line-height:1.2}.tile small{color:var(--mute);font-size:11px;line-height:1.2}
 .stat{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:6px 0}
-input{width:100%;padding:7px 12px;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px}
+input{width:100%;padding:8px 12px;font:inherit;color:var(--ink);background:var(--card);border:1px solid color-mix(in srgb,var(--mute) 45%,var(--line));border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06)}input:focus{border-color:var(--acc);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 18%,transparent)}mark{background:none;color:var(--hl);font-weight:700;text-decoration:underline}
 input:focus,a:focus-visible,summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -39,7 +39,7 @@ td{padding:2px 6px;border-top:1px solid var(--line);vertical-align:top}
 td.e{width:26px;font-size:15px;text-align:center}
 td a{color:var(--ink);text-decoration:none}td a:hover{color:var(--acc)}
 code{font:11.5px Consolas,monospace;color:var(--acc);overflow-wrap:anywhere}
-.nt{display:block;font-size:11px;line-height:1.25;color:var(--mute)}
+.en{font-weight:600}.ko,.sp{color:var(--mute)}mark{background:none;color:#d9480f;font-weight:700}@media(prefers-color-scheme:dark){mark{color:#ff9a62}}.nt{display:block;font-size:11px;line-height:1.25;color:var(--mute)}
 .g{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:99px;margin-right:3px;white-space:nowrap}
 .g.n{background:var(--nb);color:var(--n)}.g.f{background:var(--fb);color:var(--f)}.g.o{background:var(--ob);color:var(--o)}.g.u{background:var(--ub);color:var(--u)}
 tr[hidden],section[hidden]{display:none}
@@ -74,7 +74,7 @@ var D=[
 ["🖥️","시스템","display","디스플레이·소리·전원·저장소",[
 "🖥️|디스플레이|display","🔄|화면 회전|screenrotation|n","🔎|고급 디스플레이|display-advanced||Win11에서는 디스플레이 페이지로 열림","🌙|야간 모드|nightlight","📡|무선 디스플레이 검색|ms-settings-connectabledevices:devicediscovery|u","🎮|그래픽 설정|display-advancedgraphics","🎮|그래픽 기본 설정|display-advancedgraphics-default|n",
 "🔊|소리|sound","🎧|소리 장치|sound-devices","🎙️|기본 마이크 속성|sound-defaultinputproperties|n","🔈|기본 출력 속성|sound-defaultoutputproperties|n","🎚️|볼륨 믹서|apps-volume",
-"🔔|알림 및 작업|notifications","🎯|집중 지원|quiethours|f|공식 표기는 quiethours (앞서 바꿨던 quietmomentshome은 되돌림)","⏰|지정 시간 동안|quietmomentsscheduled","📽️|디스플레이 복제 중|quietmomentspresentation","🕹️|전체 화면 게임 중|quietmomentsgame",
+"🔔|알림 및 작업|notifications","🎯|집중 지원|quiethours|f","⏰|지정 시간 동안|quietmomentsscheduled","📽️|디스플레이 복제 중|quietmomentspresentation","🕹️|전체 화면 게임 중|quietmomentsgame",
 "🔌|전원 및 절전|powersleep","🔋|절전 모드|batterysaver","🪫|절전 모드 설정|batterysaver-settings","📊|배터리 사용량|batterysaver-usagedetails","🌱|에너지 권장 사항|energyrecommendations|n|Win11 22H2 이상","👀|재실 감지|presence|n|Win11 22H2 이상",
 "💾|저장소|storagesense","🧹|저장소 센스|storagepolicies","💡|저장소 권장 사항|storagerecommendations|n","🗄️|디스크 및 볼륨|disksandvolumes|n","📂|기본 저장 위치|savelocations",
 "📱|태블릿 모드|tabletmode|o|Win11에서 제거됨","🪟|멀티태스킹|multitasking","🪟|멀티태스킹 업데이트|multitasking-sgupdate|n","📺|이 PC로 프로젝션|project","🔗|공유 환경|crossdevice","📋|클립보드|clipboard","🖧|원격 데스크톱|remotedesktop",
@@ -84,22 +84,22 @@ var D=[
 "🖊️|펜 및 Windows Ink|pen","🔘|펜 바로 가기 버튼|pen-button|n","📷|카메라 설정|camera|n|Win11 이상, ?cameraId= 지원","⌨️|하드웨어 키보드 텍스트 제안|devicestyping-hwkbtextsuggestions","⌨️|입력|typing","▶️|자동 실행|autoplay","🔌|USB|usb",
 "📱|휴대폰|mobile-devices","➕|휴대폰 추가|mobile-devices-addphone","📲|Phone Link 열기|mobile-devices-addphone-direct|f|원문 '너 의 휴대폰'의 실제 동작","📈|기기 사용|deviceusage|n"]],
 ["🌐","네트워크 및 인터넷","network-status","이더넷·Wi-Fi·VPN·프록시",[
-"📶|상태|network-status","⚙️|고급 네트워크 설정|network-advancedsettings|n","📈|데이터 사용량|datausage|u","📋|사용 가능한 네트워크|ms-availablenetworks:|u","📱|Cellular & SIM|network-cellular","🛜|Wi-Fi|network-wifi||Wi-Fi 어댑터가 있을 때","🗂️|알려진 네트워크|network-wifisettings","🧾|Wi-Fi 프로비저닝|wifi-provisioning|n","📞|Wi-Fi 호출|network-wificalling|u",
-"🔌|이더넷|network-ethernet","☎️|전화 접속|network-dialup|f|원문 '전하접속' 오타","🔁|DirectAccess|network-directaccess||DirectAccess 사용 시에만","🔒|VPN|network-vpn","✈️|비행기 모드|network-airplanemode","📶|근접 항목(비행기 모드)|proximity|n","📡|모바일 핫스팟|network-mobilehotspot","💳|NFC|nfctransactions|u","🧭|프록시|network-proxy"]],
+"📶|상태|network-status","⚙️|고급 네트워크 설정|network-advancedsettings|n","📈|데이터 사용량|datausage|u","📋|사용 가능한 네트워크|ms-availablenetworks:|u","📱|셀룰러 및 SIM|network-cellular","🛜|Wi-Fi|network-wifi||Wi-Fi 어댑터가 있을 때","🗂️|알려진 네트워크|network-wifisettings","🧾|Wi-Fi 프로비저닝|wifi-provisioning|n","📞|Wi-Fi 호출|network-wificalling|u",
+"🔌|이더넷|network-ethernet","☎️|전화 접속|network-dialup|f|원문 '전하접속' 오타","🔁|DirectAccess|network-directaccess||DirectAccess 사용 시에만","🔒|VPN|network-vpn","✈️|비행기 모드|network-airplanemode","📶|비행기 모드 근접 항목|proximity|n","📡|모바일 핫스팟|network-mobilehotspot","💳|NFC|nfctransactions|u","🧭|프록시|network-proxy"]],
 ["🎨","개인 설정","personalization","배경·색·테마·시작·작업 표시줄",[
-"🎨|개인 설정|personalization","🖼️|배경|personalization-background","🎨|색|colors","🎨|색 (신규 주소)|personalization-colors|n","🔒|잠금 화면|lockscreen","🧩|테마|themes","🔤|글꼴|fonts","🚀|시작|personalization-start","📁|시작 메뉴 표시 폴더|personalization-start-places","📌|작업 표시줄|taskbar",
+"🎨|개인 설정|personalization","🖼️|배경|personalization-background","🎨|색|colors","🎨|색|personalization-colors|n","🔒|잠금 화면|lockscreen","🧩|테마|themes","🔤|글꼴|fonts","🚀|시작|personalization-start","📁|시작 메뉴 표시 폴더|personalization-start-places","📌|작업 표시줄|taskbar",
 "✍️|텍스트 입력|personalization-textinput|n","⌨️|터치 키보드|personalization-touchkeyboard|n","🤖|Copilot 키 설정|personalization-textinput-copilot-hardwarekey|n","💡|동적 조명|personalization-lighting|n","👀|Glance|personalization-glance|o|1809 이후 사용 중단","🧭|탐색 모음|personalization-navbar|o|1809 이후 사용 중단"]],
 ["📦","앱","appsfeatures","설치된 앱·기본 앱·시작 프로그램",[
 "🗃️|앱 및 기능|appsfeatures","🧾|앱 세부 옵션|appsfeatures-app|n|뒤에 ?패키지패밀리이름 전달","🧰|선택적 기능|optionalfeatures","⭐|기본 앱|defaultapps||?registeredAppUser= 등으로 앱 지정 (Win11 2023-04 이후)","🌐|기본 브라우저 설정|defaultbrowsersettings|no|Win11에서 사용 중단","🗺️|오프라인 지도|maps","⬇️|지도 다운로드|maps-downloadmaps","🌍|웹 사이트용 앱|appsforwebsites","🎬|비디오 재생|videoplayback","🏁|시작 프로그램|startupapps"]],
 ["👤","계정","yourinfo","로그인·이메일·가족·동기화",[
 "🙂|사용자 정보|yourinfo","📧|이메일 및 계정|emailandaccounts","🔐|로그인 옵션|signinoptions","📍|동적 잠금|signinoptions-dynamiclock","😀|Windows Hello 얼굴 인식|signinoptions-launchfaceenrollment","👆|Windows Hello 지문 인식|signinoptions-launchfingerprintenrollment","🔑|보안 키 설정|signinoptions-launchsecuritykeyenrollment",
-"🏢|회사 또는 학교 액세스|workplace","🛠️|프로비저닝(회사)|workplace-provisioning|n","📦|프로비저닝(모바일)|provisioning|n","🪙|토큰 복구|workplace-repairtoken|n","👪|가족 및 다른 사용자|otherusers","👨‍👩‍👧|가족 그룹|family-group|n","🏪|키오스크 설정|assignedaccess","💻|Windows Anywhere|windowsanywhere|n","🔄|설정 동기화|sync","☁️|백업|backup|fo|Win11에서 제거되어 동기화로 열림 (이전 설명 정정)"]],
+"🏢|회사 또는 학교 액세스|workplace","🛠️|프로비저닝(회사)|workplace-provisioning|n","📦|프로비저닝(모바일)|provisioning|n","🪙|토큰 복구|workplace-repairtoken|n","👪|가족 및 다른 사용자|otherusers","👨‍👩‍👧|가족 그룹|family-group|n","🏪|키오스크 설정|assignedaccess","💻|Windows Anywhere|windowsanywhere|n","🔄|설정 동기화|sync","☁️|백업|backup|fo|Win11에서 제거되어 동기화로 열림"]],
 ["🕒","시간 및 언어","dateandtime","시간·지역·입력 언어·음성",[
 "📅|날짜 및 시간|dateandtime","🌏|언어 및 지역|regionlanguage","🏳️|지역 형식|regionformatting|n","⌨️|키보드|keyboard|n","⌨️|고급 키보드|keyboard-advanced|n","🇯🇵|일본어 IME|regionlanguage-jpnime|f|원문 '일본 IME'",
-"🇨🇳|병음 IME|regionlanguage-chsime-pinyin","🇨🇳|병음 도메인 사전|regionlanguage-chsime-pinyin-domainlexicon|n","🇨🇳|병음 키 구성|regionlanguage-chsime-pinyin-keyconfig|n","🇨🇳|병음 사용자 사전|regionlanguage-chsime-pinyin-udp|n","🇨🇳|오필(Wubi) IME|regionlanguage-chsime-wubi|f|원문 'webi' 오타","🇨🇳|오필 사용자 사전|regionlanguage-chsime-wubi-udp|n",
+"🇨🇳|병음 IME|regionlanguage-chsime-pinyin","🇨🇳|병음 도메인 사전|regionlanguage-chsime-pinyin-domainlexicon|n","🇨🇳|병음 키 구성|regionlanguage-chsime-pinyin-keyconfig|n","🇨🇳|병음 사용자 사전|regionlanguage-chsime-pinyin-udp|n","🇨🇳|오필 IME|regionlanguage-chsime-wubi|f|원문 'webi' 오타","🇨🇳|오필 사용자 사전|regionlanguage-chsime-wubi-udp|n",
 "🇹🇼|주음(Bopomofo) IME|regionlanguage-bpmfime|n","🇹🇼|창힐 IME|regionlanguage-cangjieime|n","🇹🇼|속성 IME|regionlanguage-quickime|n","🇰🇷|한국어 IME|regionlanguage-korime|n","🈳|표시 언어 설정|regionlanguage-setdisplaylanguage|u","➕|표시 언어 추가|regionlanguage-adddisplaylanguage|u","🎤|음성|speech","⏰|시계|ms-clock:|u"]],
 ["🎮","게임","gaming-gamebar","게임 바·캡처·게임 모드",[
-"🎛️|게임 바|gaming-gamebar","🎥|캡처(Game DVR)|gaming-gamedvr","🚀|게임 모드|gaming-gamemode","🎮|Xbox 모드(전체 화면)|gaming-fullscreen|n","🟢|Xbox 네트워킹|gaming-xboxnetworking|u","🛑|TruePlay|gaming-trueplay|o|1809에서 제거됨"]],
+"🎛️|게임 바|gaming-gamebar","🎥|게임 DVR|gaming-gamedvr","🚀|게임 모드|gaming-gamemode","🎮|Xbox 모드|gaming-fullscreen|n","🟢|Xbox 네트워킹|gaming-xboxnetworking|u","🛑|TruePlay|gaming-trueplay|o|1809에서 제거됨"]],
 ["♿","접근성","easeofaccess-display","시각·청각·상호작용",[
 "🔠|디스플레이|easeofaccess-display","✏️|텍스트 커서|easeofaccess-cursor","🔍|돋보기|easeofaccess-magnifier","🌈|색상 필터|easeofaccess-colorfilter","🌈|적응형 색상 링크|easeofaccess-colorfilter-adaptivecolorlink|n","🔵|블루라이트 링크|easeofaccess-colorfilter-bluelightlink|n","◐|고대비|easeofaccess-highcontrast",
 "🗣️|내레이터|easeofaccess-narrator","🔈|내레이터 자동 시작|easeofaccess-narrator-isautostartenabled","🔊|오디오|easeofaccess-audio","💬|자막|easeofaccess-closedcaptioning|f|원문 '선택 자막'","🎙️|음성|easeofaccess-speechrecognition","🦻|청각 장치|easeofaccess-hearingaids|n|Win11 24H2 이상",
@@ -112,12 +112,12 @@ var D=[
 "🎵|음악 라이브러리|privacy-musiclibrary|n","🏃|모션|privacy-motion|n","🥽|백그라운드 공간 인식|privacy-backgroundspatialperception|n","🖼️|그래픽 캡처(프로그램)|privacy-graphicscaptureprogrammatic|n","🖼️|그래픽 캡처(테두리 없이)|privacy-graphicscapturewithoutborder|n",
 "🔄|백그라운드 앱|privacy-backgroundapps|o|Win11은 앱별 고급 옵션(appsfeatures-app)으로 이동","🔌|액세서리 앱|privacy-accessoryapps|o|1809 이후 사용 중단","📢|광고 ID|privacy-advertisingid|o|1809 이후 사용 중단"]],
 ["🔄","Windows 업데이트","windowsupdate","업데이트·전송 최적화",[
-"🔄|Windows 업데이트|windowsupdate","🔍|업데이트 확인|windowsupdate-action","🧾|선택적 업데이트|windowsupdate-optionalupdates","⏱️|사용 시간|windowsupdate-activehours","📜|업데이트 기록|windowsupdate-history","🔁|다시 시작 옵션|windowsupdate-restartoptions","⚙️|고급 옵션|windowsupdate-options","⚡|Seeker on demand|windowsupdate-seekerondemand|n",
+"🔄|Windows 업데이트|windowsupdate","🔍|업데이트 확인|windowsupdate-action","🧾|선택적 업데이트|windowsupdate-optionalupdates","⏱️|사용 시간|windowsupdate-activehours","📜|업데이트 기록|windowsupdate-history","🔁|다시 시작 옵션|windowsupdate-restartoptions","⚙️|고급 옵션|windowsupdate-options","⚡|요청 시 시커|windowsupdate-seekerondemand|n",
 "📦|전송 최적화|delivery-optimization","📈|전송 최적화 활동|delivery-optimization-activity|n","🔧|전송 최적화 고급|delivery-optimization-advanced|n","🧪|Windows 참가자 프로그램|windowsinsider||가입 상태일 때만","🧪|참가자 옵트인|windowsinsider-optin|n"]],
 ["🧰","특수 장치·기타","extras","Surface Hub·혼합 현실·Extras",[
 "🖲️|Surface Hub 계정|surfacehub-accounts|u","🧹|Surface Hub 세션 클린업|surfacehub-sessioncleanup|u","📹|Surface Hub 팀 회의|surfacehub-calling|u","👋|Surface Hub 환영 화면|surfacehub-welcome|u","🛠️|Surface Hub 장치 관리|surfacehub-devicemanagement|fu|원문 devicemanagenent 철자 수정",
 "🥽|혼합 현실|holographic|u","🔊|혼합 현실 오디오|holographic-audio","🏠|혼합 현실 환경|privacy-holographic-environment","📺|헤드셋 디스플레이|holographic-headset","🗑️|혼합 현실 제거|holographic-management|n","🖥️|시작 및 데스크톱|holographic-startupandesktop|n",
-"➕|Extras|extras||타사 앱이 설치된 경우에만","🛍️|Microsoft Store|ms-windows-store:|u"]]
+"➕|추가 항목|extras||타사 앱이 설치된 경우에만","🛍️|Microsoft Store|ms-windows-store:|u"]]
 ];
 var L=[
 ["집중 지원","앞 버전에서 quietmomentshome으로 바꿨으나 공식 문서는 quiethours라서 되돌림"],
@@ -129,6 +129,241 @@ var L=[
 ["미수록","원문에는 있으나 공식 표에 없는 항목. 동작 여부는 Windows 버전별로 직접 확인 필요"],
 ["오타·역자 오류","전하접속, 선택 자막, webi, 너 의 휴대폰, 띄어쓰기 오류는 표시 이름에서 정정"]
 ];
+var EN={};`display=Display
+screenrotation=Display – Screen rotation
+display-advanced=Advanced display settings
+nightlight=Night light settings
+ms-settings-connectabledevices:devicediscovery=Connect to wireless display
+display-advancedgraphics=Graphics settings
+display-advancedgraphics-default=Graphics default settings
+sound=Sound
+sound-devices=Sound devices
+sound-defaultinputproperties=Default microphone
+sound-defaultoutputproperties=Default audio output
+apps-volume=Volume mixer
+notifications=Notifications & actions
+quiethours=Focus assist
+quietmomentsscheduled=During these hours
+quietmomentspresentation=Duplicating my display
+quietmomentsgame=Playing a game full screen
+powersleep=Power & sleep
+batterysaver=Battery Saver
+batterysaver-settings=Battery Saver settings
+batterysaver-usagedetails=Battery use
+energyrecommendations=Energy recommendations
+presence=Presence sensing
+storagesense=Storage
+storagepolicies=Storage Sense
+storagerecommendations=Storage recommendations
+disksandvolumes=Disks & volumes
+savelocations=Default save locations
+tabletmode=Tablet mode
+multitasking=Multitasking
+multitasking-sgupdate=Multitasking (sgupdate)
+project=Projecting to this PC
+crossdevice=Shared experiences
+clipboard=Clipboard
+remotedesktop=Remote Desktop
+deviceencryption=Encryption
+troubleshoot=Troubleshoot
+recovery=Recovery
+activation=Activation
+developers=For developers
+about=About
+controlcenter=Control center
+phone=Phone
+bluetooth=Bluetooth
+connecteddevices=Connected devices
+printers=Printers & scanners
+mousetouchpad=Mouse & touchpad
+devices-touchpad=Touchpad
+devices-touch=Touch
+wheel=Wheel
+pen=Pen & Windows Ink
+pen-button=Pen shortcut button
+camera=Camera settings
+devicestyping-hwkbtextsuggestions=Text suggestions
+typing=Typing
+autoplay=AutoPlay
+usb=USB
+mobile-devices=Phone Link (Your phone)
+mobile-devices-addphone=Phone Link – Add phone
+mobile-devices-addphone-direct=Phone Link app
+deviceusage=Device usage
+network-status=Network & internet
+network-advancedsettings=Advanced network settings
+datausage=Data usage
+ms-availablenetworks:=Available networks
+network-cellular=Cellular & SIM
+network-wifi=Wi-Fi
+network-wifisettings=Manage known networks
+wifi-provisioning=Wi-Fi provisioning
+network-wificalling=Wi-Fi calling
+network-ethernet=Ethernet
+network-dialup=Dial-up
+network-directaccess=DirectAccess
+network-vpn=VPN
+network-airplanemode=Airplane mode
+proximity=Airplane mode – Proximity
+network-mobilehotspot=Mobile hotspot
+nfctransactions=NFC
+network-proxy=Proxy
+personalization=Personalization
+personalization-background=Background
+colors=Colors
+personalization-colors=Colors
+lockscreen=Lock screen
+themes=Themes
+fonts=Fonts
+personalization-start=Start
+personalization-start-places=Choose which folders appear on Start
+taskbar=Taskbar
+personalization-textinput=Text input
+personalization-touchkeyboard=Touch keyboard
+personalization-textinput-copilot-hardwarekey=Customize Copilot key on keyboard
+personalization-lighting=Dynamic Lighting
+personalization-glance=Glance
+personalization-navbar=Navigation bar
+appsfeatures=Apps & features
+appsfeatures-app=App features
+optionalfeatures=Manage optional features
+defaultapps=Default apps
+defaultbrowsersettings=Default browser settings
+maps=Offline maps
+maps-downloadmaps=Download maps
+appsforwebsites=Apps for websites
+videoplayback=Video playback
+startupapps=Startup apps
+yourinfo=Your info
+emailandaccounts=Email & app accounts
+signinoptions=Sign-in options
+signinoptions-dynamiclock=Dynamic lock
+signinoptions-launchfaceenrollment=Windows Hello face setup
+signinoptions-launchfingerprintenrollment=Windows Hello fingerprint setup
+signinoptions-launchsecuritykeyenrollment=Security key setup
+workplace=Access work or school
+workplace-provisioning=Provisioning (enterprise)
+provisioning=Provisioning (mobile)
+workplace-repairtoken=Repair token
+otherusers=Family & other people
+family-group=Family group
+assignedaccess=Set up a kiosk
+windowsanywhere=Windows Anywhere
+sync=Sync your settings
+backup=Backup
+dateandtime=Date & time
+regionlanguage=Language & region
+regionformatting=Region
+keyboard=Language – Keyboard
+keyboard-advanced=Language – Advanced keyboard settings
+regionlanguage-jpnime=Japan IME settings
+regionlanguage-chsime-pinyin=Pinyin IME settings
+regionlanguage-chsime-pinyin-domainlexicon=Pinyin domain lexicon
+regionlanguage-chsime-pinyin-keyconfig=Pinyin key configuration
+regionlanguage-chsime-pinyin-udp=Pinyin user-defined phrases
+regionlanguage-chsime-wubi=Wubi IME settings
+regionlanguage-chsime-wubi-udp=Wubi user-defined phrases
+regionlanguage-bpmfime=Bopomofo IME
+regionlanguage-cangjieime=Cangjie IME
+regionlanguage-quickime=Quick IME
+regionlanguage-korime=Korean IME
+regionlanguage-setdisplaylanguage=Windows display language
+regionlanguage-adddisplaylanguage=Add a display language
+speech=Speech
+ms-clock:=Clock
+gaming-gamebar=Game bar
+gaming-gamedvr=Game DVR
+gaming-gamemode=Game Mode
+gaming-fullscreen=Xbox Mode
+gaming-xboxnetworking=Xbox networking
+gaming-trueplay=TruePlay
+easeofaccess-display=Display
+easeofaccess-cursor=Text cursor
+easeofaccess-magnifier=Magnifier
+easeofaccess-colorfilter=Color filters
+easeofaccess-colorfilter-adaptivecolorlink=Color filters – Adaptive color
+easeofaccess-colorfilter-bluelightlink=Color filters – Blue light
+easeofaccess-highcontrast=High contrast
+easeofaccess-narrator=Narrator
+easeofaccess-narrator-isautostartenabled=Narrator – Start after sign-in
+easeofaccess-audio=Audio
+easeofaccess-closedcaptioning=Closed captions
+easeofaccess-speechrecognition=Speech
+easeofaccess-hearingaids=Hearing devices
+easeofaccess-keyboard=Keyboard
+easeofaccess-mouse=Mouse
+easeofaccess-mousepointer=Mouse pointer & touch
+easeofaccess-eyecontrol=Eye control
+easeofaccess-visualeffects=Visual effects
+windowsdefender=Windows Security
+windowsdefender:=Open Windows Security
+search=Search
+search-permissions=Search permissions
+search-moredetails=Search more details
+privacy-general=General
+privacy-speech=Speech
+privacy-speechtyping=Inking & typing
+privacy-feedback=Feedback & diagnostics
+privacy-feedback-telemetryviewergroup=Diagnostic data viewer
+privacy-activityhistory=Activity history
+privacy-location=Location
+privacy-webcam=Camera
+privacy-microphone=Microphone
+privacy-voiceactivation=Voice activation
+privacy-notifications=Notifications
+privacy-accountinfo=Account info
+findmydevice=Find my device
+privacy-contacts=Contacts
+privacy-calendar=Calendar
+privacy-phonecalls=Phone calls
+privacy-callhistory=Call history
+privacy-email=Email
+privacy-eyetracker=Eye tracker
+privacy-tasks=Tasks
+privacy-messaging=Messaging
+privacy-radios=Radios
+privacy-customdevices=Other devices
+privacy-appdiagnostics=App diagnostics
+privacy-automaticfiledownloads=Automatic file downloads
+privacy-documents=Documents
+privacy-downloadsfolder=Downloads folder
+privacy-pictures=Pictures
+privacy-videos=Videos
+privacy-broadfilesystemaccess=File system
+privacy-musiclibrary=Music library
+privacy-motion=Motion
+privacy-backgroundspatialperception=Background spatial perception
+privacy-graphicscaptureprogrammatic=Graphics capture (programmatic)
+privacy-graphicscapturewithoutborder=Graphics capture (without border)
+privacy-backgroundapps=Background apps
+privacy-accessoryapps=Accessory apps
+privacy-advertisingid=Advertising ID
+windowsupdate=Windows Update
+windowsupdate-action=Check for updates
+windowsupdate-optionalupdates=Optional updates
+windowsupdate-activehours=Active hours
+windowsupdate-history=View update history
+windowsupdate-restartoptions=Restart options
+windowsupdate-options=Advanced options
+windowsupdate-seekerondemand=Seeker on demand
+delivery-optimization=Delivery Optimization
+delivery-optimization-activity=Delivery Optimization – Activity
+delivery-optimization-advanced=Delivery Optimization – Advanced
+windowsinsider=Windows Insider Program
+windowsinsider-optin=Windows Insider Program – Opt in
+surfacehub-accounts=Surface Hub – Accounts
+surfacehub-sessioncleanup=Surface Hub – Session cleanup
+surfacehub-calling=Surface Hub – Team conferencing
+surfacehub-welcome=Surface Hub – Welcome screen
+surfacehub-devicemanagement=Surface Hub – Team device management
+holographic=Mixed Reality
+holographic-audio=Audio and speech
+privacy-holographic-environment=Environment
+holographic-headset=Headset display
+holographic-management=Uninstall
+holographic-startupandesktop=Startup and desktop
+extras=Extras
+ms-windows-store:=Microsoft Store`.split("\n").forEach(function(l){var i=l.indexOf("=");if(i>0)EN[l.slice(0,i)]=l.slice(i+1)});
 var NM={n:"신규",f:"수정",o:"구버전",u:"미수록"};
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 var tot={n:0,f:0,o:0,u:0,all:0},bus="",html="";
@@ -138,7 +373,8 @@ g[4].forEach(function(s){
 var p=s.split("|"),uri=p[2].indexOf(":")>-1?p[2]:"ms-settings:"+p[2],fl=p[3]||"",gs="";
 tot.all++;
 fl.split("").forEach(function(c){if(NM[c]){tot[c]++;gs+='<span class="g '+c+'">'+NM[c]+"</span>";if(c=="n")cn++}});
-rows+='<tr><td class="e">'+p[0]+'</td><td><a href="'+uri+'">'+esc(p[1])+(p[4]?'</a><span class="nt">'+esc(p[4])+"</span>":"</a>")+'</td><td><a href="'+uri+'"><code>'+esc(uri)+"</code></a></td><td>"+gs+"</td></tr>";
+var en=EN[p[2]]||"",ko=p[1],nm=en&&en.toLowerCase()!=ko.toLowerCase(),note=p[4]&&p[4].indexOf("원문")!==0?p[4]:"";
+rows+='<tr data-en="'+esc(en)+'" data-ko="'+esc(ko)+'" data-u="'+esc(uri)+'"><td class="e">'+p[0]+'</td><td><a href="'+uri+'">'+(en?'<span class="en" data-o="'+esc(en)+'">'+esc(en)+'</span>':'')+(nm?'<span class="sp"> · </span>':'')+(nm||!en?'<span class="ko" data-o="'+esc(ko)+'">'+esc(ko)+'</span>':'')+'</a>'+(note?'<span class="nt">'+esc(note)+'</span>':'')+'</td><td><a href="'+uri+'"><code data-o="'+esc(uri)+'">'+esc(uri)+'</code></a></td><td>'+gs+'</td></tr>';
 });
 bus+='<a class="tile" href="#c'+gi+'"><b>'+g[0]+"</b><i>"+esc(g[1])+"</i><small>"+g[4].length+"개"+(cn?" · 신규 "+cn:"")+"</small></a>";
 html+='<section id="c'+gi+'" class="card"><h2>'+g[0]+" "+esc(g[1])+' <small style="font-weight:400;color:var(--mute);font-size:11.5px">'+esc(g[3])+'</small></h2><div class="wrap"><table><tr><th></th><th>설정 페이지</th><th>URI</th><th>구분</th></tr>'+rows+"</table></div></section>";
@@ -148,20 +384,24 @@ document.getElementById("m").innerHTML=html;
 document.getElementById("stat").innerHTML='<b>전체 '+tot.all+'개</b><span class="g n">신규 '+tot.n+'</span><span class="g f">수정 '+tot.f+'</span><span class="g o">구버전 '+tot.o+'</span><span class="g u">미수록 '+tot.u+"</span>";
 document.getElementById("log").insertAdjacentHTML("beforeend",L.map(function(r){return"<tr><td><b>"+esc(r[0])+"</b></td><td>"+esc(r[1])+"</td></tr>"}).join(""));
 document.getElementById("q").addEventListener("input",function(e){
-var k=e.target.value.trim().toLowerCase();
+var k=e.target.value.trim().toLowerCase(),re=k?new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"):null;
 document.querySelectorAll("#m section").forEach(function(s){
 var any=false;
-s.querySelectorAll("tr").forEach(function(r,i){if(!i)return;var ok=!k||r.textContent.toLowerCase().indexOf(k)>-1;r.hidden=!ok;if(ok)any=true});
+s.querySelectorAll("tr").forEach(function(r,i){if(!i)return;var d=r.dataset,ok=!k||(d.en+" "+d.ko+" "+d.u).toLowerCase().indexOf(k)>-1;r.hidden=!ok;if(ok)any=true;hlRow(r,ok?re:null)});
 s.hidden=!any;
 });
 layout();
+mark(k);
 });
+function hl(t,re){if(!re)return esc(t);var o="",i=0,m;re.lastIndex=0;while((m=re.exec(t))){o+=esc(t.slice(i,m.index))+"<mark>"+esc(m[0])+"</mark>";i=m.index+m[0].length;if(!m[0].length)re.lastIndex++}return o+esc(t.slice(i))}
+function hlRow(r,re){r.querySelectorAll("[data-o]").forEach(function(el){el.innerHTML=hl(el.getAttribute("data-o"),re)})}
 var m=document.getElementById("m"),secs=[].slice.call(m.querySelectorAll("section")),nc=0;
 function layout(){var n=Math.max(1,Math.min(3,Math.floor(m.clientWidth/560)));nc=n;var cols=[];m.innerHTML="";for(var i=0;i<n;i++){var c=document.createElement("div");c.className="col";m.appendChild(c);cols.push(c)}
 secs.forEach(function(s){var t=cols[0];cols.forEach(function(c){if(c.offsetHeight<t.offsetHeight)t=c});t.appendChild(s)})}
 layout();
 var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){var n=Math.max(1,Math.min(3,Math.floor(m.clientWidth/560)));if(n!=nc)layout()},150)});
 document.getElementById("bus").addEventListener("click",function(e){var t=e.target.closest("a.tile");if(!t)return;e.preventDefault();var el=document.getElementById(t.getAttribute("href").slice(1));if(!el)return;el.scrollIntoView({behavior:"smooth",block:"start"});el.classList.add("hl");clearTimeout(el._h);el._h=setTimeout(function(){el.classList.remove("hl")},1000)});
+function mark(k){document.querySelectorAll("#m mark").forEach(function(x){x.replaceWith(document.createTextNode(x.textContent))});document.querySelectorAll("#m td").forEach(function(td){td.normalize()});if(!k)return;var re=new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi");document.querySelectorAll("#m td:not(.e)").forEach(function(td){var w=document.createTreeWalker(td,NodeFilter.SHOW_TEXT),ns=[],n;while(n=w.nextNode())ns.push(n);ns.forEach(function(t){var v=t.nodeValue;if(!re.test(v)){re.lastIndex=0;return}re.lastIndex=0;var f=document.createDocumentFragment(),i=0,m;while((m=re.exec(v))){if(!m[0])break;f.appendChild(document.createTextNode(v.slice(i,m.index)));var mk=document.createElement("mark");mk.textContent=m[0];f.appendChild(mk);i=m.index+m[0].length}f.appendChild(document.createTextNode(v.slice(i)));t.parentNode.replaceChild(f,t)})})}
 </script>
 </body>
 </html>
