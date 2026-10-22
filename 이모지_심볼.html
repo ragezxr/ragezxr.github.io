@@ -6,6 +6,7 @@
 3. 공통 적용 시 양쪽의 기능적 차이와 고유 데이터는 유지하되, 요청된 동작·UI·디자인 규칙은 일관되게 반영한다.
 4. 수정할 때 기존 기능, 토글 상태, 검색·복사·상세 팝업 및 콤팩트 모드 동작을 불필요하게 제거하거나 변경하지 않는다.
 5. 중복 최적화는 실제 스타일시트의 동일 선택자·동일 선언·동일 조건 규칙만 대상으로 하며, 스크립트 내 문자열·템플릿과 기능별 코드는 변경하지 않는다.
+6. 피부색·머리 형태 등의 추가 이모지 조합은 전체 항목·전체 검색 및 '사람·신체' 상위 분류의 목록에 표시하지 않는다. 기본형 이모지의 상세 팝업에서 추가 조합을 제공하는 기존 기능은 유지한다.
 -->
 <html lang="ko">
 <head>
@@ -14,7 +15,7 @@
 <meta name="color-scheme" content="dark">
 <title>✨ 이모지 &amp; 🔣 심볼</title>
 <style>
-:root{color-scheme:dark}*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#10151d}iframe.explorer-frame{will-change:transform;position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:0;display:block;visibility:hidden;pointer-events:none;background:#10151d;contain:strict}iframe.explorer-frame.active{visibility:visible;pointer-events:auto}
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#10151d}iframe.explorer-frame{will-change:transform;position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:0;display:block;visibility:hidden;opacity:0;pointer-events:none;background:#10151d;contain:strict}iframe.explorer-frame.active{visibility:visible;pointer-events:auto}iframe.explorer-frame.ready{opacity:1}iframe.explorer-frame.active:not(.ready){background:#10151d}
 #navHistoryControls{display:none!important;position:fixed;z-index:2147483000;top:8px;right:8px;opacity:.5;transform:none;transform-origin:top right;display:flex;gap:5px;padding:4px;border:1px solid rgba(132,157,190,.42);border-radius:12px;background:rgba(15,22,33,.88);box-shadow:0 3px 14px #0005;backdrop-filter:blur(8px)}#navHistoryControls button{width:34px;height:32px;padding:0;border:1px solid #42536b;border-radius:8px;background:#202d40;color:#eaf3ff;font:700 20px/1 system-ui,sans-serif;cursor:pointer}#navHistoryControls button:hover:not(:disabled){background:#345071;border-color:#8abaff}#navHistoryControls button:disabled{opacity:.35;cursor:default}#navHistoryControls button:focus-visible{outline:2px solid #8abaff;outline-offset:2px}@media(max-width:560px){#navHistoryControls{top:5px;right:5px;gap:3px;padding:3px}#navHistoryControls button{width:30px;height:29px;font-size:18px}}
 </style>
 
@@ -43,6 +44,7 @@
 </style>
 </head>
 <body>
+<!-- 초기 표시 최적화: 첫 화면 iframe을 먼저 표시하고, 반대편 페이지는 기존 유휴 시간(preload) 절차로 지연 로드합니다. 비필수 팝업·도움말은 첫 화면 표시 이후 초기화되도록 유지합니다. -->
 
 <iframe id="emojiFrame" class="explorer-frame" title="이모지 탐색기" allow="clipboard-read; clipboard-write"></iframe>
 <iframe id="specialFrame" class="explorer-frame" title="특수문자 탐색기" allow="clipboard-read; clipboard-write"></iframe>
@@ -801,7 +803,11 @@ return;
       const subcategory = ensureCardSubcategory(card);
       // 세부 분류는 필터가 아니라 해당 그룹 위치로 이동하는 탐색 명령입니다.
       const subgroupMatches = true;
-      const isBaseEmoji = !card.classList.contains('variant-hidden') && card.dataset.category !== '이모지 구성요소';
+      const cardGlyph = card.querySelector('.emoji-main')?.dataset.emoji || '';
+      const isExtraCombination = !!cardGlyph && (SKIN_TONE_RE.test(cardGlyph) || HAIR_SEQUENCE_RE.test(cardGlyph));
+      // 전체 보기(전체 검색 포함)와 '사람·신체' 상위 분류에서는 기본형 연결 여부와 관계없이 추가 조합을 목록에 표시하지 않습니다.
+      const suppressExtraCombination = isExtraCombination && (globalSearchActive || activeCategory === '전체' || card.dataset.category === '사람·신체');
+      const isBaseEmoji = !card.classList.contains('variant-hidden') && !suppressExtraCombination && card.dataset.category !== '이모지 구성요소';
       const show = isBaseEmoji && subgroupMatches && (!query || matchesSearch(getSearchIndex(card), query));
       card.hidden = !show;
       if (show) {
@@ -5845,6 +5851,7 @@ const emojiFrame = document.getElementById('emojiFrame');
 const specialFrame = document.getElementById('specialFrame');
 const frames = { emoji: emojiFrame, special: specialFrame };
 const loaded = { emoji: false, special: false };
+for (const frame of Object.values(frames)) frame.addEventListener('load', () => { frame.classList.add('ready'); }, { once: true });
 function focusExplorerSearch(mode=currentMode){const frame=frames[mode];const input=frame?.contentDocument?.getElementById('searchInput');if(!input||!frame.classList.contains('active'))return;try{input.focus({preventScroll:true});input.setSelectionRange(input.value.length,input.value.length);}catch(_){try{input.focus();}catch(__){}}}
 
 const MODE_KEY = 'emoji-symbol-last-mode-v1';
@@ -6383,7 +6390,8 @@ document.addEventListener('input',event=>{if(event.target&&event.target.classLis
     doc.addEventListener('wheel', e => {
       if (loading || unifiedQuery.trim() || e.ctrlKey || e.metaKey) return;
       const target = e.target;
-      const overTabs = !!(target && target.closest && target.closest('#topFilterChips, #bottomFilterChips'));
+      const overTabs = !!(target && target.closest && target.closest('#topFilterChips, .subcategory-chips, .subcategory-area'));
+      // 하단 상위항목 탭(#bottomFilterChips)은 휠로 분류 이동하지 않으며, 상단 상세항목 탭에서는 휠 이동을 허용합니다.
       const horizontalWheel = Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 8;
       const shiftWheel = e.shiftKey && Math.abs(e.deltaY) > 8;
       if (!overTabs && !horizontalWheel && !shiftWheel) return;
