@@ -602,32 +602,38 @@
 
         function createHistoryColorButton(item, compact = false) {
             const info = findCssColorInfo(item.hex);
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = compact
-                ? 'min-w-0 flex items-center gap-2 p-2 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-indigo-400 hover:bg-slate-800 transition-colors text-left'
-                : 'min-w-0 flex flex-col gap-1.5 p-2 rounded-xl border border-slate-700 bg-slate-950/70 hover:border-indigo-400 hover:bg-slate-800 transition-colors text-left';
-            button.title = `${item.hex} · 클릭하여 기준 색상으로 적용`;
+            // 카드 전체(HEX 버튼 제외)를 클릭하면 해당 색상을 기준값으로 적용합니다.
+            const card = document.createElement('div');
+            card.className = compact
+                ? 'min-w-0 flex items-center gap-2 p-2 rounded-xl border border-slate-700 bg-slate-950/80 hover:border-indigo-400 hover:bg-slate-800 transition-colors text-left cursor-pointer'
+                : 'min-w-0 flex flex-col gap-1.5 p-2 rounded-xl border border-slate-700 bg-slate-950/70 hover:border-indigo-400 hover:bg-slate-800 transition-colors text-left cursor-pointer';
+            card.title = `${item.hex} · 색상 영역 클릭: 기준값 적용 / HEX 클릭: 값 복사`;
             const swatch = document.createElement('span');
             swatch.className = compact ? 'w-8 h-8 rounded-lg border border-white/20 shrink-0' : 'w-full h-9 rounded-lg border border-white/20';
             swatch.style.backgroundColor = item.hex;
             const details = document.createElement('span');
             details.className = 'min-w-0 flex-1';
-            const hex = document.createElement('span');
-            hex.className = 'block text-[11px] font-mono font-bold text-slate-100 truncate';
+            const hex = document.createElement('button');
+            hex.type = 'button';
+            hex.className = 'history-hex-copy block max-w-full text-[11px] font-mono font-bold text-slate-100 truncate text-left cursor-copy hover:text-green-300 hover:underline focus:outline-none focus-visible:ring-1 focus-visible:ring-green-400 rounded-sm';
             hex.textContent = item.hex;
+            hex.title = `${item.hex} 복사`;
+            hex.setAttribute('aria-label', `${item.hex} HEX 값 복사`);
+            hex.addEventListener('click', event => {
+                event.stopPropagation();
+                copyToClipboard(item.hex, 'HEX 값');
+            });
             const name = document.createElement('span');
             name.className = 'block text-[10px] text-slate-400 truncate';
             name.textContent = info.exact ? info.names.join(' / ') : `≈ ${info.name}`;
             details.append(hex, name);
-            if (compact) button.append(swatch, details);
-            else button.append(swatch, details);
-            button.addEventListener('click', () => {
+            card.append(swatch, details);
+            card.addEventListener('click', () => {
                 updateBaseColor(item.hex);
                 toast(`이전 색상을 기준값으로 적용했습니다: ${item.hex}`, item.hex);
                 closeColorHistoryPopup();
             });
-            return button;
+            return card;
         }
 
         function renderBaseColorHistory() {
